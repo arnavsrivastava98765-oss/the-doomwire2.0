@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "DoomWire Companion Shield",
+  "version": "1.0.0",
+  "description": "Active native firewall companion for DoomWire 3D Cyber-Radar. Enforces Cut-the-Wire rules across your browser.",
+  "permissions": [
+    "declarativeNetRequest",
+    "declarativeNetRequestFeedback",
+    "storage"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "DoomWire Active Shield"
+  }
+}
