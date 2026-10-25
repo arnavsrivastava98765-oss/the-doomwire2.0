@@ -34,7 +34,7 @@ import {
   X
 } from 'lucide-react';
 
-const SOCKET_SERVER_URL = 'http://localhost:5000';
+const SOCKET_SERVER_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
 
 // Web Audio Tactical Synthesizer
 class TacticalAudio {
