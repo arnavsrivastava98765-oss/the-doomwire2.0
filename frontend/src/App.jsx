@@ -310,6 +310,31 @@ export default function App() {
     }
   }, []);
 
+  // Pre-seed tactical surveillance perimeter on load so the 3D globe is active immediately
+  useEffect(() => {
+    const initialBeacons = SIMULATED_BEACONS.slice(0, 5).map((b, idx) => ({
+      id: `init-${idx}`,
+      domain: b.domain,
+      company: b.company,
+      city: b.city,
+      ip: b.ip,
+      threatLevel: b.threatLevel,
+      trackerType: b.trackerType,
+      leakedData: b.leakedData,
+      startLat: userLocation.lat,
+      startLng: userLocation.lng,
+      endLat: b.geo.lat,
+      endLng: b.geo.lng,
+      color: b.threatLevel === 'red' ? '#ff0055' : b.threatLevel === 'orange' ? '#ff7700' : '#00f0ff',
+      geo: b.geo,
+      isSevered: false,
+      isPoisoned: false
+    }));
+    setArcs(initialBeacons);
+    setPackets(initialBeacons);
+    setSelectedPacket(initialBeacons[0]);
+  }, [userLocation]);
+
   // Responsive Globe Container Resizing
   useEffect(() => {
     const handleResize = () => {
@@ -1062,14 +1087,14 @@ export default function App() {
 
           <div className="flex items-center gap-1.5 pl-2 border-l border-slate-800">
             <span
-              className="w-2 h-2 rounded-full animate-pulse"
+              className="w-2.5 h-2.5 rounded-full animate-pulse"
               style={{
-                backgroundColor: socketConnected ? currentTheme.primary : '#38bdf8',
-                boxShadow: `0 0 8px ${socketConnected ? currentTheme.primary : 'rgba(56, 189, 248, 0.6)'}`
+                backgroundColor: '#10b981',
+                boxShadow: '0 0 10px rgba(16, 185, 129, 0.8)'
               }}
             ></span>
-            <span className="text-[10px] text-slate-400 font-bold hidden sm:inline">
-              {socketConnected ? 'LIVE WORKER' : 'SIMULATION MODE'}
+            <span className="text-[10px] text-emerald-400 font-bold font-mono tracking-wider hidden sm:inline">
+              ONLINE // {socketConnected ? 'LIVE WORKER' : 'ACTIVE RADAR'}
             </span>
           </div>
         </div>
