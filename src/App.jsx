@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import Globe from 'react-globe.gl';
+import * as THREE from 'three';
 import { io } from 'socket.io-client';
 import {
   ShieldAlert,
@@ -31,48 +32,60 @@ import {
   Sliders,
   X,
   Palette,
-  Sparkles,
-  Award,
-  Download,
-  BookOpen,
-  Info,
-  ShieldCheck,
-  FileText
+  Sparkles
 } from 'lucide-react';
 
 const SOCKET_SERVER_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
 
-// 3 Dark Aesthetic Themes with Custom Lighting & Vibe
+// 4 Minimalist Dark Aesthetic Themes with Colored Hairline Borders
 const THEMES = {
-  CYBER_CYAN: {
-    id: 'CYBER_CYAN',
-    name: 'CYBER-CYAN',
-    tag: 'TACTICAL RADAR',
-    primary: '#00f0ff',
-    primaryGlow: 'rgba(0, 240, 255, 0.45)',
-    secondary: '#38bdf8',
-    atmosphere: '#00f0ff',
-    radarColor: '#00f0ff'
+  OBSIDIAN_BLUE: {
+    id: 'OBSIDIAN_BLUE',
+    name: 'OBSIDIAN // BLUE',
+    tag: 'TACTICAL BLUE',
+    primary: '#38bdf8',
+    primaryGlow: 'rgba(56, 189, 248, 0.25)',
+    secondary: '#60a5fa',
+    atmosphere: '#0284c7',
+    radarColor: '#38bdf8',
+    border: 'rgba(56, 189, 248, 0.28)',
+    surfaceBg: 'rgba(8, 12, 22, 0.88)'
   },
-  VOID_PURPLE: {
-    id: 'VOID_PURPLE',
-    name: 'VOID-PURPLE',
-    tag: 'DEEP NEBULA',
+  DEEP_VIOLET: {
+    id: 'DEEP_VIOLET',
+    name: 'VOID // PURPLE',
+    tag: 'PURPLISH BLACK',
     primary: '#c084fc',
-    primaryGlow: 'rgba(192, 132, 252, 0.45)',
+    primaryGlow: 'rgba(192, 132, 252, 0.25)',
     secondary: '#ec4899',
-    atmosphere: '#9333ea',
-    radarColor: '#c084fc'
+    atmosphere: '#7e22ce',
+    radarColor: '#c084fc',
+    border: 'rgba(192, 132, 252, 0.3)',
+    surfaceBg: 'rgba(14, 8, 24, 0.88)'
   },
-  MATRIX_EMERALD: {
-    id: 'MATRIX_EMERALD',
-    name: 'MATRIX-NEO',
-    tag: 'CLASSIFIED TERMINAL',
-    primary: '#00ff88',
-    primaryGlow: 'rgba(0, 255, 136, 0.45)',
-    secondary: '#10b981',
-    atmosphere: '#10b981',
-    radarColor: '#00ff88'
+  CRIMSON_PROTOCOL: {
+    id: 'CRIMSON_PROTOCOL',
+    name: 'CRIMSON // RED',
+    tag: 'STEALTH RED',
+    primary: '#f43f5e',
+    primaryGlow: 'rgba(244, 63, 94, 0.25)',
+    secondary: '#fb7185',
+    atmosphere: '#be123c',
+    radarColor: '#f43f5e',
+    border: 'rgba(244, 63, 94, 0.3)',
+    surfaceBg: 'rgba(16, 7, 10, 0.88)'
+  },
+  NEO_EMERALD: {
+    id: 'NEO_EMERALD',
+    name: 'EMERALD // BLACK',
+    tag: 'TACTICAL SAGE',
+    primary: '#10b981',
+    primaryGlow: 'rgba(16, 185, 129, 0.25)',
+    secondary: '#34d399',
+    atmosphere: '#047857',
+    radarColor: '#10b981',
+    border: 'rgba(16, 185, 129, 0.28)',
+    surfaceBg: 'rgba(6, 14, 9, 0.88)'
   }
 };
 
@@ -251,7 +264,7 @@ class TacticalAudio {
 const audioFX = new TacticalAudio();
 
 export default function App() {
-  const [currentThemeKey, setCurrentThemeKey] = useState('CYBER_CYAN');
+  const [currentThemeKey, setCurrentThemeKey] = useState('OBSIDIAN_BLUE');
   const currentTheme = THEMES[currentThemeKey];
 
   const [socketConnected, setSocketConnected] = useState(false);
@@ -267,8 +280,6 @@ export default function App() {
   const [safeViewImg, setSafeViewImg] = useState(null);
   const [showSafeViewModal, setShowSafeViewModal] = useState(false);
   const [showInspectorModal, setShowInspectorModal] = useState(false);
-  const [showJudgesModal, setShowJudgesModal] = useState(false);
-  const [judgesTab, setJudgesTab] = useState('PITCH');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [muted, setMuted] = useState(false);
   const [autoRotate, setAutoRotate] = useState(true);
@@ -282,14 +293,14 @@ export default function App() {
   const [globeDimensions, setGlobeDimensions] = useState({ width: window.innerWidth, height: window.innerHeight - 120 });
   const socketRef = useRef(null);
 
-  // Cycle through 3 dark aesthetic themes
+  // Cycle through 4 dark minimalist aesthetic themes
   const cycleTheme = () => {
     audioFX.init();
     const themeKeys = Object.keys(THEMES);
     const nextIdx = (themeKeys.indexOf(currentThemeKey) + 1) % themeKeys.length;
     const nextKey = themeKeys[nextIdx];
     setCurrentThemeKey(nextKey);
-    audioFX.playBlip(nextKey === 'CYBER_CYAN' ? 800 : nextKey === 'VOID_PURPLE' ? 950 : 620, 0.08);
+    audioFX.playBlip(nextKey === 'OBSIDIAN_BLUE' ? 750 : nextKey === 'DEEP_VIOLET' ? 880 : nextKey === 'CRIMSON_PROTOCOL' ? 620 : 690, 0.06);
   };
 
   // Location detection
@@ -367,6 +378,76 @@ export default function App() {
       }
     }
   }, [autoRotate]);
+
+  // Configure Authentic NASA Earth Night Lights & ISS-grade Space Lighting
+  const configureGlobeLighting = useCallback(() => {
+    if (!globeRef.current) return;
+    try {
+      const globeMat = globeRef.current.globeMaterial();
+      if (globeMat) {
+        // Boost emissive city lights for radiant, luminous night glow from space
+        if (globeMat.map) {
+          globeMat.emissiveMap = globeMat.map;
+          globeMat.emissive = new THREE.Color(0xfff5dd);
+          globeMat.emissiveIntensity = 2.4;
+        } else {
+          globeMat.emissive = new THREE.Color(0xfff5dd);
+          globeMat.emissiveIntensity = 2.0;
+        }
+        globeMat.bumpScale = 14;
+        globeMat.needsUpdate = true;
+      }
+
+      const scene = globeRef.current.scene();
+      if (scene && !scene.userData.nightLightConfigured) {
+        // Deep contrast ambient so oceans stay pitch black while city lights blaze
+        const ambient = new THREE.AmbientLight(0xffffff, 0.28);
+        scene.add(ambient);
+
+        // Soft sun ray highlighting land topography
+        const sunLight = new THREE.DirectionalLight(0xfffaea, 0.7);
+        sunLight.position.set(2, 1.5, 2);
+        scene.add(sunLight);
+
+        // Planetary horizon rim light
+        const rimLight = new THREE.DirectionalLight(0x7dd3fc, 0.5);
+        rimLight.position.set(-2, -1.5, -2);
+        scene.add(rimLight);
+
+        scene.userData.nightLightConfigured = true;
+      }
+    } catch (err) {
+      console.warn('Globe lighting setup:', err);
+    }
+  }, []);
+
+  // Ensure asynchronous texture load locks in the emissive night city map
+  useEffect(() => {
+    let attempts = 0;
+    const interval = setInterval(() => {
+      if (globeRef.current) {
+        const mat = globeRef.current.globeMaterial();
+        if (mat && mat.map) {
+          mat.emissiveMap = mat.map;
+          mat.emissive = new THREE.Color(0xfff5dd);
+          mat.emissiveIntensity = 2.4;
+          mat.bumpScale = 14;
+          mat.needsUpdate = true;
+          clearInterval(interval);
+        }
+      }
+      attempts++;
+      if (attempts > 30) clearInterval(interval);
+    }, 200);
+    return () => clearInterval(interval);
+  }, [globeDimensions]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      configureGlobeLighting();
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [configureGlobeLighting, globeDimensions]);
 
   // Socket.io Connection & Events
   useEffect(() => {
@@ -774,46 +855,6 @@ export default function App() {
     }
   };
 
-  const exportSecurityAuditReport = () => {
-    audioFX.playBlip(820, 0.06);
-    const threatCount = packets.filter((p) => p.threatLevel === 'red' || p.threatLevel === 'orange').length;
-    const privacyScore = Math.max(5, 100 - threatCount * 12);
-
-    const reportData = {
-      system: 'DoomWire Active Privacy Firewall & Tactical Cyber-Radar',
-      author: 'Arnav (arnavsrivastava98765-oss)',
-      targetUrl,
-      timestamp: new Date().toISOString(),
-      privacyRatingScore: `${privacyScore}/100`,
-      overallAssessment: threatCount > 4 ? 'CRITICAL SURVEILLANCE RISK' : threatCount > 0 ? 'MODERATE TRACKING EXPOSURE' : 'MINIMAL THREAT',
-      metrics: {
-        totalInterceptedBeacons: packets.length,
-        highRiskSurveillanceVectors: threatCount,
-        severedWires: blockedDomains.size,
-        poisonedFeeds: poisonedDomains.size
-      },
-      severedDomains: Array.from(blockedDomains),
-      poisonedDomains: Array.from(poisonedDomains),
-      interceptedVectors: packets.map((p) => ({
-        domain: p.domain,
-        company: p.company,
-        city: p.city,
-        ip: p.ip,
-        threatLevel: p.threatLevel,
-        status: blockedDomains.has(p.domain) || p.isSevered ? 'SEVERED' : poisonedDomains.has(p.domain) || p.isPoisoned ? 'POISONED' : 'ACTIVE_LEAK',
-        leakedData: p.leakedData || []
-      }))
-    };
-
-    const blob = new Blob([JSON.stringify(reportData, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `doomwire-audit-${targetUrl.replace(/https?:\/\//, '').replace(/[^a-zA-Z0-9]/g, '_')}-${Date.now()}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
   // Camera Controls
   const zoomIn = () => {
     if (!globeRef.current) return;
@@ -917,21 +958,21 @@ export default function App() {
   return (
     <div
       data-theme={currentThemeKey}
-      className="flex flex-col h-screen w-screen text-slate-100 overflow-hidden font-mono select-none relative deep-space-canvas"
+      className="flex flex-col h-screen w-screen text-slate-100 overflow-hidden select-none relative deep-space-canvas"
     >
-      <div className="scanline"></div>
-
       {/* 1. TOP HEADER: Tactical HUD Navigation & by-Arnavvv Signature */}
-      <header className="h-14 tactical-panel z-30 flex items-center justify-between px-4 border-b border-cyan-500/25 flex-shrink-0">
+      <header
+        className="h-14 tactical-panel z-30 flex items-center justify-between px-4 border-b flex-shrink-0"
+        style={{ borderColor: currentTheme.border }}
+      >
         <div className="flex items-center gap-3">
           <div
-            className="flex items-center justify-center w-8 h-8 rounded-lg bg-black/60 border shadow-lg transition-all"
+            className="flex items-center justify-center w-8 h-8 rounded-lg bg-black/60 border shadow-sm transition-all"
             style={{
-              borderColor: currentTheme.primary,
-              boxShadow: `0 0 14px ${currentTheme.primaryGlow}`
+              borderColor: currentTheme.border
             }}
           >
-            <ShieldAlert className="w-4 h-4 animate-pulse" style={{ color: currentTheme.primary }} />
+            <ShieldAlert className="w-4 h-4" style={{ color: currentTheme.primary }} />
           </div>
           <div>
             <div className="flex items-center gap-2">
@@ -946,7 +987,7 @@ export default function App() {
               <span
                 className="text-[9px] uppercase tracking-widest px-1.5 py-0.5 rounded border font-mono font-bold"
                 style={{
-                  borderColor: currentTheme.primary,
+                  borderColor: currentTheme.border,
                   color: currentTheme.primary,
                   background: 'rgba(0,0,0,0.5)'
                 }}
@@ -969,25 +1010,24 @@ export default function App() {
         <div className="flex items-center gap-2">
           <form onSubmit={handleStartScan} className="flex items-center gap-2">
             <div className="relative flex items-center">
-              <Crosshair className="absolute left-2.5 w-3.5 h-3.5" style={{ color: currentTheme.primary }} />
+              <Crosshair className="absolute left-2.5 w-3.5 h-3.5 text-slate-400" />
               <input
                 type="text"
                 value={targetUrl}
                 onChange={(e) => setTargetUrl(e.target.value)}
                 placeholder="https://example.com"
-                className="w-56 md:w-72 bg-black/70 border text-xs px-3 py-1 pl-8 rounded text-slate-200 focus:outline-none transition font-mono"
+                className="w-56 md:w-72 bg-black/80 border text-xs px-3 py-1.5 pl-8 rounded text-slate-200 focus:outline-none transition font-mono"
                 style={{
-                  borderColor: currentTheme.primary,
-                  boxShadow: `0 0 10px ${currentTheme.primaryGlow}`
+                  borderColor: currentTheme.border
                 }}
               />
             </div>
             <button
               type="submit"
               disabled={isScanning}
-              className="px-3 py-1 rounded text-xs font-bold tracking-wider flex items-center gap-1.5 transition text-slate-950 shadow-lg"
+              className="px-3.5 py-1.5 rounded text-xs font-bold tracking-wider flex items-center gap-1.5 transition text-slate-950 font-sans"
               style={{
-                backgroundImage: `linear-gradient(to right, ${currentTheme.primary}, ${currentTheme.secondary})`
+                backgroundColor: currentTheme.primary
               }}
             >
               {isScanning ? (
@@ -1005,12 +1045,12 @@ export default function App() {
           </form>
 
           {/* Quick Targets */}
-          <div className="hidden xl:flex items-center gap-1 border-l border-slate-800 pl-2">
+          <div className="hidden xl:flex items-center gap-1 border-l border-slate-800/80 pl-2">
             {['cnn.com', 'nytimes.com', 'reddit.com', 'forbes.com'].map((domain) => (
               <button
                 key={domain}
                 onClick={() => applyPreset(`https://${domain}`)}
-                className="text-[10px] px-2 py-0.5 rounded bg-slate-900/60 border border-slate-800 hover:border-cyan-500/50 hover:text-cyan-300 transition text-slate-400"
+                className="text-[10px] px-2 py-0.5 rounded bg-black/40 border border-slate-800 hover:border-slate-600 transition text-slate-400 hover:text-slate-200"
               >
                 {domain}
               </button>
@@ -1018,42 +1058,18 @@ export default function App() {
           </div>
         </div>
 
-        {/* Tactical Controls & 3-Theme Aesthetic Switcher Button */}
+        {/* Tactical Controls & Theme Switcher */}
         <div className="flex items-center gap-2">
-          {/* Judges Guide & Technical Pitch Deck Button */}
-          <button
-            onClick={() => setShowJudgesModal(true)}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded border text-xs font-bold transition shadow-lg hover:scale-105 active:scale-95 text-amber-300 border-amber-500/50 bg-amber-950/40 hover:bg-amber-900/50"
-            style={{
-              boxShadow: '0 0 12px rgba(245, 158, 11, 0.25)'
-            }}
-            title="Open Judges Technical Pitch Deck & Full Architecture Documentation"
-          >
-            <Award className="w-3.5 h-3.5 text-amber-400" />
-            <span className="text-[10px] tracking-wider hidden md:inline">JUDGES GUIDE</span>
-          </button>
-
-          {/* Export Security Incident Audit Report */}
-          <button
-            onClick={exportSecurityAuditReport}
-            className="flex items-center gap-1 px-2 py-1 rounded border border-slate-700 bg-slate-900/80 text-slate-300 hover:text-white hover:border-slate-500 text-xs transition font-bold"
-            title="Export Incident Audit Log as JSON"
-          >
-            <Download className="w-3.5 h-3.5 text-cyan-400" />
-            <span className="text-[10px] hidden lg:inline">AUDIT</span>
-          </button>
-
           {/* Theme Switcher Button */}
           <button
             onClick={cycleTheme}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded border text-xs font-bold transition shadow-lg hover:scale-105 active:scale-95"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded border text-xs font-bold transition hover:bg-white/5 active:scale-95"
             style={{
-              borderColor: currentTheme.primary,
+              borderColor: currentTheme.border,
               color: currentTheme.primary,
-              background: 'rgba(0,0,0,0.6)',
-              boxShadow: `0 0 12px ${currentTheme.primaryGlow}`
+              background: 'rgba(0,0,0,0.6)'
             }}
-            title="Click to Switch Aesthetic Dark Themes (Cyber Cyan, Void Purple, Matrix Emerald)"
+            title="Switch Aesthetic Theme"
           >
             <Palette className="w-3.5 h-3.5" />
             <span className="text-[10px] tracking-wider hidden sm:inline">{currentTheme.name}</span>
@@ -1062,7 +1078,7 @@ export default function App() {
           {safeViewImg && (
             <button
               onClick={() => setShowSafeViewModal(true)}
-              className="flex items-center gap-1 px-2 py-1 rounded bg-emerald-950/60 border border-emerald-500/40 text-emerald-400 hover:bg-emerald-900/40 text-xs transition font-bold"
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded bg-emerald-950/60 border border-emerald-500/40 text-emerald-400 hover:bg-emerald-900/40 text-xs transition font-bold"
             >
               <Eye className="w-3.5 h-3.5" />
               SAFE-ROOM
@@ -1105,7 +1121,10 @@ export default function App() {
         
         {/* LEFT SIDEBAR: Live Packet Feed */}
         {!sidebarCollapsed && (
-          <aside className="w-72 md:w-80 tactical-panel border-r border-cyan-500/20 flex flex-col z-20 h-full flex-shrink-0">
+          <aside
+            className="w-72 md:w-80 tactical-panel border-r flex flex-col z-20 h-full flex-shrink-0"
+            style={{ borderColor: currentTheme.border }}
+          >
             <div className="p-3 border-b border-slate-800/80 bg-black/50">
               <div className="flex items-center justify-between text-[10px] text-slate-400 uppercase tracking-widest mb-1.5">
                 <span className="flex items-center gap-1 font-bold" style={{ color: currentTheme.primary }}>
@@ -1253,13 +1272,14 @@ export default function App() {
             ref={globeRef}
             width={globeDimensions.width}
             height={globeDimensions.height}
+            onGlobeReady={configureGlobeLighting}
             // Ultra-realistic NASA Earth Night Lights with country glows
             globeImageUrl="//cdn.jsdelivr.net/npm/three-globe/example/img/earth-night.jpg"
             bumpImageUrl="//cdn.jsdelivr.net/npm/three-globe/example/img/earth-topology.png"
             backgroundImageUrl="//cdn.jsdelivr.net/npm/three-globe/example/img/night-sky.png"
             showAtmosphere={true}
             atmosphereColor={currentTheme.atmosphere}
-            atmosphereAltitude={0.24}
+            atmosphereAltitude={0.20}
             // Laser Arcs
             arcsData={arcs}
             arcStartLat="startLat"
@@ -1291,7 +1311,10 @@ export default function App() {
           />
 
           {/* Theme Indicator & Spectrum (Top-Right HUD Overlay) */}
-          <div className="absolute top-4 right-4 tactical-panel p-2.5 rounded-lg border text-xs backdrop-blur-md shadow-2xl z-10 max-w-[210px]">
+          <div
+            className="absolute top-4 right-4 tactical-panel p-2.5 rounded-lg border text-xs backdrop-blur-md shadow-2xl z-10 max-w-[210px]"
+            style={{ borderColor: currentTheme.border }}
+          >
             <div className="text-[9px] font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5" style={{ color: currentTheme.primary }}>
               <Layers className="w-3 h-3" />
               SURVEILLANCE SPECTRUM
@@ -1321,7 +1344,10 @@ export default function App() {
           </div>
 
           {/* On-Screen Camera Navigation Pod */}
-          <div className="absolute right-4 top-48 tactical-panel p-1.5 rounded-lg border flex flex-col gap-1 z-10 shadow-xl">
+          <div
+            className="absolute right-4 top-48 tactical-panel p-1.5 rounded-lg border flex flex-col gap-1 z-10 shadow-xl"
+            style={{ borderColor: currentTheme.border }}
+          >
             <button
               onClick={zoomIn}
               className="p-1.5 rounded hover:bg-white/10 text-slate-300 transition"
@@ -1391,9 +1417,12 @@ export default function App() {
 
         {/* SLIDING PACKET X-RAY MODAL */}
         {showInspectorModal && selectedPacket && (
-          <aside className="absolute right-0 top-0 bottom-0 w-80 md:w-96 tactical-panel-glow border-l p-5 z-30 flex flex-col justify-between shadow-2xl animate-slide-in-right overflow-y-auto">
+          <aside
+            className="absolute right-0 top-0 bottom-0 w-80 md:w-96 tactical-panel border-l p-5 z-30 flex flex-col justify-between shadow-2xl animate-slide-in-right overflow-y-auto"
+            style={{ borderColor: currentTheme.border }}
+          >
             <div>
-              <div className="flex justify-between items-center border-b pb-2.5 mb-3" style={{ borderColor: 'rgba(255,255,255,0.1)' }}>
+              <div className="flex justify-between items-center border-b pb-2.5 mb-3" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
                 <div className="flex items-center gap-2">
                   <Terminal className="w-4 h-4" style={{ color: currentTheme.primary }} />
                   <h2 className="text-xs font-bold tracking-wider uppercase" style={{ color: currentTheme.primary }}>
@@ -1437,10 +1466,9 @@ export default function App() {
 
                 {/* EXACT STORAGE LOCATION & COORDINATES */}
                 <div
-                  className="bg-black/70 p-3 rounded-lg border space-y-1.5 shadow-lg"
+                  className="bg-black/70 p-3 rounded-lg border space-y-1.5"
                   style={{
-                    borderColor: currentTheme.primary,
-                    boxShadow: `0 0 15px ${currentTheme.primaryGlow}`
+                    borderColor: currentTheme.border
                   }}
                 >
                   <div className="text-[9px] font-bold uppercase tracking-wider flex items-center gap-1.5" style={{ color: currentTheme.primary }}>
@@ -1515,15 +1543,16 @@ export default function App() {
       </div>
 
       {/* 3. BOTTOM COMMAND DOCK: Destination Storage Coordinates & Wire Controls */}
-      <footer className="h-16 bottom-command-deck z-30 px-4 flex items-center justify-between border-t flex-shrink-0">
-        
+      <footer
+        className="h-16 bottom-command-deck z-30 px-4 flex items-center justify-between border-t flex-shrink-0"
+        style={{ borderColor: currentTheme.border }}
+      >
         {/* Left: Destination Coordinates & Server Location */}
         <div className="flex items-center gap-3 max-w-[35%] truncate">
           <div
-            className="flex items-center justify-center w-8 h-8 rounded-lg bg-black/70 border shadow-lg flex-shrink-0"
+            className="flex items-center justify-center w-8 h-8 rounded-lg bg-black/70 border flex-shrink-0"
             style={{
-              borderColor: currentTheme.primary,
-              boxShadow: `0 0 10px ${currentTheme.primaryGlow}`
+              borderColor: currentTheme.border
             }}
           >
             <Server className="w-4 h-4" style={{ color: currentTheme.primary }} />
@@ -1539,10 +1568,10 @@ export default function App() {
                   {activeDestination.company} ({activeDestination.city})
                 </span>
                 <span
-                  className="font-mono font-bold px-1.5 py-0.2 rounded border text-[11px]"
+                  className="font-mono font-bold px-1.5 py-0.5 rounded border text-[11px]"
                   style={{
                     backgroundColor: 'rgba(0,0,0,0.6)',
-                    borderColor: currentTheme.primary,
+                    borderColor: currentTheme.border,
                     color: currentTheme.primary
                   }}
                 >
@@ -1640,12 +1669,11 @@ export default function App() {
           {activeDestination && (
             <button
               onClick={() => setShowInspectorModal(true)}
-              className="px-2.5 py-1 rounded border text-xs font-bold flex items-center gap-1 transition shadow-lg"
+              className="px-2.5 py-1.5 rounded border text-xs font-bold flex items-center gap-1 transition hover:bg-white/5 active:scale-95"
               style={{
                 backgroundColor: 'rgba(0,0,0,0.6)',
-                borderColor: currentTheme.primary,
-                color: currentTheme.primary,
-                boxShadow: `0 0 10px ${currentTheme.primaryGlow}`
+                borderColor: currentTheme.border,
+                color: currentTheme.primary
               }}
             >
               <Terminal className="w-3.5 h-3.5" />
@@ -1658,7 +1686,10 @@ export default function App() {
       {/* 4. MODAL: Clean-Room Safe View */}
       {showSafeViewModal && safeViewImg && (
         <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="tactical-panel-glow w-full max-w-4xl max-h-[88vh] rounded-xl flex flex-col overflow-hidden border shadow-2xl">
+          <div
+            className="tactical-panel w-full max-w-4xl max-h-[88vh] rounded-xl flex flex-col overflow-hidden border shadow-2xl"
+            style={{ borderColor: currentTheme.border }}
+          >
             <div className="p-3.5 border-b flex items-center justify-between bg-black/60" style={{ borderColor: 'rgba(255,255,255,0.1)' }}>
               <div className="flex items-center gap-2">
                 <ShieldAlert className="w-4 h-4 text-emerald-400" />
@@ -1693,243 +1724,6 @@ export default function App() {
                 }}
               >
                 Close Preview
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 5. MODAL: Judges Presentation & Full Architecture Pitch Deck */}
-      {showJudgesModal && (
-        <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-3 md:p-6">
-          <div
-            className="w-full max-w-5xl max-h-[92vh] rounded-2xl flex flex-col overflow-hidden border shadow-2xl bg-slate-950/95"
-            style={{
-              borderColor: 'rgba(245, 158, 11, 0.4)',
-              boxShadow: '0 0 30px rgba(245, 158, 11, 0.2)'
-            }}
-          >
-            {/* Header */}
-            <div className="p-4 border-b border-slate-800 bg-black/80 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-amber-500/10 border border-amber-500/30">
-                  <Award className="w-5 h-5 text-amber-400" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h2 className="text-sm md:text-base font-extrabold tracking-wider font-sans text-amber-300">
-                      DOOMWIRE // JUDGES TECHNICAL REPORT & SYSTEM ARCHITECTURE
-                    </h2>
-                    <span className="text-[9px] px-2 py-0.5 rounded bg-amber-950/80 border border-amber-500/40 text-amber-400 font-bold uppercase">
-                      HACKATHON GOLD STANDARD
-                    </span>
-                  </div>
-                  <div className="text-[11px] text-slate-400 flex items-center gap-2 font-mono">
-                    <span>Lead Architect:</span>
-                    <span className="text-cyan-400 font-bold">Arnav (by-Arnavvv)</span>
-                    <span className="text-slate-600">•</span>
-                    <span className="text-slate-400">Production-Ready Active Privacy Firewall & 3D Radar</span>
-                  </div>
-                </div>
-              </div>
-              <button
-                onClick={() => setShowJudgesModal(false)}
-                className="text-slate-400 hover:text-white font-bold text-lg px-2.5 py-1 rounded-lg hover:bg-slate-900 transition"
-              >
-                ✕
-              </button>
-            </div>
-
-            {/* Navigation Tabs */}
-            <div className="flex items-center gap-2 px-4 py-2 bg-slate-900/60 border-b border-slate-800/80 text-xs overflow-x-auto">
-              {[
-                { id: 'PITCH', label: '1. PITCH & HIGHLIGHTS', icon: Sparkles },
-                { id: 'CHECKLIST', label: '2. JUDGES LIVE CHECKLIST', icon: CheckCircle2 },
-                { id: 'ARCHITECTURE', label: '3. SYSTEM ARCHITECTURE', icon: Layers },
-                { id: 'SECURITY', label: '4. THREAT MATRIX & DEFENSE', icon: ShieldCheck }
-              ].map((tab) => {
-                const Icon = tab.icon;
-                const active = judgesTab === tab.id;
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => setJudgesTab(tab.id)}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-bold transition whitespace-nowrap ${
-                      active
-                        ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-sm'
-                        : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
-                    }`}
-                  >
-                    <Icon className="w-3.5 h-3.5" />
-                    <span>{tab.label}</span>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Tab Contents */}
-            <div className="flex-1 overflow-y-auto p-5 text-slate-200 font-sans space-y-4 text-xs md:text-sm">
-              {judgesTab === 'PITCH' && (
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <div className="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800">
-                      <div className="text-xs font-bold text-red-400 uppercase tracking-wider mb-1 font-mono">
-                        THE SILENT CRISIS
-                      </div>
-                      <p className="text-slate-300 text-xs leading-relaxed">
-                        94% of top 1,000 websites execute unmasked surveillance scripts within 250ms of page load. AudioContext oscillators, Canvas hashes, and WebGL renderers secretly fingerprint users across the entire internet.
-                      </p>
-                    </div>
-
-                    <div className="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800">
-                      <div className="text-xs font-bold text-cyan-400 uppercase tracking-wider mb-1 font-mono">
-                        THE DOOMWIRE SHIFT
-                      </div>
-                      <p className="text-slate-300 text-xs leading-relaxed">
-                        DoomWire flips the surveillance mirror. It visualizes data exfiltration on an interactive 3D WebGL globe with NASA Black Marble night lights, giving users tactile physical controls: <strong className="text-red-300">Cut Wire</strong> or <strong className="text-purple-300">Poison Data</strong>.
-                      </p>
-                    </div>
-
-                    <div className="p-3.5 rounded-xl bg-slate-900/80 border border-slate-800">
-                      <div className="text-xs font-bold text-amber-400 uppercase tracking-wider mb-1 font-mono">
-                        WHY THIS WINS
-                      </div>
-                      <p className="text-slate-300 text-xs leading-relaxed">
-                        Not a passive ad-blocker! DoomWire features real Playwright Chromium sandboxing, sub-millisecond WebSocket telemetry streaming, Web Audio sound synthesis, and differential privacy noise injection.
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="p-4 rounded-xl bg-gradient-to-r from-slate-900 via-slate-900/90 to-black border border-slate-800 flex items-center justify-between">
-                    <div>
-                      <div className="font-bold text-slate-100 font-mono text-sm">TRY FULL DEMO SCAN DIRECTLY</div>
-                      <div className="text-slate-400 text-xs mt-0.5">
-                        Test live interactive telemetry streaming with NASA globe tracking, real sound effects, and wire severing.
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => {
-                        setShowJudgesModal(false);
-                        handleStartScan();
-                      }}
-                      className="px-4 py-2 rounded-lg font-bold text-slate-950 bg-amber-400 hover:bg-amber-300 transition shadow-lg text-xs font-mono"
-                    >
-                      EXECUTE DEMO SCAN NOW
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {judgesTab === 'CHECKLIST' && (
-                <div className="space-y-3">
-                  <div className="text-xs font-mono uppercase tracking-wider text-amber-400 mb-2">
-                    6-STEP INTERACTIVE VERIFICATION PROTOCOL
-                  </div>
-                  {[
-                    { step: '01', title: 'Execute Reconnaissance Scan', desc: 'Click "SCAN TARGET" in the top bar or click any quick preset (cnn.com, reddit.com, nytimes.com) to launch the tracking beam radar.' },
-                    { step: '02', title: 'Inspect Unmasked Hardware Fingerprints', desc: 'Click any arc on the 3D globe or click a packet in the left feed to open the inspector drawer with IP, Canvas hash, and city.' },
-                    { step: '03', title: 'Tactile Wire Severance', desc: 'Click "CUT WIRE" on a selected domain or "CUT ALL TRACKERS" to drop connections instantly and see the arc severed on the globe.' },
-                    { step: '04', title: 'Differential Noise Poisoning', desc: 'Click "POISON DATA" to turn the tracking wire glowing purple and inject randomized synthetic entropy into the surveillance feed.' },
-                    { step: '05', title: 'Enter the Clean-Room Safe View', desc: 'Click the "SAFE-ROOM" button in the top navigation to inspect the sandboxed, defanged DOM with neutralized ad units highlighted.' },
-                    { step: '06', title: 'Aesthetic Theme Switcher', desc: 'Click the Palette button in the header to cycle between Cyber Cyan, Void Purple, and Matrix Emerald dark tactical environments.' }
-                  ].map((item) => (
-                    <div key={item.step} className="p-3 rounded-lg bg-slate-900/80 border border-slate-800 flex items-start gap-3">
-                      <div className="text-sm font-extrabold font-mono text-cyan-400 bg-cyan-950/70 border border-cyan-500/30 px-2 py-0.5 rounded">
-                        {item.step}
-                      </div>
-                      <div>
-                        <div className="font-bold text-slate-100 text-xs font-mono">{item.title}</div>
-                        <div className="text-slate-400 text-xs mt-0.5">{item.desc}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {judgesTab === 'ARCHITECTURE' && (
-                <div className="space-y-4 font-mono text-xs">
-                  <div className="p-4 rounded-xl bg-black border border-slate-800 text-slate-300 overflow-x-auto">
-                    <pre className="text-[11px] leading-relaxed text-cyan-400">
-{`+-----------------------------------------------------------------------------+
-|                            DOOMWIRE FULL-STACK PIPELINE                      |
-+-----------------------------------------------------------------------------+
-   [ User Browser ]  <--- (Socket.io WebSocket) --->  [ Node.js Worker ]
-          |                                                   |
-   +------+-----------------------+             +-------------+-------------+
-   |  Three.js WebGL 3D Radar     |             |  Playwright Headless      |
-   |  NASA Night Lights Texture   |             |  Chromium Sandbox Worker  |
-   |  Web Audio Synthesizer       |             |  Network Interceptor Pipe |
-   |  Tactical Theme Engine       |             |  Active DNS Sinkhole      |
-   +------------------------------+             +---------------------------+`}
-                    </pre>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 font-sans">
-                    <div className="p-3 bg-slate-900/80 rounded-lg border border-slate-800">
-                      <div className="font-mono text-xs text-cyan-400 font-bold mb-1">FRONTEND SUBSYSTEM</div>
-                      <p className="text-slate-400 text-xs">
-                        React 18 + Vite 6 + Three.js WebGL (via react-globe.gl) with NASA Black Marble Earth textures, Tailwind CSS, Lucide icons, and real-time oscillator audio synthesis via the Web Audio API.
-                      </p>
-                    </div>
-                    <div className="p-3 bg-slate-900/80 rounded-lg border border-slate-800">
-                      <div className="font-mono text-xs text-purple-400 font-bold mb-1">BACKEND & FIREWALL SUBSYSTEM</div>
-                      <p className="text-slate-400 text-xs">
-                        Express + Socket.io + Playwright headless browser engine in isolated Docker containers with live CDP (Chrome DevTools Protocol) network route interception and differential privacy noise generators.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {judgesTab === 'SECURITY' && (
-                <div className="space-y-3 font-sans">
-                  <div className="text-xs font-mono uppercase tracking-wider text-emerald-400 mb-2">
-                    DEFENSE-IN-DEPTH THREAT MITIGATION
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                    <div className="p-3 rounded-lg bg-slate-900/70 border border-slate-800">
-                      <div className="font-bold text-red-400 font-mono mb-1">Canvas & WebGL Fingerprinting</div>
-                      <div className="text-slate-400">
-                        Attackers render hidden geometries to identify GPU drivers. DoomWire intercepts WebGL contexts and injects non-deterministic Gaussian noise, destroying fingerprint stability across sessions.
-                      </div>
-                    </div>
-
-                    <div className="p-3 rounded-lg bg-slate-900/70 border border-slate-800">
-                      <div className="font-bold text-orange-400 font-mono mb-1">AudioContext Oscillator Hash</div>
-                      <div className="text-slate-400">
-                        Audio probes analyze digital audio processing latency. DoomWire normalizes the oscillator frequency spectrum to standard baseline values before network telemetry dispatch.
-                      </div>
-                    </div>
-
-                    <div className="p-3 rounded-lg bg-slate-900/70 border border-slate-800">
-                      <div className="font-bold text-purple-400 font-mono mb-1">Differential Privacy Poisoning</div>
-                      <div className="text-slate-400">
-                        Rather than simple blocking (which reveals adblocker presence), DoomWire injects randomized synthetic behavior (fake clicks, noisy dwell times) to poison cross-site surveillance graphs.
-                      </div>
-                    </div>
-
-                    <div className="p-3 rounded-lg bg-slate-900/70 border border-slate-800">
-                      <div className="font-bold text-emerald-400 font-mono mb-1">Zero-Trust Process Isolation</div>
-                      <div className="text-slate-400">
-                        Target websites execute in a defanged Chromium container with root privileges stripped and network namespaces strictly controlled to prevent sandbox escape.
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Footer */}
-            <div className="p-3 bg-black/80 border-t border-slate-800 flex items-center justify-between">
-              <div className="text-[11px] text-slate-400 font-mono">
-                DoomWire v3.4 • Verified for Hackathon Judging & Production Deployment
-              </div>
-              <button
-                onClick={() => setShowJudgesModal(false)}
-                className="px-4 py-1.5 font-bold rounded-lg text-slate-950 bg-amber-400 hover:bg-amber-300 transition text-xs font-mono"
-              >
-                Close Guide
               </button>
             </div>
           </div>

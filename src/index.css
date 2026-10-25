@@ -1,51 +1,72 @@
 @import "tailwindcss";
 
-/* THEME 1: CYBER_CYAN (Default Tactical Cyberpunk) */
-:root, [data-theme="CYBER_CYAN"] {
-  --bg-deep: #020409;
-  --bg-panel: rgba(4, 9, 22, 0.88);
-  --bg-panel-glow: rgba(6, 14, 32, 0.94);
-  --border-neon: rgba(0, 240, 255, 0.3);
+/* 
+  DOOMWIRE MINIMALIST DARK DESIGN SYSTEM
+  Deep Obsidian Canvas + Refined 1px Colored Borderlines
+*/
+
+/* THEME 1: OBSIDIAN_BLUE (Electric Blue on Obsidian) */
+:root, [data-theme="OBSIDIAN_BLUE"] {
+  --bg-deep: #05070c;
+  --bg-panel: rgba(8, 12, 20, 0.88);
+  --bg-panel-glow: rgba(10, 16, 28, 0.94);
+  --border-theme: rgba(56, 189, 248, 0.25);
+  --border-theme-hover: rgba(56, 189, 248, 0.6);
   
-  --theme-primary: #00f0ff;
-  --theme-primary-glow: rgba(0, 240, 255, 0.45);
-  --theme-secondary: #3b82f6;
-  --theme-accent: #c084fc;
-  --atmosphere-color: #00f0ff;
-  --grid-color: rgba(0, 240, 255, 0.035);
-  --space-radial: rgba(0, 70, 150, 0.15);
+  --theme-primary: #38bdf8;
+  --theme-primary-subtle: rgba(56, 189, 248, 0.12);
+  --theme-secondary: #60a5fa;
+  --atmosphere-color: #0284c7;
+  --grid-color: rgba(56, 189, 248, 0.02);
+  --space-radial: rgba(14, 116, 144, 0.12);
 }
 
-/* THEME 2: VOID_PURPLE (Deep Space Galaxy & Nebula) */
-[data-theme="VOID_PURPLE"] {
-  --bg-deep: #06020c;
-  --bg-panel: rgba(13, 5, 24, 0.88);
-  --bg-panel-glow: rgba(20, 8, 36, 0.94);
-  --border-neon: rgba(168, 85, 247, 0.35);
+/* THEME 2: DEEP_VIOLET (Deep Purplish Black + Vivid Purple) */
+[data-theme="DEEP_VIOLET"] {
+  --bg-deep: #06040b;
+  --bg-panel: rgba(14, 8, 24, 0.88);
+  --bg-panel-glow: rgba(20, 12, 34, 0.94);
+  --border-theme: rgba(192, 132, 252, 0.28);
+  --border-theme-hover: rgba(192, 132, 252, 0.65);
   
   --theme-primary: #c084fc;
-  --theme-primary-glow: rgba(192, 132, 252, 0.45);
+  --theme-primary-subtle: rgba(192, 132, 252, 0.12);
   --theme-secondary: #ec4899;
-  --theme-accent: #38bdf8;
-  --atmosphere-color: #9333ea;
-  --grid-color: rgba(168, 85, 247, 0.035);
-  --space-radial: rgba(112, 26, 117, 0.18);
+  --atmosphere-color: #7e22ce;
+  --grid-color: rgba(192, 132, 252, 0.02);
+  --space-radial: rgba(126, 34, 206, 0.12);
 }
 
-/* THEME 3: MATRIX_EMERALD (Classified Military Terminal) */
-[data-theme="MATRIX_EMERALD"] {
-  --bg-deep: #020a05;
-  --bg-panel: rgba(3, 18, 9, 0.88);
-  --bg-panel-glow: rgba(4, 28, 14, 0.94);
-  --border-neon: rgba(16, 185, 129, 0.35);
+/* THEME 3: CRIMSON_PROTOCOL (Obsidian Black + Sharp Crimson Red) */
+[data-theme="CRIMSON_PROTOCOL"] {
+  --bg-deep: #070406;
+  --bg-panel: rgba(16, 7, 10, 0.88);
+  --bg-panel-glow: rgba(24, 10, 15, 0.94);
+  --border-theme: rgba(244, 63, 94, 0.28);
+  --border-theme-hover: rgba(244, 63, 94, 0.65);
   
-  --theme-primary: #00ff88;
-  --theme-primary-glow: rgba(0, 255, 136, 0.45);
-  --theme-secondary: #10b981;
-  --theme-accent: #f59e0b;
-  --atmosphere-color: #10b981;
-  --grid-color: rgba(16, 185, 129, 0.035);
-  --space-radial: rgba(6, 78, 59, 0.18);
+  --theme-primary: #f43f5e;
+  --theme-primary-subtle: rgba(244, 63, 94, 0.12);
+  --theme-secondary: #fb7185;
+  --atmosphere-color: #be123c;
+  --grid-color: rgba(244, 63, 94, 0.02);
+  --space-radial: rgba(190, 18, 60, 0.12);
+}
+
+/* THEME 4: NEO_EMERALD (Obsidian Forest Black + Crisp Emerald) */
+[data-theme="NEO_EMERALD"] {
+  --bg-deep: #040705;
+  --bg-panel: rgba(6, 14, 9, 0.88);
+  --bg-panel-glow: rgba(8, 20, 13, 0.94);
+  --border-theme: rgba(16, 185, 129, 0.26);
+  --border-theme-hover: rgba(16, 185, 129, 0.65);
+  
+  --theme-primary: #10b981;
+  --theme-primary-subtle: rgba(16, 185, 129, 0.12);
+  --theme-secondary: #34d399;
+  --atmosphere-color: #047857;
+  --grid-color: rgba(16, 185, 129, 0.02);
+  --space-radial: rgba(4, 120, 87, 0.12);
 }
 
 * {
@@ -56,119 +77,109 @@
 
 body {
   background-color: var(--bg-deep);
-  color: #f1f5f9;
-  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #f8fafc;
+  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   overflow: hidden;
   height: 100vh;
   width: 100vw;
   user-select: none;
-  transition: background-color 0.4s ease;
+  transition: background-color 0.3s ease;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.font-sans {
+  font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
 }
 
 .font-mono {
-  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-family: 'JetBrains Mono', monospace;
+  font-feature-settings: "zero" 1, "tnum" 1;
 }
 
-/* Realistic Deep Space Canvas with Star Dust */
+/* Deep Obsidian Canvas with Fine Subtle Grid */
 .deep-space-canvas {
   background-color: var(--bg-deep);
   background-image: 
-    radial-gradient(circle at 50% 50%, var(--space-radial) 0%, var(--bg-deep) 80%),
+    radial-gradient(circle at 50% 50%, var(--space-radial) 0%, var(--bg-deep) 75%),
     linear-gradient(to right, var(--grid-color) 1px, transparent 1px),
     linear-gradient(to bottom, var(--grid-color) 1px, transparent 1px);
-  background-size: 100% 100%, 36px 36px, 36px 36px;
-  transition: all 0.4s ease;
+  background-size: 100% 100%, 40px 40px, 40px 40px;
+  transition: all 0.3s ease;
 }
 
-/* Glassmorphism Tactical Panels */
+/* Minimalist Glass Panels with Refined Hairline Borders */
 .tactical-panel {
   background: var(--bg-panel);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid var(--border-neon);
-  box-shadow: 0 10px 35px 0 rgba(0, 0, 0, 0.75), inset 0 0 15px rgba(255, 255, 255, 0.02);
-  transition: background 0.35s ease, border-color 0.35s ease;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-theme);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+  transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 .tactical-panel-glow {
   background: var(--bg-panel-glow);
-  backdrop-filter: blur(24px);
-  border: 1px solid var(--border-neon);
-  box-shadow: 0 0 35px var(--theme-primary-glow), inset 0 0 20px rgba(255, 255, 255, 0.03);
-  transition: background 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-theme);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.85);
+  transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 /* Bottom Command Deck */
 .bottom-command-deck {
-  background: linear-gradient(180deg, var(--bg-panel) 0%, var(--bg-deep) 100%);
-  backdrop-filter: blur(24px);
-  border-top: 1px solid var(--border-neon);
-  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.85);
-  transition: all 0.35s ease;
+  background: var(--bg-panel);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border-theme);
+  box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.8);
+  transition: all 0.3s ease;
 }
 
-/* CRT Scanline Overlay */
-.scanline {
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.22) 50%);
-  background-size: 100% 3px;
-  pointer-events: none;
-  opacity: 0.25;
-  z-index: 5;
-}
-
-/* Custom Scrollbar */
+/* Sleek Minimal Scrollbar */
 ::-webkit-scrollbar {
   width: 4px;
   height: 4px;
 }
 ::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.5);
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--border-neon);
-  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--theme-primary);
-  box-shadow: 0 0 10px var(--theme-primary);
 }
 
-/* Threat Badges */
+/* Refined Minimal Threat Badges */
 .badge-threat-green {
-  background: rgba(0, 255, 136, 0.12);
-  color: #00ff88;
-  border: 1px solid rgba(0, 255, 136, 0.35);
-  box-shadow: 0 0 10px rgba(0, 255, 136, 0.2);
+  background: rgba(16, 185, 129, 0.1);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.25);
 }
 
 .badge-threat-yellow {
-  background: rgba(245, 158, 11, 0.12);
+  background: rgba(245, 158, 11, 0.1);
   color: #fbbf24;
-  border: 1px solid rgba(245, 158, 11, 0.35);
-  box-shadow: 0 0 10px rgba(245, 158, 11, 0.2);
+  border: 1px solid rgba(245, 158, 11, 0.25);
 }
 
 .badge-threat-orange {
-  background: rgba(255, 102, 0, 0.15);
-  color: #ff7700;
-  border: 1px solid rgba(255, 102, 0, 0.4);
-  box-shadow: 0 0 12px rgba(255, 102, 0, 0.22);
+  background: rgba(249, 115, 22, 0.12);
+  color: #fb923c;
+  border: 1px solid rgba(249, 115, 22, 0.3);
 }
 
 .badge-threat-red {
-  background: rgba(255, 0, 85, 0.18);
-  color: #ff0055;
-  border: 1px solid rgba(255, 0, 85, 0.5);
-  box-shadow: 0 0 15px rgba(255, 0, 85, 0.3);
+  background: rgba(244, 63, 94, 0.12);
+  color: #fb7185;
+  border: 1px solid rgba(244, 63, 94, 0.3);
 }
 
 .badge-threat-purple {
-  background: rgba(192, 132, 252, 0.18);
+  background: rgba(168, 85, 247, 0.12);
   color: #c084fc;
-  border: 1px solid rgba(192, 132, 252, 0.5);
-  box-shadow: 0 0 15px rgba(192, 132, 252, 0.3);
+  border: 1px solid rgba(168, 85, 247, 0.3);
 }
 
 /* Animations */
@@ -178,5 +189,5 @@ body {
 }
 
 .animate-slide-in-right {
-  animation: slideRightIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: slideRightIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
