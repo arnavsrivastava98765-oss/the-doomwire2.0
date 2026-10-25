@@ -28,13 +28,47 @@ import {
   ChevronRight,
   Compass,
   Server,
-  Database,
-  ArrowUpRight,
   Sliders,
-  X
+  X,
+  Palette,
+  Sparkles
 } from 'lucide-react';
 
 const SOCKET_SERVER_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+
+// 3 Dark Aesthetic Themes with Custom Lighting & Vibe
+const THEMES = {
+  CYBER_CYAN: {
+    id: 'CYBER_CYAN',
+    name: 'CYBER-CYAN',
+    tag: 'TACTICAL RADAR',
+    primary: '#00f0ff',
+    primaryGlow: 'rgba(0, 240, 255, 0.45)',
+    secondary: '#38bdf8',
+    atmosphere: '#00f0ff',
+    radarColor: '#00f0ff'
+  },
+  VOID_PURPLE: {
+    id: 'VOID_PURPLE',
+    name: 'VOID-PURPLE',
+    tag: 'DEEP NEBULA',
+    primary: '#c084fc',
+    primaryGlow: 'rgba(192, 132, 252, 0.45)',
+    secondary: '#ec4899',
+    atmosphere: '#9333ea',
+    radarColor: '#c084fc'
+  },
+  MATRIX_EMERALD: {
+    id: 'MATRIX_EMERALD',
+    name: 'MATRIX-NEO',
+    tag: 'CLASSIFIED TERMINAL',
+    primary: '#00ff88',
+    primaryGlow: 'rgba(0, 255, 136, 0.45)',
+    secondary: '#10b981',
+    atmosphere: '#10b981',
+    radarColor: '#00ff88'
+  }
+};
 
 // Web Audio Tactical Synthesizer
 class TacticalAudio {
@@ -108,6 +142,9 @@ class TacticalAudio {
 const audioFX = new TacticalAudio();
 
 export default function App() {
+  const [currentThemeKey, setCurrentThemeKey] = useState('CYBER_CYAN');
+  const currentTheme = THEMES[currentThemeKey];
+
   const [socketConnected, setSocketConnected] = useState(false);
   const [targetUrl, setTargetUrl] = useState('https://cnn.com');
   const [scanStatus, setScanStatus] = useState('STANDBY // PERIMETER READY');
@@ -125,15 +162,25 @@ export default function App() {
   const [muted, setMuted] = useState(false);
   const [autoRotate, setAutoRotate] = useState(true);
 
-  // Client User location coordinates (Origin Terminal)
-  const [userLocation, setUserLocation] = useState({ lat: 13.0827, lng: 80.2707, city: 'Local Command Terminal' });
+  // Client User location coordinates
+  const [userLocation, setUserLocation] = useState({ lat: 13.0827, lng: 80.2707, city: 'Command Terminal' });
 
   const globeRef = useRef();
   const globeContainerRef = useRef();
   const [globeDimensions, setGlobeDimensions] = useState({ width: window.innerWidth, height: window.innerHeight - 120 });
   const socketRef = useRef(null);
 
-  // Client location detection
+  // Cycle through 3 dark aesthetic themes
+  const cycleTheme = () => {
+    audioFX.init();
+    const themeKeys = Object.keys(THEMES);
+    const nextIdx = (themeKeys.indexOf(currentThemeKey) + 1) % themeKeys.length;
+    const nextKey = themeKeys[nextIdx];
+    setCurrentThemeKey(nextKey);
+    audioFX.playBlip(nextKey === 'CYBER_CYAN' ? 800 : nextKey === 'VOID_PURPLE' ? 950 : 620, 0.08);
+  };
+
+  // Location detection
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -167,18 +214,18 @@ export default function App() {
     return () => window.removeEventListener('resize', handleResize);
   }, [sidebarCollapsed]);
 
-  // Three.js OrbitControls configuration
+  // OrbitControls setup with full Pan & Zoom
   useEffect(() => {
     if (globeRef.current) {
       const controls = globeRef.current.controls();
       if (controls) {
         controls.autoRotate = autoRotate;
-        controls.autoRotateSpeed = 0.5;
+        controls.autoRotateSpeed = 0.55;
         controls.enableDamping = true;
         controls.dampingFactor = 0.08;
         controls.enableZoom = true;
         controls.zoomSpeed = 1.3;
-        controls.enablePan = true; // Enables easy shifting up/down/left/right
+        controls.enablePan = true;
         controls.panSpeed = 1.3;
       }
     }
@@ -352,14 +399,12 @@ export default function App() {
     };
   }, [userLocation]);
 
-  // Sound FX toggle
   const toggleMute = () => {
     audioFX.init();
     audioFX.muted = !muted;
     setMuted(!muted);
   };
 
-  // Start Recon Scan
   const handleStartScan = (e) => {
     if (e) e.preventDefault();
     if (!targetUrl.trim() || isScanning) return;
@@ -393,7 +438,6 @@ export default function App() {
     }
   };
 
-  // Focus and select packet with smooth camera pan
   const selectAndFocusPacket = (pkt) => {
     setSelectedPacket(pkt);
     setShowInspectorModal(true);
@@ -409,7 +453,6 @@ export default function App() {
     }
   };
 
-  // Wire Actions
   const cutTheWire = (domain) => {
     if (socketRef.current) socketRef.current.emit('cut_wire', domain);
     if (selectedPacket?.domain === domain) {
@@ -431,7 +474,6 @@ export default function App() {
     }
   };
 
-  // Master Bulk Actions
   const cutAllTrackers = () => {
     const trackerDomains = packets
       .filter((p) => p.threatLevel !== 'green')
@@ -452,7 +494,7 @@ export default function App() {
     }
   };
 
-  // Manual Camera Manipulation Controls
+  // Camera Controls
   const zoomIn = () => {
     if (!globeRef.current) return;
     const { lat, lng, altitude } = globeRef.current.pointOfView();
@@ -494,7 +536,7 @@ export default function App() {
     globeRef.current.pointOfView({ lat: 20, lng: 0, altitude: 2.5 }, 550);
   };
 
-  // Radar target rings
+  // Target impact radar rings
   const ringsData = useMemo(() => {
     return arcs.map((arc) => ({
       lat: arc.endLat,
@@ -506,7 +548,7 @@ export default function App() {
     }));
   }, [arcs]);
 
-  // Labels for target servers storing user data
+  // Real-time server labels mapped directly onto 3D Earth
   const labelsData = useMemo(() => {
     const seen = new Set();
     const result = [];
@@ -519,13 +561,13 @@ export default function App() {
           lng: p.geo.lng,
           text: `${p.company} (${p.city})`,
           size: 0.9,
-          color: p.isPoisoned ? '#c084fc' : p.threatLevel === 'red' ? '#ff0055' : '#00f0ff',
+          color: p.isPoisoned ? '#c084fc' : p.threatLevel === 'red' ? '#ff0055' : currentTheme.primary,
           packet: p
         });
       }
     });
     return result;
-  }, [packets]);
+  }, [packets, currentTheme]);
 
   // Filtered Packets
   const filteredPackets = useMemo(() => {
@@ -550,27 +592,55 @@ export default function App() {
     return { total, threats, severedCount, poisonedCount };
   }, [packets, blockedDomains, poisonedDomains]);
 
-  // Active or selected destination telemetry for prominent bottom display
   const activeDestination = selectedPacket || packets[0] || null;
 
   return (
-    <div className="flex flex-col h-screen w-screen bg-[#020409] text-slate-100 overflow-hidden font-mono select-none relative cyber-canvas-bg">
+    <div
+      data-theme={currentThemeKey}
+      className="flex flex-col h-screen w-screen text-slate-100 overflow-hidden font-mono select-none relative deep-space-canvas"
+    >
       <div className="scanline"></div>
 
-      {/* 1. TOP HEADER: Tactical HUD Navigation */}
+      {/* 1. TOP HEADER: Tactical HUD Navigation & by-Arnavvv Signature */}
       <header className="h-14 tactical-panel z-30 flex items-center justify-between px-4 border-b border-cyan-500/25 flex-shrink-0">
         <div className="flex items-center gap-3">
-          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-cyan-950/70 border border-cyan-500/40 shadow-[0_0_12px_rgba(0,240,255,0.35)]">
-            <ShieldAlert className="text-cyan-400 w-4 h-4 animate-pulse" />
+          <div
+            className="flex items-center justify-center w-8 h-8 rounded-lg bg-black/60 border shadow-lg transition-all"
+            style={{
+              borderColor: currentTheme.primary,
+              boxShadow: `0 0 14px ${currentTheme.primaryGlow}`
+            }}
+          >
+            <ShieldAlert className="w-4 h-4 animate-pulse" style={{ color: currentTheme.primary }} />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-sm md:text-base font-extrabold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-300 to-indigo-400 font-sans">
+              <h1
+                className="text-sm md:text-base font-extrabold tracking-wider font-sans text-transparent bg-clip-text"
+                style={{
+                  backgroundImage: `linear-gradient(to right, ${currentTheme.primary}, #ffffff, ${currentTheme.secondary})`
+                }}
+              >
                 DOOMWIRE
               </h1>
-              <span className="text-[9px] uppercase tracking-widest px-1.5 py-0.5 rounded bg-cyan-950/80 border border-cyan-500/40 text-cyan-300">
-                ACTIVE CYBER-RADAR
+              <span
+                className="text-[9px] uppercase tracking-widest px-1.5 py-0.5 rounded border font-mono font-bold"
+                style={{
+                  borderColor: currentTheme.primary,
+                  color: currentTheme.primary,
+                  background: 'rgba(0,0,0,0.5)'
+                }}
+              >
+                {currentTheme.tag}
               </span>
+            </div>
+            {/* User Custom Signature: by-Arnavvv */}
+            <div
+              className="text-[10px] tracking-wider font-mono flex items-center gap-1 font-bold"
+              style={{ color: currentTheme.primary }}
+            >
+              <span>by-Arnavvv</span>
+              <span className="text-slate-500 text-[8px] font-sans">• ACTIVE 3D CYBER-RADAR</span>
             </div>
           </div>
         </div>
@@ -579,27 +649,30 @@ export default function App() {
         <div className="flex items-center gap-2">
           <form onSubmit={handleStartScan} className="flex items-center gap-2">
             <div className="relative flex items-center">
-              <Crosshair className="absolute left-2.5 w-3.5 h-3.5 text-cyan-500/70" />
+              <Crosshair className="absolute left-2.5 w-3.5 h-3.5" style={{ color: currentTheme.primary }} />
               <input
                 type="text"
                 value={targetUrl}
                 onChange={(e) => setTargetUrl(e.target.value)}
                 placeholder="https://example.com"
-                className="w-56 md:w-72 bg-black/70 border border-cyan-500/35 text-xs px-3 py-1 pl-8 rounded text-slate-200 focus:outline-none focus:border-cyan-400 focus:shadow-[0_0_15px_rgba(0,240,255,0.3)] transition font-mono"
+                className="w-56 md:w-72 bg-black/70 border text-xs px-3 py-1 pl-8 rounded text-slate-200 focus:outline-none transition font-mono"
+                style={{
+                  borderColor: currentTheme.primary,
+                  boxShadow: `0 0 10px ${currentTheme.primaryGlow}`
+                }}
               />
             </div>
             <button
               type="submit"
               disabled={isScanning}
-              className={`px-3 py-1 rounded text-xs font-bold tracking-wider flex items-center gap-1.5 transition ${
-                isScanning
-                  ? 'bg-cyan-950/80 border border-cyan-500/40 text-cyan-400 cursor-wait'
-                  : 'bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 shadow-[0_0_15px_rgba(0,240,255,0.4)]'
-              }`}
+              className="px-3 py-1 rounded text-xs font-bold tracking-wider flex items-center gap-1.5 transition text-slate-950 shadow-lg"
+              style={{
+                backgroundImage: `linear-gradient(to right, ${currentTheme.primary}, ${currentTheme.secondary})`
+              }}
             >
               {isScanning ? (
                 <>
-                  <RefreshCw className="w-3 h-3 animate-spin text-cyan-400" />
+                  <RefreshCw className="w-3 h-3 animate-spin text-slate-950" />
                   SCANNING...
                 </>
               ) : (
@@ -625,8 +698,24 @@ export default function App() {
           </div>
         </div>
 
-        {/* Tactical Status & Audio Control */}
+        {/* Tactical Controls & 3-Theme Aesthetic Switcher Button */}
         <div className="flex items-center gap-2">
+          {/* Theme Switcher Button */}
+          <button
+            onClick={cycleTheme}
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded border text-xs font-bold transition shadow-lg hover:scale-105 active:scale-95"
+            style={{
+              borderColor: currentTheme.primary,
+              color: currentTheme.primary,
+              background: 'rgba(0,0,0,0.6)',
+              boxShadow: `0 0 12px ${currentTheme.primaryGlow}`
+            }}
+            title="Click to Switch Aesthetic Dark Themes (Cyber Cyan, Void Purple, Matrix Emerald)"
+          >
+            <Palette className="w-3.5 h-3.5" />
+            <span className="text-[10px] tracking-wider hidden sm:inline">{currentTheme.name}</span>
+          </button>
+
           {safeViewImg && (
             <button
               onClick={() => setShowSafeViewModal(true)}
@@ -642,7 +731,7 @@ export default function App() {
             className="p-1 rounded bg-slate-900/70 border border-slate-800 text-slate-400 hover:text-cyan-300 transition"
             title={muted ? 'Unmute Cyber Audio' : 'Mute Audio'}
           >
-            {muted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4 text-cyan-400" />}
+            {muted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" style={{ color: currentTheme.primary }} />}
           </button>
 
           <button
@@ -655,9 +744,11 @@ export default function App() {
 
           <div className="flex items-center gap-1.5 pl-2 border-l border-slate-800">
             <span
-              className={`w-2 h-2 rounded-full ${
-                socketConnected ? 'bg-cyan-400 shadow-[0_0_10px_#00f0ff]' : 'bg-red-500 animate-ping'
-              }`}
+              className="w-2 h-2 rounded-full animate-pulse"
+              style={{
+                backgroundColor: socketConnected ? currentTheme.primary : '#ef4444',
+                boxShadow: socketConnected ? `0 0 8px ${currentTheme.primary}` : 'none'
+              }}
             ></span>
             <span className="text-[10px] text-slate-400 font-bold hidden sm:inline">
               {socketConnected ? 'ONLINE' : 'OFFLINE'}
@@ -666,16 +757,15 @@ export default function App() {
         </div>
       </header>
 
-      {/* 2. MAIN CENTER AREA: Feed + 3D Globe (Strictly within screen bounds) */}
+      {/* 2. MAIN CENTER AREA: Feed + Realistic Space 3D Globe */}
       <div className="flex-1 relative flex overflow-hidden w-full">
         
-        {/* LEFT SIDEBAR: Live Packet Feed (Collapsible & non-intrusive) */}
+        {/* LEFT SIDEBAR: Live Packet Feed */}
         {!sidebarCollapsed && (
           <aside className="w-72 md:w-80 tactical-panel border-r border-cyan-500/20 flex flex-col z-20 h-full flex-shrink-0">
-            {/* Telemetry Summary */}
             <div className="p-3 border-b border-slate-800/80 bg-black/50">
               <div className="flex items-center justify-between text-[10px] text-slate-400 uppercase tracking-widest mb-1.5">
-                <span className="flex items-center gap-1 text-cyan-400 font-bold">
+                <span className="flex items-center gap-1 font-bold" style={{ color: currentTheme.primary }}>
                   <Radio className="w-3 h-3 animate-spin" /> STATUS
                 </span>
                 <span className="truncate max-w-[150px] text-slate-300">{scanStatus}</span>
@@ -685,7 +775,7 @@ export default function App() {
               <div className="grid grid-cols-4 gap-1.5 text-center mt-2">
                 <div className="bg-slate-950/80 p-1.5 rounded border border-slate-800/80">
                   <div className="text-[8px] text-slate-500 uppercase">Packets</div>
-                  <div className="text-cyan-300 font-bold text-xs">{stats.total}</div>
+                  <div className="font-bold text-xs" style={{ color: currentTheme.primary }}>{stats.total}</div>
                 </div>
                 <div className="bg-slate-950/80 p-1.5 rounded border border-slate-800/80">
                   <div className="text-[8px] text-slate-500 uppercase">Threats</div>
@@ -705,7 +795,7 @@ export default function App() {
             {/* Filter Tabs */}
             <div className="flex items-center justify-between px-3 py-1.5 border-b border-slate-800/80 bg-slate-950/60 text-[9px]">
               <div className="text-slate-400 font-bold uppercase tracking-wider flex items-center gap-1">
-                <Activity className="w-3 h-3 text-cyan-400" />
+                <Activity className="w-3 h-3" style={{ color: currentTheme.primary }} />
                 STREAM ({filteredPackets.length})
               </div>
               <div className="flex gap-1">
@@ -715,9 +805,18 @@ export default function App() {
                     onClick={() => setFilterMode(mode)}
                     className={`px-1.5 py-0.5 rounded font-bold transition ${
                       filterMode === mode
-                        ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/50'
+                        ? 'border text-white'
                         : 'text-slate-500 hover:text-slate-300'
                     }`}
+                    style={
+                      filterMode === mode
+                        ? {
+                            borderColor: currentTheme.primary,
+                            backgroundColor: 'rgba(0,0,0,0.6)',
+                            color: currentTheme.primary
+                          }
+                        : {}
+                    }
                   >
                     {mode}
                   </button>
@@ -745,13 +844,22 @@ export default function App() {
                       onClick={() => selectAndFocusPacket(pkt)}
                       className={`p-2 rounded border cursor-pointer transition relative group ${
                         isSelected
-                          ? 'bg-cyan-950/50 border-cyan-400 shadow-[0_0_12px_rgba(0,240,255,0.25)]'
+                          ? 'border-cyan-400 shadow-[0_0_12px_rgba(0,240,255,0.25)]'
                           : isSevered
                           ? 'bg-red-950/15 border-red-900/35 hover:border-red-500/50 opacity-70'
                           : isPoisoned
                           ? 'bg-purple-950/20 border-purple-800/40 hover:border-purple-500/60'
                           : 'bg-slate-950/70 border-slate-800/80 hover:border-cyan-500/40'
                       }`}
+                      style={
+                        isSelected
+                          ? {
+                              backgroundColor: 'rgba(0,0,0,0.7)',
+                              borderColor: currentTheme.primary,
+                              boxShadow: `0 0 12px ${currentTheme.primaryGlow}`
+                            }
+                          : {}
+                      }
                     >
                       <div className="flex items-center justify-between gap-1 mb-0.5">
                         <span className="text-[11px] font-bold text-slate-200 truncate group-hover:text-cyan-300 transition">
@@ -796,18 +904,19 @@ export default function App() {
           </aside>
         )}
 
-        {/* CENTER 3D GLOBE CANVAS */}
+        {/* CENTER 3D HARD GRAPHICS GLOBE: NASA Night Lights + Country Glows */}
         <main ref={globeContainerRef} className="flex-1 relative h-full w-full overflow-hidden flex items-center justify-center">
           <Globe
             ref={globeRef}
             width={globeDimensions.width}
             height={globeDimensions.height}
+            // Ultra-realistic NASA Earth Night Lights with country glows
             globeImageUrl="//cdn.jsdelivr.net/npm/three-globe/example/img/earth-night.jpg"
             bumpImageUrl="//cdn.jsdelivr.net/npm/three-globe/example/img/earth-topology.png"
             backgroundImageUrl="//cdn.jsdelivr.net/npm/three-globe/example/img/night-sky.png"
             showAtmosphere={true}
-            atmosphereColor="#00f0ff"
-            atmosphereAltitude={0.22}
+            atmosphereColor={currentTheme.atmosphere}
+            atmosphereAltitude={0.24}
             // Laser Arcs
             arcsData={arcs}
             arcStartLat="startLat"
@@ -821,13 +930,13 @@ export default function App() {
             arcStroke={0.65}
             arcAltitudeAutoScale={0.45}
             onArcClick={(arc) => selectAndFocusPacket(arc)}
-            // Animated Radar Rings on target storage cities
+            // Animated impact radar rings
             ringsData={ringsData}
             ringColor={(d) => d.color}
             ringMaxRadius={(d) => d.maxR}
             ringPropagationSpeed={(d) => d.propagationSpeed}
             ringRepeatPeriod={(d) => d.repeatPeriod}
-            // 3D Destination Labels on Globe
+            // 3D Server Destination Labels
             labelsData={labelsData}
             labelLat="lat"
             labelLng="lng"
@@ -838,9 +947,9 @@ export default function App() {
             onLabelClick={(label) => selectAndFocusPacket(label.packet)}
           />
 
-          {/* Radar Legend (Top-Right HUD Overlay) */}
-          <div className="absolute top-4 right-4 tactical-panel p-2.5 rounded-lg border border-cyan-500/25 text-xs backdrop-blur-md shadow-2xl z-10 max-w-[210px]">
-            <div className="text-[9px] text-cyan-400 font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5">
+          {/* Theme Indicator & Spectrum (Top-Right HUD Overlay) */}
+          <div className="absolute top-4 right-4 tactical-panel p-2.5 rounded-lg border text-xs backdrop-blur-md shadow-2xl z-10 max-w-[210px]">
+            <div className="text-[9px] font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5" style={{ color: currentTheme.primary }}>
               <Layers className="w-3 h-3" />
               SURVEILLANCE SPECTRUM
             </div>
@@ -851,15 +960,15 @@ export default function App() {
               </div>
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-[#fbbf24] shadow-[0_0_6px_#fbbf24]"></span>
-                <span className="text-slate-300">Ad / Profiler Tracker</span>
+                <span className="text-slate-300">Ad / Profiler</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-[#ff7700] shadow-[0_0_6px_#ff7700]"></span>
-                <span className="text-slate-300">Session Replay Spy</span>
+                <span className="text-slate-300">Session Replay</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-[#ff0055] shadow-[0_0_6px_#ff0055]"></span>
-                <span className="text-slate-300">High-Risk Phishing/FP</span>
+                <span className="text-slate-300">Malicious/FP</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-[#c084fc] shadow-[0_0_6px_#c084fc]"></span>
@@ -868,18 +977,18 @@ export default function App() {
             </div>
           </div>
 
-          {/* Quick Camera Navigation Overlay on Globe (Right Side) */}
-          <div className="absolute right-4 top-48 tactical-panel p-1.5 rounded-lg border border-cyan-500/25 flex flex-col gap-1 z-10 shadow-xl">
+          {/* On-Screen Camera Navigation Pod */}
+          <div className="absolute right-4 top-48 tactical-panel p-1.5 rounded-lg border flex flex-col gap-1 z-10 shadow-xl">
             <button
               onClick={zoomIn}
-              className="p-1.5 rounded hover:bg-cyan-500/20 text-slate-300 hover:text-cyan-300 transition"
+              className="p-1.5 rounded hover:bg-white/10 text-slate-300 transition"
               title="Zoom In"
             >
               <ZoomIn className="w-4 h-4" />
             </button>
             <button
               onClick={zoomOut}
-              className="p-1.5 rounded hover:bg-cyan-500/20 text-slate-300 hover:text-cyan-300 transition"
+              className="p-1.5 rounded hover:bg-white/10 text-slate-300 transition"
               title="Zoom Out"
             >
               <ZoomOut className="w-4 h-4" />
@@ -887,7 +996,7 @@ export default function App() {
             <div className="w-full h-px bg-slate-800 my-0.5"></div>
             <button
               onClick={shiftUp}
-              className="p-1.5 rounded hover:bg-cyan-500/20 text-slate-300 hover:text-cyan-300 transition"
+              className="p-1.5 rounded hover:bg-white/10 text-slate-300 transition"
               title="Shift Up"
             >
               <ChevronUp className="w-4 h-4" />
@@ -895,14 +1004,14 @@ export default function App() {
             <div className="flex gap-1">
               <button
                 onClick={shiftLeft}
-                className="p-1.5 rounded hover:bg-cyan-500/20 text-slate-300 hover:text-cyan-300 transition"
+                className="p-1.5 rounded hover:bg-white/10 text-slate-300 transition"
                 title="Shift Left"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
               <button
                 onClick={shiftRight}
-                className="p-1.5 rounded hover:bg-cyan-500/20 text-slate-300 hover:text-cyan-300 transition"
+                className="p-1.5 rounded hover:bg-white/10 text-slate-300 transition"
                 title="Shift Right"
               >
                 <ChevronRight className="w-4 h-4" />
@@ -910,7 +1019,7 @@ export default function App() {
             </div>
             <button
               onClick={shiftDown}
-              className="p-1.5 rounded hover:bg-cyan-500/20 text-slate-300 hover:text-cyan-300 transition"
+              className="p-1.5 rounded hover:bg-white/10 text-slate-300 transition"
               title="Shift Down"
             >
               <ChevronDown className="w-4 h-4" />
@@ -918,16 +1027,18 @@ export default function App() {
             <div className="w-full h-px bg-slate-800 my-0.5"></div>
             <button
               onClick={resetCamera}
-              className="p-1.5 rounded hover:bg-cyan-500/20 text-slate-300 hover:text-cyan-300 transition"
+              className="p-1.5 rounded hover:bg-white/10 text-slate-300 transition"
               title="Reset Orbit"
             >
-              <Compass className="w-4 h-4 text-cyan-400" />
+              <Compass className="w-4 h-4" style={{ color: currentTheme.primary }} />
             </button>
             <button
               onClick={() => setAutoRotate(!autoRotate)}
-              className={`p-1.5 rounded transition ${
-                autoRotate ? 'bg-cyan-950/70 text-cyan-400' : 'text-slate-500 hover:text-slate-300'
-              }`}
+              className="p-1.5 rounded transition"
+              style={{
+                color: autoRotate ? currentTheme.primary : '#64748b',
+                background: autoRotate ? 'rgba(0,0,0,0.5)' : 'transparent'
+              }}
               title="Toggle Auto Rotation"
             >
               <RotateCw className={`w-4 h-4 ${autoRotate ? 'animate-spin' : ''}`} style={{ animationDuration: '8s' }} />
@@ -935,28 +1046,28 @@ export default function App() {
           </div>
         </main>
 
-        {/* SLIDING PACKET X-RAY MODAL/DRAWER (Overlay mode so it never clips screens) */}
+        {/* SLIDING PACKET X-RAY MODAL */}
         {showInspectorModal && selectedPacket && (
-          <aside className="absolute right-0 top-0 bottom-0 w-80 md:w-96 tactical-panel-glow border-l border-cyan-500/35 p-5 z-30 flex flex-col justify-between shadow-2xl animate-slide-in-right overflow-y-auto">
+          <aside className="absolute right-0 top-0 bottom-0 w-80 md:w-96 tactical-panel-glow border-l p-5 z-30 flex flex-col justify-between shadow-2xl animate-slide-in-right overflow-y-auto">
             <div>
-              <div className="flex justify-between items-center border-b border-cyan-500/25 pb-2.5 mb-3">
+              <div className="flex justify-between items-center border-b pb-2.5 mb-3" style={{ borderColor: 'rgba(255,255,255,0.1)' }}>
                 <div className="flex items-center gap-2">
-                  <Terminal className="w-4 h-4 text-cyan-400" />
-                  <h2 className="text-xs font-bold text-cyan-300 tracking-wider uppercase">
+                  <Terminal className="w-4 h-4" style={{ color: currentTheme.primary }} />
+                  <h2 className="text-xs font-bold tracking-wider uppercase" style={{ color: currentTheme.primary }}>
                     PACKET X-RAY INSPECTOR
                   </h2>
                 </div>
                 <button
                   onClick={() => setShowInspectorModal(false)}
-                  className="text-slate-400 hover:text-cyan-300 font-bold text-sm transition p-1"
+                  className="text-slate-400 hover:text-white font-bold text-sm transition p-1"
                 >
                   <X className="w-4 h-4" />
                 </button>
               </div>
 
               <div className="space-y-3 text-xs">
-                {/* Parent Company & Storage Entity */}
-                <div className="bg-black/70 p-3 rounded-lg border border-slate-800 cyber-corner">
+                {/* Destination Entity */}
+                <div className="bg-black/70 p-3 rounded-lg border border-slate-800">
                   <div className="text-[9px] text-slate-500 uppercase tracking-wider mb-1">
                     Destination Surveillance Entity
                   </div>
@@ -976,13 +1087,21 @@ export default function App() {
                       {selectedPacket.threatLevel}
                     </span>
                   </div>
-                  <div className="text-cyan-400 text-xs mt-1 truncate">{selectedPacket.domain}</div>
+                  <div className="text-xs mt-1 truncate" style={{ color: currentTheme.primary }}>
+                    {selectedPacket.domain}
+                  </div>
                 </div>
 
                 {/* EXACT STORAGE LOCATION & COORDINATES */}
-                <div className="bg-black/70 p-3 rounded-lg border border-cyan-500/30 space-y-1.5 shadow-[0_0_15px_rgba(0,240,255,0.08)]">
-                  <div className="text-[9px] text-cyan-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
-                    <MapPin className="w-3.5 h-3.5 text-cyan-400" />
+                <div
+                  className="bg-black/70 p-3 rounded-lg border space-y-1.5 shadow-lg"
+                  style={{
+                    borderColor: currentTheme.primary,
+                    boxShadow: `0 0 15px ${currentTheme.primaryGlow}`
+                  }}
+                >
+                  <div className="text-[9px] font-bold uppercase tracking-wider flex items-center gap-1.5" style={{ color: currentTheme.primary }}>
+                    <MapPin className="w-3.5 h-3.5" style={{ color: currentTheme.primary }} />
                     EXACT SERVER DESTINATION & STORAGE
                   </div>
                   <div className="flex items-center justify-between text-slate-300">
@@ -991,7 +1110,7 @@ export default function App() {
                   </div>
                   <div className="flex items-center justify-between text-slate-300">
                     <span className="text-slate-400">Exact Coordinates:</span>
-                    <span className="text-cyan-300 font-bold font-mono">
+                    <span className="font-bold font-mono" style={{ color: currentTheme.primary }}>
                       {selectedPacket.geo?.lat?.toFixed(4)}°, {selectedPacket.geo?.lng?.toFixed(4)}°
                     </span>
                   </div>
@@ -1001,7 +1120,7 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* Data Leaks Detected */}
+                {/* Harvested Leaks */}
                 <div className="bg-black/70 p-3 rounded-lg border border-slate-800">
                   <div className="text-[9px] text-red-400 font-bold uppercase tracking-wider mb-2 flex items-center gap-1">
                     <AlertTriangle className="w-3.5 h-3.5" />
@@ -1020,7 +1139,7 @@ export default function App() {
             </div>
 
             {/* In-drawer action buttons */}
-            <div className="space-y-2 pt-3 border-t border-cyan-500/25 mt-3">
+            <div className="space-y-2 pt-3 border-t mt-3" style={{ borderColor: 'rgba(255,255,255,0.1)' }}>
               {blockedDomains.has(selectedPacket.domain) || selectedPacket.isSevered ? (
                 <button
                   onClick={() => restoreWire(selectedPacket.domain)}
@@ -1033,14 +1152,14 @@ export default function App() {
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     onClick={() => cutTheWire(selectedPacket.domain)}
-                    className="w-full bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 text-white font-bold py-2 rounded flex items-center justify-center gap-1.5 transition text-xs shadow-[0_0_12px_rgba(255,0,85,0.35)]"
+                    className="w-full bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 text-white font-bold py-2 rounded flex items-center justify-center gap-1.5 transition text-xs shadow-lg"
                   >
                     <Scissors className="w-3.5 h-3.5" />
                     CUT WIRE
                   </button>
                   <button
                     onClick={() => poisonTheWire(selectedPacket.domain)}
-                    className="w-full bg-gradient-to-r from-purple-700 to-indigo-700 hover:from-purple-600 hover:to-indigo-600 text-white font-bold py-2 rounded flex items-center justify-center gap-1.5 transition text-xs shadow-[0_0_12px_rgba(176,38,255,0.35)]"
+                    className="w-full bg-gradient-to-r from-purple-700 to-indigo-700 hover:from-purple-600 hover:to-indigo-600 text-white font-bold py-2 rounded flex items-center justify-center gap-1.5 transition text-xs shadow-lg"
                   >
                     <Skull className="w-3.5 h-3.5" />
                     POISON WIRE
@@ -1052,17 +1171,23 @@ export default function App() {
         )}
       </div>
 
-      {/* 3. BOTTOM COMMAND DOCK: Real-time Destination Telemetry, Wire Cut Controls & Camera Deck */}
-      <footer className="h-16 bottom-command-deck z-30 px-4 flex items-center justify-between border-t border-cyan-500/30 flex-shrink-0">
+      {/* 3. BOTTOM COMMAND DOCK: Destination Storage Coordinates & Wire Controls */}
+      <footer className="h-16 bottom-command-deck z-30 px-4 flex items-center justify-between border-t flex-shrink-0">
         
-        {/* Left: Prominent Destination Storage Location & Exact Coordinates */}
+        {/* Left: Destination Coordinates & Server Location */}
         <div className="flex items-center gap-3 max-w-[35%] truncate">
-          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-cyan-950/80 border border-cyan-500/50 shadow-[0_0_10px_rgba(0,240,255,0.3)] flex-shrink-0">
-            <Server className="text-cyan-400 w-4 h-4" />
+          <div
+            className="flex items-center justify-center w-8 h-8 rounded-lg bg-black/70 border shadow-lg flex-shrink-0"
+            style={{
+              borderColor: currentTheme.primary,
+              boxShadow: `0 0 10px ${currentTheme.primaryGlow}`
+            }}
+          >
+            <Server className="w-4 h-4" style={{ color: currentTheme.primary }} />
           </div>
           <div className="truncate">
             <div className="text-[9px] text-slate-400 uppercase tracking-widest flex items-center gap-1">
-              <MapPin className="w-3 h-3 text-cyan-400" />
+              <MapPin className="w-3 h-3" style={{ color: currentTheme.primary }} />
               <span>DATA DESTINATION & STORAGE COORDINATES:</span>
             </div>
             {activeDestination ? (
@@ -1070,7 +1195,14 @@ export default function App() {
                 <span className="font-bold text-slate-100 truncate">
                   {activeDestination.company} ({activeDestination.city})
                 </span>
-                <span className="text-cyan-300 font-mono font-bold bg-cyan-950/60 px-1.5 py-0.2 rounded border border-cyan-500/30 text-[11px]">
+                <span
+                  className="font-mono font-bold px-1.5 py-0.2 rounded border text-[11px]"
+                  style={{
+                    backgroundColor: 'rgba(0,0,0,0.6)',
+                    borderColor: currentTheme.primary,
+                    color: currentTheme.primary
+                  }}
+                >
                   {activeDestination.geo?.lat?.toFixed(4)}°N, {activeDestination.geo?.lng?.toFixed(4)}°E
                 </span>
               </div>
@@ -1101,14 +1233,14 @@ export default function App() {
                 <>
                   <button
                     onClick={() => cutTheWire(activeDestination.domain)}
-                    className="px-3 py-1 rounded bg-red-600 hover:bg-red-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-[0_0_12px_rgba(255,0,85,0.4)] transition"
+                    className="px-3 py-1 rounded bg-red-600 hover:bg-red-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-lg transition"
                   >
                     <Scissors className="w-3.5 h-3.5" />
                     CUT WIRE
                   </button>
                   <button
                     onClick={() => poisonTheWire(activeDestination.domain)}
-                    className="px-3 py-1 rounded bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-[0_0_12px_rgba(176,38,255,0.4)] transition"
+                    className="px-3 py-1 rounded bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold flex items-center gap-1.5 shadow-lg transition"
                   >
                     <Skull className="w-3.5 h-3.5" />
                     POISON DATA
@@ -1121,7 +1253,7 @@ export default function App() {
           {/* Master Kill Switch for All Trackers */}
           <button
             onClick={cutAllTrackers}
-            className="px-3 py-1 rounded bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 text-white text-xs font-bold flex items-center gap-1.5 shadow-[0_0_15px_rgba(255,0,85,0.4)] transition"
+            className="px-3 py-1 rounded bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 text-white text-xs font-bold flex items-center gap-1.5 shadow-lg transition"
             title="Block and Sever All Detected Tracker Wires"
           >
             <Scissors className="w-3.5 h-3.5" />
@@ -1130,7 +1262,7 @@ export default function App() {
 
           <button
             onClick={poisonAllTrackers}
-            className="px-3 py-1 rounded bg-gradient-to-r from-purple-700 to-indigo-700 hover:from-purple-600 hover:to-indigo-600 text-white text-xs font-bold flex items-center gap-1.5 shadow-[0_0_15px_rgba(176,38,255,0.4)] transition"
+            className="px-3 py-1 rounded bg-gradient-to-r from-purple-700 to-indigo-700 hover:from-purple-600 hover:to-indigo-600 text-white text-xs font-bold flex items-center gap-1.5 shadow-lg transition"
             title="Inject Synthetic Noise & Decoys into All Tracker Connections"
           >
             <Skull className="w-3.5 h-3.5" />
@@ -1150,22 +1282,28 @@ export default function App() {
           )}
         </div>
 
-        {/* Right: Quick Camera View Navigation Controls */}
+        {/* Right: Quick Camera View Navigation Controls & Inspect Payload */}
         <div className="flex items-center gap-1.5">
           <div className="hidden lg:flex items-center gap-1 text-[10px] text-slate-400 font-bold bg-black/60 px-2 py-1 rounded border border-slate-800">
-            <Compass className="w-3 h-3 text-cyan-400" />
+            <Compass className="w-3 h-3" style={{ color: currentTheme.primary }} />
             <span>NAV:</span>
             <button onClick={zoomIn} className="px-1.5 py-0.5 rounded hover:bg-slate-800 text-slate-200" title="Zoom In">+</button>
             <button onClick={zoomOut} className="px-1.5 py-0.5 rounded hover:bg-slate-800 text-slate-200" title="Zoom Out">-</button>
             <button onClick={shiftUp} className="px-1.5 py-0.5 rounded hover:bg-slate-800 text-slate-200" title="Shift Up">↑</button>
             <button onClick={shiftDown} className="px-1.5 py-0.5 rounded hover:bg-slate-800 text-slate-200" title="Shift Down">↓</button>
-            <button onClick={resetCamera} className="px-1.5 py-0.5 rounded hover:bg-slate-800 text-cyan-300" title="Reset">RESET</button>
+            <button onClick={resetCamera} className="px-1.5 py-0.5 rounded hover:bg-slate-800" style={{ color: currentTheme.primary }} title="Reset">RESET</button>
           </div>
 
           {activeDestination && (
             <button
               onClick={() => setShowInspectorModal(true)}
-              className="px-2.5 py-1 rounded bg-cyan-950/70 border border-cyan-500/40 text-cyan-300 hover:bg-cyan-900/50 text-xs font-bold flex items-center gap-1 transition"
+              className="px-2.5 py-1 rounded border text-xs font-bold flex items-center gap-1 transition shadow-lg"
+              style={{
+                backgroundColor: 'rgba(0,0,0,0.6)',
+                borderColor: currentTheme.primary,
+                color: currentTheme.primary,
+                boxShadow: `0 0 10px ${currentTheme.primaryGlow}`
+              }}
             >
               <Terminal className="w-3.5 h-3.5" />
               INSPECT PAYLOAD
@@ -1174,11 +1312,11 @@ export default function App() {
         </div>
       </footer>
 
-      {/* 4. MODAL: Clean-Room Safe View Modal */}
+      {/* 4. MODAL: Clean-Room Safe View */}
       {showSafeViewModal && safeViewImg && (
         <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="tactical-panel-glow w-full max-w-4xl max-h-[88vh] rounded-xl flex flex-col overflow-hidden border border-cyan-500/40 shadow-2xl">
-            <div className="p-3.5 border-b border-cyan-500/30 flex items-center justify-between bg-black/60">
+          <div className="tactical-panel-glow w-full max-w-4xl max-h-[88vh] rounded-xl flex flex-col overflow-hidden border shadow-2xl">
+            <div className="p-3.5 border-b flex items-center justify-between bg-black/60" style={{ borderColor: 'rgba(255,255,255,0.1)' }}>
               <div className="flex items-center gap-2">
                 <ShieldAlert className="w-4 h-4 text-emerald-400" />
                 <h3 className="text-xs font-bold text-slate-100">
@@ -1202,11 +1340,14 @@ export default function App() {
                 className="max-w-full max-h-[68vh] rounded border border-slate-800 shadow-2xl object-contain"
               />
             </div>
-            <div className="p-3 bg-black/70 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+            <div className="p-3 bg-black/70 border-t flex items-center justify-between text-xs text-slate-400" style={{ borderColor: 'rgba(255,255,255,0.1)' }}>
               <span>All severed surveillance trackers stripped before network arrival.</span>
               <button
                 onClick={() => setShowSafeViewModal(false)}
-                className="px-3 py-1 bg-cyan-600 hover:bg-cyan-500 text-slate-950 font-bold rounded"
+                className="px-3 py-1 font-bold rounded text-slate-950 transition"
+                style={{
+                  backgroundColor: currentTheme.primary
+                }}
               >
                 Close Preview
               </button>
