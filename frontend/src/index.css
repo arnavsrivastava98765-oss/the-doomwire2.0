@@ -1,0 +1,191 @@
+@import "tailwindcss";
+
+:root {
+  --bg-deep: #020409;
+  --bg-panel: rgba(5, 9, 20, 0.88);
+  --bg-panel-glow: rgba(7, 14, 30, 0.94);
+  --border-neon: rgba(0, 240, 255, 0.28);
+  
+  --neon-cyan: #00f0ff;
+  --neon-cyan-glow: rgba(0, 240, 255, 0.45);
+  --neon-emerald: #00ff88;
+  --neon-amber: #fbbf24;
+  --neon-orange: #ff6600;
+  --neon-crimson: #ff0055;
+  --neon-violet: #c084fc;
+  
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+  --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-deep);
+  color: #f1f5f9;
+  font-family: var(--font-sans);
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+  user-select: none;
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+.font-sans {
+  font-family: var(--font-sans);
+}
+
+/* Tactical Background Grid & Ambient Space Vignette */
+.cyber-canvas-bg {
+  background-color: #020409;
+  background-image: 
+    radial-gradient(circle at 50% 50%, rgba(0, 80, 160, 0.12) 0%, rgba(2, 4, 9, 0.95) 75%),
+    linear-gradient(to right, rgba(0, 240, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 240, 255, 0.035) 1px, transparent 1px);
+  background-size: 100% 100%, 36px 36px, 36px 36px;
+}
+
+/* Glassmorphism Tactical Panels */
+.tactical-panel {
+  background: var(--bg-panel);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-neon);
+  box-shadow: 0 10px 35px 0 rgba(0, 0, 0, 0.75), inset 0 0 15px rgba(0, 240, 255, 0.03);
+}
+
+.tactical-panel-glow {
+  background: var(--bg-panel-glow);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(0, 240, 255, 0.4);
+  box-shadow: 0 0 35px rgba(0, 240, 255, 0.2), inset 0 0 20px rgba(0, 240, 255, 0.06);
+}
+
+/* Bottom Command Deck */
+.bottom-command-deck {
+  background: linear-gradient(180deg, rgba(6, 12, 28, 0.92) 0%, rgba(2, 5, 14, 0.98) 100%);
+  backdrop-filter: blur(24px);
+  border-top: 1px solid rgba(0, 240, 255, 0.35);
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.85), inset 0 1px 0 rgba(0, 240, 255, 0.2);
+}
+
+/* Subtle CRT Scanline Overlay */
+.scanline {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%);
+  background-size: 100% 3px;
+  pointer-events: none;
+  opacity: 0.3;
+  z-index: 5;
+}
+
+/* Tactical Corner Accents */
+.cyber-corner {
+  position: relative;
+}
+.cyber-corner::before {
+  content: '';
+  position: absolute;
+  top: -1px; left: -1px;
+  width: 8px; height: 8px;
+  border-top: 2px solid var(--neon-cyan);
+  border-left: 2px solid var(--neon-cyan);
+}
+.cyber-corner::after {
+  content: '';
+  position: absolute;
+  bottom: -1px; right: -1px;
+  width: 8px; height: 8px;
+  border-bottom: 2px solid var(--neon-cyan);
+  border-right: 2px solid var(--neon-cyan);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(2, 4, 9, 0.9);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 240, 255, 0.25);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 240, 255, 0.6);
+  box-shadow: 0 0 10px var(--neon-cyan);
+}
+
+/* Neon Glow Badges */
+.badge-threat-green {
+  background: rgba(0, 255, 136, 0.12);
+  color: #00ff88;
+  border: 1px solid rgba(0, 255, 136, 0.35);
+  box-shadow: 0 0 10px rgba(0, 255, 136, 0.18);
+}
+
+.badge-threat-yellow {
+  background: rgba(245, 158, 11, 0.12);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.18);
+}
+
+.badge-threat-orange {
+  background: rgba(255, 102, 0, 0.15);
+  color: #ff7700;
+  border: 1px solid rgba(255, 102, 0, 0.4);
+  box-shadow: 0 0 12px rgba(255, 102, 0, 0.22);
+}
+
+.badge-threat-red {
+  background: rgba(255, 0, 85, 0.18);
+  color: #ff0055;
+  border: 1px solid rgba(255, 0, 85, 0.5);
+  box-shadow: 0 0 15px rgba(255, 0, 85, 0.3);
+}
+
+.badge-threat-purple {
+  background: rgba(192, 132, 252, 0.18);
+  color: #c084fc;
+  border: 1px solid rgba(192, 132, 252, 0.5);
+  box-shadow: 0 0 15px rgba(192, 132, 252, 0.3);
+}
+
+/* Animations */
+@keyframes pulse-ring {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.1); opacity: 1; filter: drop-shadow(0 0 12px var(--neon-cyan)); }
+  100% { transform: scale(0.95); opacity: 0.8; }
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 2.5s infinite ease-in-out;
+}
+
+@keyframes slideInUp {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.animate-slide-in-up {
+  animation: slideInUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideRightIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.animate-slide-in-right {
+  animation: slideRightIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
