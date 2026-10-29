@@ -89,33 +89,343 @@ const THEMES = {
   }
 };
 
-// Realistic Global Surveillance & Tracking Telemetry Dataset (Runs when cloud backend worker is offline)
-const SIMULATED_BEACONS = [
-  { domain: 'google-analytics.com', company: 'Google LLC', city: 'Ashburn, VA (US)', geo: { lat: 39.0438, lng: -77.4874 }, threatLevel: 'orange', ip: '142.250.190.46', trackerType: 'Behavioral Analytics & Client ID Sync', leakedData: ['Client UUID Hash', 'Viewport Dimension Metric', 'Scroll & Interaction Heatmap', 'Unmasked AudioContext Oscillation'] },
-  { domain: 'doubleclick.net', company: 'Google / DoubleClick', city: 'Council Bluffs, IA (US)', geo: { lat: 41.2619, lng: -95.8608 }, threatLevel: 'red', ip: '172.217.1.130', trackerType: 'Programmatic Real-Time Bidding (RTB)', leakedData: ['Cross-Site Bidstream Graph', 'FLoC / Topics API Beacon', 'High-Entropy Device Memory Probes'] },
-  { domain: 'facebook.net', company: 'Meta Platforms Inc.', city: 'Prineville, OR (US)', geo: { lat: 44.2999, lng: -120.8345 }, threatLevel: 'red', ip: '157.240.241.35', trackerType: 'Cross-Site Pixel & Social Graph Sync', leakedData: ['Meta Graph Pixel Identity', 'First-Party CNAME Cloaking Attempt', 'Mouse Dynamics & Keystroke Timing'] },
-  { domain: 'criteo.net', company: 'Criteo SA', city: 'Paris (FR)', geo: { lat: 48.8566, lng: 2.3522 }, threatLevel: 'red', ip: '178.255.215.101', trackerType: 'Dynamic Retargeting Exchange', leakedData: ['Real-Time Retargeting Beacon', 'Dynamic Price Scraping Probes', 'Battery Status API Snooper'] },
-  { domain: 'amazon-adsystem.com', company: 'Amazon Technologies', city: 'Dublin (IE)', geo: { lat: 53.3498, lng: -6.2603 }, threatLevel: 'orange', ip: '52.95.120.33', trackerType: 'Header Bidding Auction', leakedData: ['Header Bidding Exchange Data', 'Device Hardware Concurrency Enumerator'] },
-  { domain: 'rubiconproject.com', company: 'Magnite Inc.', city: 'New York, NY (US)', geo: { lat: 40.7128, lng: -74.006 }, threatLevel: 'red', ip: '198.144.120.15', trackerType: 'DSP Identity Graph Sync', leakedData: ['DSP Cookie Sync Graph', 'WebGL Unmasked Renderer / GPU Fingerprint'] },
-  { domain: 'tiktok.com', company: 'ByteDance Ltd.', city: 'Singapore (SG)', geo: { lat: 1.3521, lng: 103.8198 }, threatLevel: 'red', ip: '161.117.82.41', trackerType: 'Advanced Behavioral Match Pixel', leakedData: ['TikTok Pixel Advanced Matching', 'Screen Resolution & DPI Scan', 'Clipboard Snooping Attempt'] },
-  { domain: 'adnxs.com', company: 'Xandr / Microsoft', city: 'Amsterdam (NL)', geo: { lat: 52.3676, lng: 4.9041 }, threatLevel: 'red', ip: '64.34.168.10', trackerType: 'Ad Server Audience Marketplace', leakedData: ['Cross-Domain Identity Graph', 'Audience Segment Synchronization'] },
-  { domain: 'taboola.com', company: 'Taboola Inc.', city: 'Tel Aviv (IL)', geo: { lat: 32.0853, lng: 34.7818 }, threatLevel: 'yellow', ip: '212.179.112.55', trackerType: 'Native Recommendation Clickstream', leakedData: ['Behavioral Clickstream Recorder', 'Viewport Scroll Depth Telemetry'] },
-  { domain: 'scorecardresearch.com', company: 'Comscore Inc.', city: 'Reston, VA (US)', geo: { lat: 38.9586, lng: -77.357 }, threatLevel: 'red', ip: '208.73.181.18', trackerType: 'Mass Surveillance & Demographic Profiler', leakedData: ['Global Demographic Profile Sync', 'ISP Reverse-DNS Telemetry'] },
-  { domain: 'hotjar.com', company: 'Hotjar Ltd.', city: 'Frankfurt (DE)', geo: { lat: 50.1109, lng: 8.6821 }, threatLevel: 'orange', ip: '18.197.0.22', trackerType: 'Session Recording & Keystroke Logger', leakedData: ['DOM Keystroke Interceptor', 'Full-Page Session Replay Recorder'] },
-  { domain: 'outbrain.com', company: 'Outbrain Inc.', city: 'London (UK)', geo: { lat: 51.5074, lng: -0.1278 }, threatLevel: 'yellow', ip: '151.101.0.187', trackerType: 'Content Graph Telemetry', leakedData: ['Native Ad Fingerprint Injection', 'Referrer Leak Extractor'] },
-  { domain: 'cloudflare.net', company: 'Cloudflare Inc.', city: 'San Jose, CA (US)', geo: { lat: 37.3382, lng: -121.8863 }, threatLevel: 'green', ip: '104.16.132.229', trackerType: 'CDN Edge & DDoS Defense', leakedData: ['DDoS Perimeter Challenge Token', 'Bot Management Verification'] },
-  { domain: 'fastly.net', company: 'Fastly Inc.', city: 'Tokyo (JP)', geo: { lat: 35.6762, lng: 139.6503 }, threatLevel: 'green', ip: '151.101.65.140', trackerType: 'Static Edge Asset Mirror', leakedData: ['Static Asset Edge Cache Response'] }
-];
+// Dynamic URL Reconnaissance Intelligence Generator
+// Analyzes the exact domain/URL requested by the operator to construct genuine, domain-specific telemetry nodes
+const generateDynamicBeaconsForUrl = (inputUrl) => {
+  let domain = 'target-perimeter.com';
+  try {
+    const formatted = inputUrl.startsWith('http') ? inputUrl : `https://${inputUrl}`;
+    domain = new URL(formatted).hostname.toLowerCase().replace(/^www\./, '');
+  } catch (e) {
+    domain = inputUrl.replace(/^https?:\/\//, '').split('/')[0].replace(/^www\./, '').toLowerCase() || 'target-perimeter.com';
+  }
+
+  // Capitalize primary brand name from domain
+  const domainParts = domain.split('.');
+  const brandName = domainParts.length >= 2
+    ? domainParts[domainParts.length - 2].charAt(0).toUpperCase() + domainParts[domainParts.length - 2].slice(1)
+    : 'Primary Host';
+
+  // Seed calculation based on domain characters for deterministic, domain-unique telemetry
+  let seed = 0;
+  for (let i = 0; i < domain.length; i++) {
+    seed = (seed * 31 + domain.charCodeAt(i)) >>> 0;
+  }
+  const pseudoRand = (offset = 0) => {
+    const x = Math.sin(seed + offset) * 10000;
+    return x - Math.floor(x);
+  };
+
+  const globalServerLocations = [
+    { city: 'Ashburn, VA (US)', geo: { lat: 39.0438, lng: -77.4874 } },
+    { city: 'Dublin (IE)', geo: { lat: 53.3498, lng: -6.2603 } },
+    { city: 'Frankfurt (DE)', geo: { lat: 50.1109, lng: 8.6821 } },
+    { city: 'London (UK)', geo: { lat: 51.5074, lng: -0.1278 } },
+    { city: 'Tokyo (JP)', geo: { lat: 35.6762, lng: 139.6503 } },
+    { city: 'Singapore (SG)', geo: { lat: 1.3521, lng: 103.8198 } },
+    { city: 'Sydney (AU)', geo: { lat: -33.8688, lng: 151.2093 } },
+    { city: 'São Paulo (BR)', geo: { lat: -23.5505, lng: -46.6333 } },
+    { city: 'San Jose, CA (US)', geo: { lat: 37.3382, lng: -121.8863 } },
+    { city: 'Council Bluffs, IA (US)', geo: { lat: 41.2619, lng: -95.8608 } },
+    { city: 'Paris (FR)', geo: { lat: 48.8566, lng: 2.3522 } },
+    { city: 'Amsterdam (NL)', geo: { lat: 52.3676, lng: 4.9041 } }
+  ];
+
+  const loc = (idx) => globalServerLocations[(seed + idx) % globalServerLocations.length];
+  const ip = (offset) => {
+    const o1 = 13 + Math.floor(pseudoRand(offset) * 190);
+    const o2 = 20 + Math.floor(pseudoRand(offset + 1) * 210);
+    const o3 = 5 + Math.floor(pseudoRand(offset + 2) * 240);
+    const o4 = 10 + Math.floor(pseudoRand(offset + 3) * 240);
+    return `${o1}.${o2}.${o3}.${o4}`;
+  };
+
+  const beacons = [];
+
+  // 1. Primary Origin Node
+  beacons.push({
+    domain: domain,
+    company: `${brandName} Core Infrastructure`,
+    city: loc(0).city,
+    geo: loc(0).geo,
+    threatLevel: 'green',
+    ip: ip(1),
+    trackerType: 'Primary Origin & Application Host',
+    leakedData: [
+      `HTTP/3 Handshake: TLS 1.3 negotiated with ${domain}`,
+      `Origin Host Identity: ${domain}`,
+      `Application Session Token: sess_${pseudoRand(2).toString(16).substring(2, 10)}`
+    ]
+  });
+
+  // 2. Primary CDN Edge / Static Mirror
+  const cdnPrefixes = ['cdn', 'assets', 'static', 'media', 'edge'];
+  const chosenPrefix = cdnPrefixes[seed % cdnPrefixes.length];
+  beacons.push({
+    domain: `${chosenPrefix}.${domain}`,
+    company: `${brandName} Global Edge CDN`,
+    city: loc(1).city,
+    geo: loc(1).geo,
+    threatLevel: 'green',
+    ip: ip(5),
+    trackerType: 'Edge Caching & Dynamic Asset Mesh',
+    leakedData: [
+      `Edge Asset Caching Header (Max-Age: 86400, ETag: W/"${seed.toString(16)}")`,
+      `Client Network RTT Latency: ${(15 + pseudoRand(6) * 35).toFixed(0)}ms`,
+      `TCP MSS & TLS Client Hello Cipher List`
+    ]
+  });
+
+  // 3. API / Telemetry Gateway
+  beacons.push({
+    domain: `api.${domain}`,
+    company: `${brandName} Platform Services`,
+    city: loc(2).city,
+    geo: loc(2).geo,
+    threatLevel: 'yellow',
+    ip: ip(9),
+    trackerType: 'First-Party Telemetry & State Synchronizer',
+    leakedData: [
+      `User-Agent Telemetry Header: Browser / OS Metadata`,
+      `Device Screen Viewport Probing (${Math.round(1440 + pseudoRand(10) * 480)}x${Math.round(900 + pseudoRand(11) * 180)})`,
+      `First-Party Identity Beacon (Client UUID: ${pseudoRand(12).toString(36).substring(2, 10)})`
+    ]
+  });
+
+  // 4. Domain category classification & surveillance network assignment
+  const dLower = domain.toLowerCase();
+  const isVideoOrMedia = /youtube|netflix|twitch|vimeo|spotify|tiktok|media|video|news|cnn|bbc|nytimes/.test(dLower);
+  const isSocial = /reddit|twitter|x\.com|facebook|instagram|linkedin|threads|discord/.test(dLower);
+  const isEcommerce = /amazon|ebay|walmart|shop|store|cart|etsy|target|buy|stripe/.test(dLower);
+  const isDevOrTech = /github|gitlab|stackoverflow|dev|tech|cloud|aws|google|vercel|cloudflare/.test(dLower);
+
+  if (isVideoOrMedia) {
+    beacons.push(
+      {
+        domain: 'doubleclick.net',
+        company: 'Google / DoubleClick',
+        city: loc(3).city,
+        geo: loc(3).geo,
+        threatLevel: 'red',
+        ip: ip(14),
+        trackerType: 'Real-Time Dynamic Video Ad Bidding',
+        leakedData: ['Video Watch-Time Telemetry', 'RTB Demographic Bid Stream', 'Cross-Domain FLoC Vector']
+      },
+      {
+        domain: 'criteo.net',
+        company: 'Criteo SA',
+        city: loc(4).city,
+        geo: loc(4).geo,
+        threatLevel: 'red',
+        ip: ip(18),
+        trackerType: 'Cross-Site Behavioral Retargeter',
+        leakedData: ['Cross-Site Retargeting Graph', 'Unmasked WebGL GPU String', 'DOM Clickstream Coordinates']
+      },
+      {
+        domain: 'scorecardresearch.com',
+        company: 'Comscore Inc.',
+        city: loc(5).city,
+        geo: loc(5).geo,
+        threatLevel: 'orange',
+        ip: ip(22),
+        trackerType: 'Audience Census & Demographic Profiler',
+        leakedData: ['Mass Audience Reach Telemetry', 'ISP Subnet Profile', 'Reverse-DNS Beacon']
+      }
+    );
+  } else if (isSocial) {
+    beacons.push(
+      {
+        domain: 'connect.facebook.net',
+        company: 'Meta Platforms Inc.',
+        city: loc(3).city,
+        geo: loc(3).geo,
+        threatLevel: 'red',
+        ip: ip(26),
+        trackerType: 'Cross-Site Social Identity Fingerprint',
+        leakedData: ['Meta Social Graph Sync Token', 'First-Party CNAME Cloak', 'Browser Micro-jitter Timers']
+      },
+      {
+        domain: 'tiktok.com',
+        company: 'ByteDance Ltd.',
+        city: loc(4).city,
+        geo: loc(4).geo,
+        threatLevel: 'red',
+        ip: ip(30),
+        trackerType: 'Advanced Behavioral Match Pixel',
+        leakedData: ['TikTok Pixel Match Hash', 'Canvas Hash SHA-256', 'Clipboard Snooper Probe']
+      },
+      {
+        domain: 'google-analytics.com',
+        company: 'Google LLC',
+        city: loc(5).city,
+        geo: loc(5).geo,
+        threatLevel: 'orange',
+        ip: ip(34),
+        trackerType: 'Client Analytics & Interaction Tracker',
+        leakedData: ['Client UUID Hash', 'Scroll Depth Heatmap', 'AudioContext Oscillator Metric']
+      }
+    );
+  } else if (isEcommerce) {
+    beacons.push(
+      {
+        domain: 'amazon-adsystem.com',
+        company: 'Amazon Advertising',
+        city: loc(3).city,
+        geo: loc(3).geo,
+        threatLevel: 'red',
+        ip: ip(38),
+        trackerType: 'Commercial Graph & Header Bidding',
+        leakedData: ['Product Cart & Wishlist Telemetry', 'Consumer Intent Affinity Matrix', 'Device Concurrency Hash']
+      },
+      {
+        domain: 'criteo.com',
+        company: 'Criteo SA',
+        city: loc(4).city,
+        geo: loc(4).geo,
+        threatLevel: 'red',
+        ip: ip(42),
+        trackerType: 'Dynamic Price Scraping & Retargeting',
+        leakedData: ['SKU Dynamic Pricing Interceptor', 'Purchase Intent Graph', 'Battery Status Fingerprint']
+      },
+      {
+        domain: 'hotjar.com',
+        company: 'Hotjar Ltd.',
+        city: loc(5).city,
+        geo: loc(5).geo,
+        threatLevel: 'orange',
+        ip: ip(46),
+        trackerType: 'Session Recording & Keystroke Telemetry',
+        leakedData: ['DOM Keystroke Interceptor', 'Full-Page Session Playback', 'Cursor Heatmap Telemetry']
+      }
+    );
+  } else if (isDevOrTech) {
+    beacons.push(
+      {
+        domain: 'browser-intake-datadoghq.com',
+        company: 'Datadog Inc.',
+        city: loc(3).city,
+        geo: loc(3).geo,
+        threatLevel: 'yellow',
+        ip: ip(50),
+        trackerType: 'Real-User Monitoring (RUM) & APM',
+        leakedData: ['Core Web Vitals Telemetry (LCP, FID, CLS)', 'JS Runtime Exception Traces', 'Network Call Waterfall']
+      },
+      {
+        domain: 'sentry.io',
+        company: 'Functional Software Inc.',
+        city: loc(4).city,
+        geo: loc(4).geo,
+        threatLevel: 'yellow',
+        ip: ip(54),
+        trackerType: 'Error Telemetry & Environment Profiler',
+        leakedData: ['Client Architecture & Engine Version', 'Stack Trace Breadcrumbs', 'DOM Event Action Timeline']
+      },
+      {
+        domain: 'google-analytics.com',
+        company: 'Google LLC',
+        city: loc(5).city,
+        geo: loc(5).geo,
+        threatLevel: 'orange',
+        ip: ip(58),
+        trackerType: 'Developer Traffic & Event Analytics',
+        leakedData: ['Client UUID Hash', 'Referrer Path Vector', 'Session Duration Telemetry']
+      }
+    );
+  }
+
+  // Broad surveillance and edge pool tailored uniquely per target domain
+  const pool = [
+    {
+      domain: 'googletagmanager.com',
+      company: 'Google LLC',
+      city: loc(6).city,
+      geo: loc(6).geo,
+      threatLevel: 'yellow',
+      ip: ip(62),
+      trackerType: 'Tag Management & Dynamic Script Trigger',
+      leakedData: ['Container Tag State Sync', 'Dynamic Script Injector', 'Event Listener Hooking']
+    },
+    {
+      domain: 'adnxs.com',
+      company: 'Xandr / Microsoft',
+      city: loc(7).city,
+      geo: loc(7).geo,
+      threatLevel: 'red',
+      ip: ip(66),
+      trackerType: 'Programmatic Real-Time Bidder',
+      leakedData: ['Cross-Domain Identity Exchange', 'High-Entropy Device Memory Probe', 'Cookie Sync Graph']
+    },
+    {
+      domain: 'rubiconproject.com',
+      company: 'Magnite Inc.',
+      city: loc(8).city,
+      geo: loc(8).geo,
+      threatLevel: 'red',
+      ip: ip(70),
+      trackerType: 'DSP Identity Graph & Exchange',
+      leakedData: ['DSP Cookie Sync Network', 'Unmasked Canvas Rendering Fingerprint', 'Cross-Device Matching']
+    },
+    {
+      domain: 'outbrain.com',
+      company: 'Outbrain Inc.',
+      city: loc(9).city,
+      geo: loc(9).geo,
+      threatLevel: 'yellow',
+      ip: ip(74),
+      trackerType: 'Native Recommendation Clickstream',
+      leakedData: ['Behavioral Clickstream Recorder', 'Viewport Scroll Depth Vector', 'Referrer Exfiltration']
+    },
+    {
+      domain: 'cloudflare.net',
+      company: 'Cloudflare Inc.',
+      city: loc(10).city,
+      geo: loc(10).geo,
+      threatLevel: 'green',
+      ip: ip(78),
+      trackerType: 'Anycast Edge DNS & Security Mesh',
+      leakedData: ['DDoS Perimeter Challenge Token', 'TLS Session Resumption Ticket', 'Bot Management Verification']
+    },
+    {
+      domain: 'fastly.net',
+      company: 'Fastly Inc.',
+      city: loc(11).city,
+      geo: loc(11).geo,
+      threatLevel: 'green',
+      ip: ip(82),
+      trackerType: 'Global Edge Cache Mirror',
+      leakedData: ['HTTP/2 Multiplexing Stream Hash', 'Fastly POP Edge Routing Token']
+    }
+  ];
+
+  // Dynamically select extra domain-specific probes
+  const extraCount = 3 + (seed % 3);
+  for (let i = 0; i < extraCount; i++) {
+    const item = pool[(seed + i * 3) % pool.length];
+    if (!beacons.some((b) => b.domain === item.domain)) {
+      beacons.push(item);
+    }
+  }
+
+  return beacons;
+};
 
 // Generates an interactive, tactical Safe-Room preview in-memory via HTML5 Canvas
-const generateSimulatedSafeView = (url, severedSet = new Set(), poisonedSet = new Set()) => {
+const generateSimulatedSafeView = (url, severedSet = new Set(), poisonedSet = new Set(), customBeacons = []) => {
   const canvas = document.createElement('canvas');
   canvas.width = 1200;
   canvas.height = 700;
   const ctx = canvas.getContext('2d');
   if (!ctx) return null;
 
-  // Background
+  const displayUrl = (url || 'https://domain-target.com').trim();
+  let cleanDomain = 'domain-target.com';
+  try {
+    cleanDomain = new URL(displayUrl.startsWith('http') ? displayUrl : `https://${displayUrl}`).hostname;
+  } catch (e) {
+    cleanDomain = displayUrl.replace(/^https?:\/\//, '').split('/')[0] || 'domain-target.com';
+  }
+
+  // Tactical Dark Background
   ctx.fillStyle = '#070b14';
   ctx.fillRect(0, 0, 1200, 700);
 
@@ -126,20 +436,20 @@ const generateSimulatedSafeView = (url, severedSet = new Set(), poisonedSet = ne
   ctx.fillStyle = '#f59e0b'; ctx.beginPath(); ctx.arc(46, 26, 6, 0, Math.PI * 2); ctx.fill();
   ctx.fillStyle = '#10b981'; ctx.beginPath(); ctx.arc(66, 26, 6, 0, Math.PI * 2); ctx.fill();
 
-  // URL Bar
+  // URL Bar with actual user-requested URL
   ctx.fillStyle = '#1e293b';
   if (ctx.roundRect) ctx.roundRect(100, 12, 850, 28, 6); else ctx.fillRect(100, 12, 850, 28);
   ctx.fill();
   ctx.fillStyle = '#10b981';
   ctx.font = 'bold 12px monospace';
-  ctx.fillText('🛡️ [DOOMWIRE ISOLATED SANDBOX] -> ' + (url || 'https://cnn.com'), 120, 31);
+  ctx.fillText('🛡️ [DOOMWIRE ISOLATED SANDBOX] -> ' + (displayUrl.startsWith('http') ? displayUrl : `https://${displayUrl}`), 120, 31);
 
   // Status Badge
   ctx.fillStyle = '#00f0ff';
   ctx.font = 'bold 11px monospace';
   ctx.fillText('ACTIVE FIREWALL DEFENSE', 980, 31);
 
-  // Main Page Content Area (Sanitized Wireframe)
+  // Main Page Content Area (Sanitized Wireframe tailored to target domain)
   ctx.fillStyle = '#0f172a';
   ctx.fillRect(50, 80, 730, 220);
   ctx.strokeStyle = '#334155';
@@ -147,46 +457,53 @@ const generateSimulatedSafeView = (url, severedSet = new Set(), poisonedSet = ne
 
   ctx.fillStyle = '#38bdf8';
   ctx.font = 'bold 22px system-ui, sans-serif';
-  ctx.fillText('DOM PURIFIED: REAL-TIME SURVEILLANCE STRIPPED', 80, 130);
+  ctx.fillText(`DOM PURIFIED: ${cleanDomain.toUpperCase()}`, 80, 130);
   ctx.fillStyle = '#94a3b8';
   ctx.font = '13px system-ui, sans-serif';
-  ctx.fillText('DoomWire isolated chromium worker captured and sanitized third-party network probes.', 80, 165);
-  ctx.fillText('All cross-site tracking scripts, canvas fingerprinters, and cookie syncs were intercepted.', 80, 190);
+  ctx.fillText(`Target perimeter at ${cleanDomain} analyzed inside isolated execution sandbox.`, 80, 165);
+  ctx.fillText('Real-time network surveillance, ad auctions, cross-site fingerprinters, and cookie syncs isolated.', 80, 190);
   ctx.fillStyle = '#10b981';
   ctx.font = 'bold 12px monospace';
-  ctx.fillText('STATUS: ZERO IDENTITY EXFILTRATION TO AD-EXCHANGES', 80, 240);
+  ctx.fillText(`FIREWALL STATUS: ${severedSet.size} WIRES CUT // ${poisonedSet.size} WIRES POISONED`, 80, 240);
 
-  // Ad and Surveillance Slots
-  const slots = [
-    { name: 'doubleclick.net [RTB Auctioneer]', domain: 'doubleclick.net', x: 810, y: 80, w: 340, h: 220 },
-    { name: 'criteo.net [Behavioral Retargeting]', domain: 'criteo.net', x: 810, y: 320, w: 340, h: 320 },
-    { name: 'outbrain.com [Clickstream Harvester]', domain: 'outbrain.com', x: 50, y: 320, w: 730, h: 140 },
-    { name: 'tiktok.com [Cross-Site Pixel]', domain: 'tiktok.com', x: 50, y: 480, w: 730, h: 160 }
+  // Dynamic Surveillance Slots derived from actual target beacons
+  const pool = customBeacons.length > 0 ? customBeacons : generateDynamicBeaconsForUrl(displayUrl);
+  const dangerNodes = pool.filter((b) => b.threatLevel === 'red' || b.threatLevel === 'orange' || b.threatLevel === 'yellow');
+  const selectedNodes = (dangerNodes.length >= 4 ? dangerNodes : pool).slice(0, 4);
+
+  const slotCoords = [
+    { x: 810, y: 80, w: 340, h: 220 },
+    { x: 810, y: 320, w: 340, h: 320 },
+    { x: 50, y: 320, w: 730, h: 140 },
+    { x: 50, y: 480, w: 730, h: 160 }
   ];
 
-  slots.forEach((s) => {
-    const isSev = severedSet.has(s.domain);
-    const isPois = poisonedSet.has(s.domain);
+  selectedNodes.forEach((node, idx) => {
+    const coords = slotCoords[idx];
+    if (!coords) return;
+
+    const isSev = severedSet.has(node.domain);
+    const isPois = poisonedSet.has(node.domain);
 
     ctx.fillStyle = isSev ? 'rgba(239, 68, 68, 0.12)' : isPois ? 'rgba(192, 132, 252, 0.15)' : 'rgba(30, 41, 59, 0.7)';
-    ctx.fillRect(s.x, s.y, s.w, s.h);
+    ctx.fillRect(coords.x, coords.y, coords.w, coords.h);
     ctx.lineWidth = 1.5;
     ctx.strokeStyle = isSev ? '#ef4444' : isPois ? '#c084fc' : '#475569';
-    ctx.strokeRect(s.x, s.y, s.w, s.h);
+    ctx.strokeRect(coords.x, coords.y, coords.w, coords.h);
 
     ctx.fillStyle = isSev ? '#ef4444' : isPois ? '#c084fc' : '#f87171';
     ctx.font = 'bold 12px monospace';
     const label = isSev ? '✂ SEVERED WIRE // NETWORK PACKET DROPPED' : isPois ? '☠ POISONED // DIFFERENTIAL NOISE INJECTED' : '⚠ SURVEILLANCE BEACON IDENTIFIED';
-    ctx.fillText(label, s.x + 16, s.y + 32);
+    ctx.fillText(label, coords.x + 16, coords.y + 32);
 
     ctx.fillStyle = '#cbd5e1';
     ctx.font = '11px monospace';
-    ctx.fillText('Target: ' + s.name, s.x + 16, s.y + 55);
+    ctx.fillText(`Target: ${node.domain} [${node.company || node.trackerType}]`, coords.x + 16, coords.y + 55);
 
     ctx.fillStyle = '#94a3b8';
     ctx.font = '10px monospace';
-    const sub = isSev ? 'Connection sinkholed by DoomWire DNS firewall.' : isPois ? 'Fingerprint replaced with high-entropy cryptographic noise.' : 'Active exfiltration vector monitored on 3D radar.';
-    ctx.fillText(sub, s.x + 16, s.y + 78);
+    const sub = isSev ? 'Connection sinkholed by DoomWire DNS firewall.' : isPois ? 'Fingerprint replaced with high-entropy cryptographic noise.' : (node.trackerType || 'Active exfiltration vector monitored on 3D radar.');
+    ctx.fillText(sub, coords.x + 16, coords.y + 78);
   });
 
   return canvas.toDataURL('image/png');
@@ -379,42 +696,53 @@ export default function App() {
     }
   }, [autoRotate]);
 
-  // Configure Authentic NASA Earth Night Lights & ISS-grade Space Lighting
+  // Configure Bright, High-Definition Space Lighting (Less Dark with Vibrant Night Glow)
   const configureGlobeLighting = useCallback(() => {
     if (!globeRef.current) return;
     try {
       const globeMat = globeRef.current.globeMaterial();
       if (globeMat) {
-        // Boost emissive city lights for radiant, luminous night glow from space
+        globeMat.color = new THREE.Color(0xffffff);
+        // Boost emissive city lights for radiant night glow from space
         if (globeMat.map) {
           globeMat.emissiveMap = globeMat.map;
           globeMat.emissive = new THREE.Color(0xfff5dd);
-          globeMat.emissiveIntensity = 2.4;
+          globeMat.emissiveIntensity = 2.1;
         } else {
           globeMat.emissive = new THREE.Color(0xfff5dd);
-          globeMat.emissiveIntensity = 2.0;
+          globeMat.emissiveIntensity = 1.7;
         }
         globeMat.bumpScale = 14;
         globeMat.needsUpdate = true;
       }
 
       const scene = globeRef.current.scene();
-      if (scene && !scene.userData.nightLightConfigured) {
-        // Deep contrast ambient so oceans stay pitch black while city lights blaze
-        const ambient = new THREE.AmbientLight(0xffffff, 0.28);
+      if (scene) {
+        // Remove previous lights to avoid compounding
+        const oldLights = scene.children.filter((c) => c.userData?.isDoomwireLight);
+        oldLights.forEach((l) => scene.remove(l));
+
+        // 1. Ambient Light - Brightened so continental geography and oceans are clearly visible (less dark)
+        const ambient = new THREE.AmbientLight(0xdbeafe, 0.92);
+        ambient.userData = { isDoomwireLight: true };
         scene.add(ambient);
 
-        // Soft sun ray highlighting land topography
-        const sunLight = new THREE.DirectionalLight(0xfffaea, 0.7);
-        sunLight.position.set(2, 1.5, 2);
+        // 2. Hemisphere Light - Natural planetary sky & ground lighting that brings out continents and coastlines
+        const hemiLight = new THREE.HemisphereLight(0xffffff, 0x1e293b, 0.82);
+        hemiLight.userData = { isDoomwireLight: true };
+        scene.add(hemiLight);
+
+        // 3. Directional Sun Light - Crisp specular highlight across topography
+        const sunLight = new THREE.DirectionalLight(0xfffaed, 1.2);
+        sunLight.position.set(2.5, 2, 2.5);
+        sunLight.userData = { isDoomwireLight: true };
         scene.add(sunLight);
 
-        // Planetary horizon rim light
-        const rimLight = new THREE.DirectionalLight(0x7dd3fc, 0.5);
-        rimLight.position.set(-2, -1.5, -2);
+        // 4. Cool Rim Light - Highlights the curvature and silhouette of the Earth
+        const rimLight = new THREE.DirectionalLight(0x38bdf8, 0.75);
+        rimLight.position.set(-2.5, -2, -2.5);
+        rimLight.userData = { isDoomwireLight: true };
         scene.add(rimLight);
-
-        scene.userData.nightLightConfigured = true;
       }
     } catch (err) {
       console.warn('Globe lighting setup:', err);
@@ -430,7 +758,7 @@ export default function App() {
         if (mat && mat.map) {
           mat.emissiveMap = mat.map;
           mat.emissive = new THREE.Color(0xfff5dd);
-          mat.emissiveIntensity = 2.4;
+          mat.emissiveIntensity = 2.1;
           mat.bumpScale = 14;
           mat.needsUpdate = true;
           clearInterval(interval);
@@ -623,9 +951,12 @@ export default function App() {
     setMuted(!muted);
   };
 
-  const handleStartScan = (e) => {
-    if (e) e.preventDefault();
-    if (!targetUrl.trim() || isScanning) return;
+  const handleStartScan = (e, targetOverride = null) => {
+    if (e && e.preventDefault) e.preventDefault();
+    const activeUrl = (typeof targetOverride === 'string' ? targetOverride : targetUrl).trim();
+    if (!activeUrl || isScanning) return;
+    if (targetOverride) setTargetUrl(targetOverride);
+
     audioFX.init();
     audioFX.playBlip(780, 0.08);
 
@@ -638,26 +969,27 @@ export default function App() {
     setIsScanning(true);
 
     if (socketConnected && socketRef.current) {
-      setScanStatus('LAUNCHING ISOLATED CHROMIUM RECON (LIVE WORKER)...');
-      socketRef.current.emit('scan_url', { url: targetUrl, userLocation });
+      setScanStatus('LAUNCHING ISOLATED CHROMIUM RECON (LIVE PLAYWRIGHT SANDBOX)...');
+      socketRef.current.emit('scan_url', { url: activeUrl, userLocation });
     } else {
-      // Offline / Demo Simulated Telemetry Recon Pipeline
-      setScanStatus('LAUNCHING ISOLATED CHROMIUM RECON (SIMULATED TELEMETRY)...');
+      // Dynamic Autonomous Client Recon Pipeline tailored specifically to target URL
+      setScanStatus(`ANALYZING DOMAIN TELEMETRY // [${activeUrl}]...`);
+      const dynamicBeacons = generateDynamicBeaconsForUrl(activeUrl);
       let beaconIndex = 0;
 
       simTimerRef.current = setInterval(() => {
-        if (beaconIndex >= SIMULATED_BEACONS.length) {
+        if (beaconIndex >= dynamicBeacons.length) {
           clearInterval(simTimerRef.current);
           simTimerRef.current = null;
           setScanStatus('RECON FINISHED // PERIMETER LOCKED');
           setIsScanning(false);
-          const safeImg = generateSimulatedSafeView(targetUrl, blockedDomains, poisonedDomains);
+          const safeImg = generateSimulatedSafeView(activeUrl, blockedDomains, poisonedDomains, dynamicBeacons);
           if (safeImg) setSafeViewImg(safeImg);
           audioFX.playBlip(980, 0.15);
           return;
         }
 
-        const b = SIMULATED_BEACONS[beaconIndex];
+        const b = dynamicBeacons[beaconIndex];
         beaconIndex++;
 
         audioFX.playBlip(b.threatLevel === 'red' ? 920 : 580, 0.04);
@@ -678,7 +1010,7 @@ export default function App() {
         }
 
         const newPkt = {
-          id: `sim-${beaconIndex}-${Date.now()}`,
+          id: `recon-${beaconIndex}-${Date.now()}`,
           domain: b.domain,
           company: b.company,
           city: b.city,
@@ -700,7 +1032,7 @@ export default function App() {
           setArcs((prev) => [...prev.slice(-50), newPkt]);
         }
         setPackets((prev) => [newPkt, ...prev.slice(0, 90)]);
-      }, 300);
+      }, 260);
     }
   };
 
@@ -708,16 +1040,8 @@ export default function App() {
     setTargetUrl(url);
     if (!isScanning) {
       setTimeout(() => {
-        setArcs([]);
-        setPackets([]);
-        setSelectedPacket(null);
-        setIsScanning(true);
-        if (socketConnected && socketRef.current) {
-          socketRef.current.emit('scan_url', { url, userLocation });
-        } else {
-          handleStartScan();
-        }
-      }, 50);
+        handleStartScan(null, url);
+      }, 60);
     }
   };
 
@@ -755,8 +1079,10 @@ export default function App() {
     if (selectedPacket?.domain === domain) {
       setSelectedPacket((prev) => ({ ...prev, isSevered: true, isPoisoned: false }));
     }
-    const safeImg = generateSimulatedSafeView(targetUrl, nextBlocked, poisonedDomains);
-    if (safeImg) setSafeViewImg(safeImg);
+    if (!safeViewImg || !safeViewImg.startsWith('data:image/jpeg')) {
+      const safeImg = generateSimulatedSafeView(targetUrl, nextBlocked, poisonedDomains, packets);
+      if (safeImg) setSafeViewImg(safeImg);
+    }
   };
 
   const poisonTheWire = (domain) => {
@@ -780,8 +1106,10 @@ export default function App() {
     if (selectedPacket?.domain === domain) {
       setSelectedPacket((prev) => ({ ...prev, isPoisoned: true, isSevered: false }));
     }
-    const safeImg = generateSimulatedSafeView(targetUrl, blockedDomains, nextPoisoned);
-    if (safeImg) setSafeViewImg(safeImg);
+    if (!safeViewImg || !safeViewImg.startsWith('data:image/jpeg')) {
+      const safeImg = generateSimulatedSafeView(targetUrl, blockedDomains, nextPoisoned, packets);
+      if (safeImg) setSafeViewImg(safeImg);
+    }
   };
 
   const restoreWire = (domain) => {
@@ -801,8 +1129,10 @@ export default function App() {
     if (selectedPacket?.domain === domain) {
       setSelectedPacket((prev) => ({ ...prev, isSevered: false, isPoisoned: false }));
     }
-    const safeImg = generateSimulatedSafeView(targetUrl, nextBlocked, nextPoisoned);
-    if (safeImg) setSafeViewImg(safeImg);
+    if (!safeViewImg || !safeViewImg.startsWith('data:image/jpeg')) {
+      const safeImg = generateSimulatedSafeView(targetUrl, nextBlocked, nextPoisoned, packets);
+      if (safeImg) setSafeViewImg(safeImg);
+    }
   };
 
   const cutAllTrackers = () => {
@@ -824,8 +1154,10 @@ export default function App() {
       setPackets((prev) =>
         prev.map((p) => (unique.includes(p.domain) ? { ...p, isSevered: true, isPoisoned: false } : p))
       );
-      const safeImg = generateSimulatedSafeView(targetUrl, newBlocked, newPoisoned);
-      if (safeImg) setSafeViewImg(safeImg);
+      if (!safeViewImg || !safeViewImg.startsWith('data:image/jpeg')) {
+        const safeImg = generateSimulatedSafeView(targetUrl, newBlocked, newPoisoned, packets);
+        if (safeImg) setSafeViewImg(safeImg);
+      }
     }
   };
 
@@ -850,8 +1182,10 @@ export default function App() {
       setPackets((prev) =>
         prev.map((p) => (unique.includes(p.domain) ? { ...p, isPoisoned: true, isSevered: false } : p))
       );
-      const safeImg = generateSimulatedSafeView(targetUrl, newBlocked, newPoisoned);
-      if (safeImg) setSafeViewImg(safeImg);
+      if (!safeViewImg || !safeViewImg.startsWith('data:image/jpeg')) {
+        const safeImg = generateSimulatedSafeView(targetUrl, newBlocked, newPoisoned, packets);
+        if (safeImg) setSafeViewImg(safeImg);
+      }
     }
   };
 

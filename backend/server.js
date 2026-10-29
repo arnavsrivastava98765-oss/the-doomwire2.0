@@ -51,12 +51,56 @@ const TRACKER_RADAR = {
   'amazon-adsystem.com': { company: 'Amazon.com Inc.', type: 'Commercial Graph Tracker', threat: 'yellow', defaultCity: 'Seattle, US', lat: 47.6062, lng: -122.3321 },
   'cloudfront.net': { company: 'Amazon Web Services', type: 'Cloud CDN / Asset Delivery', threat: 'green', defaultCity: 'Ashburn, US', lat: 39.0438, lng: -77.4874 },
   'cloudflare.com': { company: 'Cloudflare Inc.', type: 'Edge Security & CDN', threat: 'green', defaultCity: 'San Francisco, US', lat: 37.7749, lng: -122.4194 },
+  'cloudflare.net': { company: 'Cloudflare Inc.', type: 'Edge Security & CDN', threat: 'green', defaultCity: 'San Francisco, US', lat: 37.7749, lng: -122.4194 },
   'fastly.net': { company: 'Fastly Inc.', type: 'Edge Content Network', threat: 'green', defaultCity: 'Denver, US', lat: 39.7392, lng: -104.9903 },
-  'akamaihd.net': { company: 'Akamai Technologies', type: 'Global Edge Network', threat: 'green', defaultCity: 'Cambridge, US', lat: 42.3736, lng: -71.1097 }
+  'akamaihd.net': { company: 'Akamai Technologies', type: 'Global Edge Network', threat: 'green', defaultCity: 'Cambridge, US', lat: 42.3736, lng: -71.1097 },
+  'akamaized.net': { company: 'Akamai Technologies', type: 'Global Edge Network', threat: 'green', defaultCity: 'Cambridge, US', lat: 42.3736, lng: -71.1097 },
+  'onetrust.io': { company: 'OneTrust Privacy', type: 'Consent & Cookie Tracker', threat: 'yellow', defaultCity: 'Atlanta, US', lat: 33.749, lng: -84.388 },
+  'onetrust.com': { company: 'OneTrust Privacy', type: 'Consent & Cookie Tracker', threat: 'yellow', defaultCity: 'Atlanta, US', lat: 33.749, lng: -84.388 },
+  'optimizely.com': { company: 'Optimizely Inc.', type: 'A/B Testing & Profiler', threat: 'yellow', defaultCity: 'Austin, US', lat: 30.2672, lng: -97.7431 },
+  'quantserve.com': { company: 'Quantcast Corp', type: 'Audience Measurement', threat: 'orange', defaultCity: 'San Francisco, US', lat: 37.7749, lng: -122.4194 },
+  'id5-sync.com': { company: 'ID5 Technology', type: 'Universal ID Cookie Sync', threat: 'red', defaultCity: 'London, UK', lat: 51.5074, lng: -0.1278 },
+  'openx.net': { company: 'OpenX Software', type: 'Ad Exchange & RTB Bidder', threat: 'red', defaultCity: 'Pasadena, US', lat: 34.1478, lng: -118.1445 },
+  'permutive.com': { company: 'Permutive Inc.', type: 'Publisher Edge Cohorts', threat: 'yellow', defaultCity: 'London, UK', lat: 51.5074, lng: -0.1278 },
+  'adsafeprotected.com': { company: 'Integral Ad Science', type: 'Ad Verification & Telemetry', threat: 'yellow', defaultCity: 'New York, US', lat: 40.7128, lng: -74.006 },
+  'teads.tv': { company: 'Teads SA', type: 'Video Ad Delivery Engine', threat: 'yellow', defaultCity: 'Montpellier, FR', lat: 43.6108, lng: 3.8767 },
+  'bounceexchange.com': { company: 'Wunderkind', type: 'Behavioral Identity Resolution', threat: 'orange', defaultCity: 'New York, US', lat: 40.7128, lng: -74.006 },
+  'smartadserver.com': { company: 'Equativ / Smart', type: 'Ad Server & Header Bidder', threat: 'red', defaultCity: 'Paris, FR', lat: 48.8566, lng: 2.3522 },
+  'indexww.com': { company: 'Index Exchange', type: 'Header Bidding Gateway', threat: 'yellow', defaultCity: 'Toronto, CA', lat: 43.6532, lng: -79.3832 },
+  'googlesyndication.com': { company: 'Google AdSense / Publisher Network', type: 'Display Ad Network', threat: 'red', defaultCity: 'Mountain View, US', lat: 37.422, lng: -122.084 }
 };
 
-// DNS and Geo-IP resolution with fallback
-async function resolveIntelligence(domain) {
+// Clean company name from domain if not in static radar
+function deriveCompanyFromDomain(domain) {
+  const parts = domain.replace(/^www\./, '').split('.');
+  if (parts.length >= 2) {
+    const brand = parts[parts.length - 2];
+    return brand.charAt(0).toUpperCase() + brand.slice(1) + ' Network';
+  }
+  return 'Edge Host / Server';
+}
+
+// Dynamically determine threat level from domain and URL patterns
+function classifyThreat(domain, url, resourceType) {
+  const d = domain.toLowerCase();
+  const u = url.toLowerCase();
+  if (d.includes('ad') || d.includes('criteo') || d.includes('rubicon') || d.includes('openx') || d.includes('bid') || d.includes('pixel') || d.includes('sync')) {
+    return 'red';
+  }
+  if (d.includes('analytics') || d.includes('track') || d.includes('telemetry') || d.includes('metric') || d.includes('collector') || d.includes('hotjar') || d.includes('clarity') || d.includes('tag')) {
+    return 'orange';
+  }
+  if (d.includes('optimizely') || d.includes('onetrust') || d.includes('cookie') || d.includes('score') || d.includes('survey')) {
+    return 'yellow';
+  }
+  if (resourceType === 'image' || resourceType === 'stylesheet' || resourceType === 'font' || d.includes('cdn') || d.includes('static') || d.includes('assets') || d.includes('cloudflare') || d.includes('fastly')) {
+    return 'green';
+  }
+  return 'green';
+}
+
+// DNS and Geo-IP resolution with dynamic intelligence
+async function resolveIntelligence(domain, fullUrl = '', resourceType = 'other') {
   // Check predefined intelligence radar first
   for (const [key, val] of Object.entries(TRACKER_RADAR)) {
     if (domain.includes(key)) {
@@ -71,6 +115,9 @@ async function resolveIntelligence(domain) {
     }
   }
 
+  const derivedCompany = deriveCompanyFromDomain(domain);
+  const derivedThreat = classifyThreat(domain, fullUrl, resourceType);
+
   // Live DNS & offline GeoIP lookup
   try {
     const lookup = await dns.lookup(domain);
@@ -79,12 +126,12 @@ async function resolveIntelligence(domain) {
 
     if (geo && geo.ll) {
       return {
-        company: 'Autonomous Cloud Server',
-        city: `${geo.city || 'Edge City'}, ${geo.country || 'Global'}`,
+        company: derivedCompany,
+        city: `${geo.city || 'Edge Node'}, ${geo.country || 'Global'}`,
         lat: geo.ll[0],
         lng: geo.ll[1],
-        type: 'Standard Content / API',
-        threat: 'green'
+        type: derivedThreat === 'red' ? 'Real-Time Ad Exchange / Telemetry' : derivedThreat === 'orange' ? 'Analytics & Telemetry Beacon' : 'Host API & Asset Gateway',
+        threat: derivedThreat
       };
     }
   } catch (e) {
@@ -105,44 +152,75 @@ async function resolveIntelligence(domain) {
   const selected = fallbackLocations[hash % fallbackLocations.length];
 
   return {
-    company: 'Independent Host / Edge CDN',
+    company: derivedCompany,
     city: selected.city,
     lat: selected.lat,
     lng: selected.lng,
-    type: 'Standard Content',
-    threat: 'green'
+    type: derivedThreat === 'red' ? 'Targeted Ad Delivery Node' : 'Origin / Edge CDN Server',
+    threat: derivedThreat
   };
 }
 
 // Deep inspect outgoing requests for surveillance payload details
 function inspectSensitiveData(req) {
   const leaks = [];
-  const url = req.url();
+  const rawUrl = req.url();
   const postData = req.postData() || '';
   const headers = req.headers();
 
-  if (url.includes('resolution=') || url.includes('screen=') || url.includes('w=') || postData.includes('screen')) {
-    leaks.push('Hardware Display Fingerprint (Screen Res: 1920x1080, ColorDepth: 24)');
-  } else {
-    leaks.push('Display Metrics: Viewport 1440x900 / 2.0x Pixel Ratio');
-  }
+  try {
+    const parsed = new URL(rawUrl);
+    const searchParams = Array.from(parsed.searchParams.keys());
+    
+    // 1. Inspect real Query Parameters
+    const trackingParams = searchParams.filter((p) =>
+      /^(utm_|gclid|fbclid|dclid|msclkid|id|uid|uuid|_ga|_gl|v|tid|cid|event|session)/i.test(p)
+    );
+    if (trackingParams.length > 0) {
+      leaks.push(`Telemetry Query Params: [${trackingParams.slice(0, 4).join(', ')}]`);
+    }
 
-  if (url.includes('webgl') || url.includes('gpu') || postData.includes('renderer') || postData.includes('canvas')) {
-    leaks.push('GPU Canvas Fingerprint: ANGLE (NVIDIA GeForce RTX, Direct3D11)');
-  } else {
-    leaks.push('Device Fingerprint Hash: SHA256-WebGL-Canvas-9a8f2');
-  }
+    // 2. Inspect real Cookies
+    if (headers['cookie']) {
+      const cookieKeys = headers['cookie'].split(';').map((c) => c.split('=')[0].trim()).filter(Boolean);
+      leaks.push(`Transmitted Cookies (${cookieKeys.length} tokens): [${cookieKeys.slice(0, 3).join(', ')}...]`);
+    }
 
-  if (headers['cookie'] || url.includes('_ga=') || url.includes('fbp=') || url.includes('uid=')) {
-    leaks.push(`Tracking Cookie Token: _uid=${Math.random().toString(36).substring(2, 10)}`);
-  } else {
-    leaks.push('Session Identity Token: sess_0x' + Math.random().toString(16).substring(2, 8));
-  }
+    // 3. Inspect Referrer & Origin Leaks
+    if (headers['referer']) {
+      try {
+        const refHost = new URL(headers['referer']).hostname;
+        leaks.push(`Origin Referrer Exfiltration: -> ${refHost}`);
+      } catch (e) {
+        leaks.push('HTTP Referrer Header Transmitted');
+      }
+    }
 
-  if (url.includes('mouse') || url.includes('click') || postData.includes('keystroke') || url.includes('heat')) {
-    leaks.push('DOM Biometric Vector: Real-time Cursor & Keystroke Telemetry');
-  } else {
-    leaks.push('Network Latency & Connection Profile: RTT 28ms / 4G');
+    // 4. Hardware & Fingerprint probes
+    if (rawUrl.includes('resolution=') || rawUrl.includes('screen=') || rawUrl.includes('w=') || postData.includes('screen')) {
+      leaks.push('Hardware Display Fingerprint (Screen Resolution & Depth Probes)');
+    }
+    if (rawUrl.includes('webgl') || rawUrl.includes('gpu') || postData.includes('renderer') || postData.includes('canvas')) {
+      leaks.push('GPU Canvas Fingerprint: WebGL Renderer & Shader Enumeration');
+    }
+    if (rawUrl.includes('mouse') || rawUrl.includes('click') || postData.includes('keystroke') || rawUrl.includes('heat')) {
+      leaks.push('DOM Biometric Vector: Real-time Cursor & Keystroke Telemetry');
+    }
+
+    // 5. POST Payload inspection
+    if (postData) {
+      leaks.push(`Outbound POST Payload: ${postData.length} bytes (JSON/Beacon Form)`);
+    }
+
+    // 6. User-Agent
+    if (headers['user-agent']) {
+      leaks.push('Client Hardware & OS User-Agent Fingerprint');
+    }
+  } catch (e) {}
+
+  if (leaks.length === 0) {
+    leaks.push('Network Latency & Connection Profile: RTT Probe');
+    leaks.push('Direct HTTP Gateway Request Token');
   }
 
   return leaks;
@@ -174,7 +252,8 @@ io.on('connection', (socket) => {
 
       const context = await activeBrowser.newContext({
         viewport: { width: 1280, height: 800 },
-        userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
+        userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+        ignoreHTTPSErrors: true
       });
 
       activePage = await context.newPage();
@@ -219,7 +298,7 @@ io.on('connection', (socket) => {
 
         // 3. Resolve intelligence and stream packet telemetry
         interceptedCount++;
-        const intel = await resolveIntelligence(domain);
+        const intel = await resolveIntelligence(domain, req.url(), req.resourceType());
         const packetPayload = {
           id: Math.random().toString(36).substring(7),
           domain: domain,
