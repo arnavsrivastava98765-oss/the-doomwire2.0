@@ -640,7 +640,8 @@ export default function App() {
 
   // Pre-seed tactical surveillance perimeter on load so the 3D globe is active immediately
   useEffect(() => {
-    const initialBeacons = SIMULATED_BEACONS.slice(0, 5).map((b, idx) => ({
+    const seedPool = generateDynamicBeaconsForUrl(targetUrl || 'cnn.com');
+    const initialBeacons = seedPool.slice(0, 5).map((b, idx) => ({
       id: `init-${idx}`,
       domain: b.domain,
       company: b.company,
@@ -700,49 +701,53 @@ export default function App() {
   const configureGlobeLighting = useCallback(() => {
     if (!globeRef.current) return;
     try {
-      const globeMat = globeRef.current.globeMaterial();
-      if (globeMat) {
-        globeMat.color = new THREE.Color(0xffffff);
-        // Boost emissive city lights for radiant night glow from space
-        if (globeMat.map) {
-          globeMat.emissiveMap = globeMat.map;
-          globeMat.emissive = new THREE.Color(0xfff5dd);
-          globeMat.emissiveIntensity = 2.1;
-        } else {
-          globeMat.emissive = new THREE.Color(0xfff5dd);
-          globeMat.emissiveIntensity = 1.7;
+      if (typeof globeRef.current.globeMaterial === 'function') {
+        const globeMat = globeRef.current.globeMaterial();
+        if (globeMat) {
+          globeMat.color = new THREE.Color(0xffffff);
+          // Boost emissive city lights for radiant night glow from space
+          if (globeMat.map) {
+            globeMat.emissiveMap = globeMat.map;
+            globeMat.emissive = new THREE.Color(0xfff5dd);
+            globeMat.emissiveIntensity = 2.1;
+          } else {
+            globeMat.emissive = new THREE.Color(0xfff5dd);
+            globeMat.emissiveIntensity = 1.7;
+          }
+          globeMat.bumpScale = 14;
+          globeMat.needsUpdate = true;
         }
-        globeMat.bumpScale = 14;
-        globeMat.needsUpdate = true;
       }
 
-      const scene = globeRef.current.scene();
-      if (scene) {
-        // Remove previous lights to avoid compounding
-        const oldLights = scene.children.filter((c) => c.userData?.isDoomwireLight);
-        oldLights.forEach((l) => scene.remove(l));
+      if (typeof globeRef.current.scene === 'function') {
+        const scene = globeRef.current.scene();
+        if (scene) {
+          // Remove previous lights to avoid compounding
+          const oldLights = scene.children.filter((c) => c.userData?.isDoomwireLight);
+          oldLights.forEach((l) => scene.remove(l));
 
-        // 1. Ambient Light - Brightened so continental geography and oceans are clearly visible (less dark)
-        const ambient = new THREE.AmbientLight(0xdbeafe, 0.92);
-        ambient.userData = { isDoomwireLight: true };
-        scene.add(ambient);
+          // 1. Ambient Light - Brightened so continental geography and oceans are clearly visible (less dark)
+          const ambient = new THREE.AmbientLight(0xdbeafe, 0.92);
+          ambient.userData = { isDoomwireLight: true };
+          scene.add(ambient);
 
-        // 2. Hemisphere Light - Natural planetary sky & ground lighting that brings out continents and coastlines
-        const hemiLight = new THREE.HemisphereLight(0xffffff, 0x1e293b, 0.82);
-        hemiLight.userData = { isDoomwireLight: true };
-        scene.add(hemiLight);
+          // 2. Hemisphere Light - Natural planetary sky & ground lighting that brings out continents and coastlines
+          const hemiLight = new THREE.HemisphereLight(0xffffff, 0x1e293b, 0.82);
+          hemiLight.userData = { isDoomwireLight: true };
+          scene.add(hemiLight);
 
-        // 3. Directional Sun Light - Crisp specular highlight across topography
-        const sunLight = new THREE.DirectionalLight(0xfffaed, 1.2);
-        sunLight.position.set(2.5, 2, 2.5);
-        sunLight.userData = { isDoomwireLight: true };
-        scene.add(sunLight);
+          // 3. Directional Sun Light - Crisp specular highlight across topography
+          const sunLight = new THREE.DirectionalLight(0xfffaed, 1.2);
+          sunLight.position.set(2.5, 2, 2.5);
+          sunLight.userData = { isDoomwireLight: true };
+          scene.add(sunLight);
 
-        // 4. Cool Rim Light - Highlights the curvature and silhouette of the Earth
-        const rimLight = new THREE.DirectionalLight(0x38bdf8, 0.75);
-        rimLight.position.set(-2.5, -2, -2.5);
-        rimLight.userData = { isDoomwireLight: true };
-        scene.add(rimLight);
+          // 4. Cool Rim Light - Highlights the curvature and silhouette of the Earth
+          const rimLight = new THREE.DirectionalLight(0x38bdf8, 0.75);
+          rimLight.position.set(-2.5, -2, -2.5);
+          rimLight.userData = { isDoomwireLight: true };
+          scene.add(rimLight);
+        }
       }
     } catch (err) {
       console.warn('Globe lighting setup:', err);
@@ -753,17 +758,19 @@ export default function App() {
   useEffect(() => {
     let attempts = 0;
     const interval = setInterval(() => {
-      if (globeRef.current) {
-        const mat = globeRef.current.globeMaterial();
-        if (mat && mat.map) {
-          mat.emissiveMap = mat.map;
-          mat.emissive = new THREE.Color(0xfff5dd);
-          mat.emissiveIntensity = 2.1;
-          mat.bumpScale = 14;
-          mat.needsUpdate = true;
-          clearInterval(interval);
+      try {
+        if (globeRef.current && typeof globeRef.current.globeMaterial === 'function') {
+          const mat = globeRef.current.globeMaterial();
+          if (mat && mat.map) {
+            mat.emissiveMap = mat.map;
+            mat.emissive = new THREE.Color(0xfff5dd);
+            mat.emissiveIntensity = 2.1;
+            mat.bumpScale = 14;
+            mat.needsUpdate = true;
+            clearInterval(interval);
+          }
         }
-      }
+      } catch (err) {}
       attempts++;
       if (attempts > 30) clearInterval(interval);
     }, 200);
@@ -1608,9 +1615,9 @@ export default function App() {
             height={globeDimensions.height}
             onGlobeReady={configureGlobeLighting}
             // Ultra-realistic NASA Earth Night Lights with country glows
-            globeImageUrl="//cdn.jsdelivr.net/npm/three-globe/example/img/earth-night.jpg"
-            bumpImageUrl="//cdn.jsdelivr.net/npm/three-globe/example/img/earth-topology.png"
-            backgroundImageUrl="//cdn.jsdelivr.net/npm/three-globe/example/img/night-sky.png"
+            globeImageUrl="https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-night.jpg"
+            bumpImageUrl="https://cdn.jsdelivr.net/npm/three-globe/example/img/earth-topology.png"
+            backgroundImageUrl="https://cdn.jsdelivr.net/npm/three-globe/example/img/night-sky.png"
             showAtmosphere={true}
             atmosphereColor={currentTheme.atmosphere}
             atmosphereAltitude={0.20}
