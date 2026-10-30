@@ -37,7 +37,13 @@ import {
 import PitchDeck from './PitchDeck.jsx';
 import { resolveRealDomainEcosystem } from './domainRecon.js';
 
-const SOCKET_SERVER_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+const getInitialBackendUrl = () => {
+  if (typeof window !== 'undefined') {
+    const saved = localStorage.getItem('doomwire_backend_url');
+    if (saved) return saved;
+  }
+  return import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+};
 
 // 4 Minimalist Dark Aesthetic Themes with Colored Hairline Borders
 const THEMES = {
@@ -286,6 +292,9 @@ export default function App() {
   const currentTheme = THEMES[currentThemeKey];
 
   const [socketConnected, setSocketConnected] = useState(false);
+  const [backendUrl, setBackendUrl] = useState(getInitialBackendUrl);
+  const [showServerModal, setShowServerModal] = useState(false);
+  const [customUrlInput, setCustomUrlInput] = useState(backendUrl);
   const [targetUrl, setTargetUrl] = useState('https://cnn.com');
   const [scanStatus, setScanStatus] = useState('STANDBY // PERIMETER READY');
   const [isScanning, setIsScanning] = useState(false);
@@ -478,9 +487,11 @@ export default function App() {
 
   // Socket.io Connection & Events
   useEffect(() => {
-    const s = io(SOCKET_SERVER_URL, {
-      reconnectionAttempts: 10,
-      reconnectionDelay: 2000
+    if (!backendUrl) return;
+    const s = io(backendUrl, {
+      reconnectionAttempts: 8,
+      reconnectionDelay: 2500,
+      timeout: 8000
     });
     socketRef.current = s;
 
@@ -642,7 +653,7 @@ export default function App() {
     return () => {
       s.disconnect();
     };
-  }, [userLocation]);
+  }, [backendUrl, userLocation]);
 
   const toggleMute = () => {
     audioFX.init();
@@ -1140,18 +1151,26 @@ export default function App() {
             <Sliders className="w-4 h-4" />
           </button>
 
-          <div className="flex items-center gap-1.5 pl-2 border-l border-slate-800">
+          <button
+            onClick={() => {
+              setCustomUrlInput(backendUrl);
+              setShowServerModal(true);
+            }}
+            title="Configure Cloud Backend / Sandbox"
+            className="flex items-center gap-1.5 pl-2 border-l border-slate-800 hover:opacity-85 transition cursor-pointer"
+          >
             <span
               className="w-2.5 h-2.5 rounded-full animate-pulse"
               style={{
-                backgroundColor: '#10b981',
-                boxShadow: '0 0 10px rgba(16, 185, 129, 0.8)'
+                backgroundColor: socketConnected ? '#10b981' : '#00f0ff',
+                boxShadow: socketConnected ? '0 0 10px rgba(16, 185, 129, 0.8)' : '0 0 10px rgba(0, 240, 255, 0.6)'
               }}
             ></span>
-            <span className="text-[10px] text-emerald-400 font-bold font-mono tracking-wider hidden sm:inline">
-              ONLINE // {socketConnected ? 'LIVE WORKER' : 'ACTIVE RADAR'}
+            <span className="text-[10px] font-bold font-mono tracking-wider hidden sm:inline" style={{ color: socketConnected ? '#34d399' : '#38bdf8' }}>
+              {socketConnected ? 'CLOUD ENGINE // ONLINE' : 'RADAR // STANDALONE'}
             </span>
-          </div>
+            <Server className="w-3.5 h-3.5 text-slate-400 ml-0.5" />
+          </button>
         </div>
       </header>
 
@@ -1764,6 +1783,104 @@ export default function App() {
               >
                 Close Preview
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 5. MODAL: Cloud Backend & Engine Configuration */}
+      {showServerModal && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+          <div
+            className="tactical-panel w-full max-w-lg rounded-xl flex flex-col overflow-hidden border shadow-2xl"
+            style={{ borderColor: currentTheme.border }}
+          >
+            <div className="p-3.5 border-b flex items-center justify-between bg-black/70" style={{ borderColor: 'rgba(255,255,255,0.1)' }}>
+              <div className="flex items-center gap-2">
+                <Server className="w-4 h-4" style={{ color: currentTheme.primary }} />
+                <h3 className="text-xs font-bold text-slate-100 tracking-wider">
+                  DOOMWIRE CLOUD ENGINE LINK
+                </h3>
+              </div>
+              <button
+                onClick={() => setShowServerModal(false)}
+                className="text-slate-400 hover:text-white font-bold text-sm px-2 py-1"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="p-5 flex flex-col gap-4 text-xs text-slate-300 bg-slate-950/90">
+              <div className="p-3 rounded-lg border border-slate-800 bg-black/50 flex items-center justify-between">
+                <div>
+                  <div className="text-[10px] font-mono text-slate-400 uppercase tracking-widest">Active Pipeline State</div>
+                  <div className="font-bold font-mono text-sm mt-0.5" style={{ color: socketConnected ? '#34d399' : '#38bdf8' }}>
+                    {socketConnected ? '⚡ CLOUD PLAYWRIGHT SANDBOX ACTIVE' : '🛡️ ZERO-SERVER DOH ENGINE ACTIVE'}
+                  </div>
+                </div>
+                <span
+                  className="w-3 h-3 rounded-full animate-ping"
+                  style={{ backgroundColor: socketConnected ? '#10b981' : '#00f0ff' }}
+                />
+              </div>
+
+              <div>
+                <label className="text-[11px] font-mono text-slate-400 block mb-1.5 uppercase tracking-wider">
+                  Cloud Backend WebSocket URL (Render / Railway / Localhost)
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={customUrlInput}
+                    onChange={(e) => setCustomUrlInput(e.target.value)}
+                    placeholder="https://doomwire-engine.onrender.com"
+                    className="flex-1 bg-black/80 border border-slate-700 rounded px-3 py-2 text-slate-100 font-mono text-xs focus:outline-none focus:border-cyan-400"
+                  />
+                  <button
+                    onClick={() => {
+                      const trimmed = customUrlInput.trim();
+                      setBackendUrl(trimmed);
+                      if (typeof window !== 'undefined') {
+                        localStorage.setItem('doomwire_backend_url', trimmed);
+                      }
+                      setShowServerModal(false);
+                    }}
+                    className="px-4 py-2 font-bold font-mono text-slate-950 rounded transition"
+                    style={{ backgroundColor: currentTheme.primary }}
+                  >
+                    LINK
+                  </button>
+                </div>
+              </div>
+
+              <div className="text-[11px] text-slate-400 leading-relaxed border-t border-slate-800/80 pt-3">
+                <span className="text-slate-200 font-semibold">Deployment Blueprint:</span>
+                <ul className="list-disc pl-4 mt-1.5 space-y-1">
+                  <li><strong>Render Free Web Service:</strong> Connect this repo to Render.com. It reads <code>render.yaml</code> and builds the isolated Chromium sandbox automatically.</li>
+                  <li><strong>Zero-Server Standalone:</strong> When no container is connected, DOOMWIRE resolves real Google DNS-over-HTTPS records and scrapes live third-party tracking scripts in any browser.</li>
+                </ul>
+              </div>
+
+              <div className="flex items-center justify-between pt-2">
+                <button
+                  onClick={() => {
+                    setCustomUrlInput('http://localhost:5000');
+                    setBackendUrl('http://localhost:5000');
+                    if (typeof window !== 'undefined') {
+                      localStorage.setItem('doomwire_backend_url', 'http://localhost:5000');
+                    }
+                  }}
+                  className="text-[10px] text-slate-500 hover:text-slate-300 underline font-mono"
+                >
+                  Reset to localhost:5000
+                </button>
+                <button
+                  onClick={() => setShowServerModal(false)}
+                  className="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded font-mono text-[11px]"
+                >
+                  Close
+                </button>
+              </div>
             </div>
           </div>
         </div>

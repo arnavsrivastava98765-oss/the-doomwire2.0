@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: doomwire-engine
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    region: oregon
+    healthCheckPath: /
+    autoDeploy: true
+    envVars:
+      - key: PORT
+        value: 5000

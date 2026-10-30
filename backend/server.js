@@ -425,10 +425,11 @@ app.get('/api/status', (req, res) => {
   });
 });
 
-const PORT = 5000;
-server.listen(PORT, () => {
+const PORT = process.env.PORT || 5000;
+server.listen(PORT, '0.0.0.0', () => {
   console.log(`=================================================`);
   console.log(`⚡ DOOMWIRE CYBER-RADAR BACKEND ONLINE ON PORT ${PORT}`);
   console.log(`⚡ Playwright Sandbox & Active Firewall Active`);
   console.log(`=================================================`);
 });
+
