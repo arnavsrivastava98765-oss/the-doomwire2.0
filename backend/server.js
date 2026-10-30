@@ -415,9 +415,21 @@ io.on('connection', (socket) => {
   });
 });
 
+// Root Health Check for Cloud Platforms (Render / Railway / Fly)
+app.get('/', (req, res) => {
+  res.status(200).json({
+    status: 'ONLINE',
+    system: 'DoomWire Tactical Command Backend',
+    service: 'Active Playwright Chromium Sandbox',
+    blockedCount: blockedDomains.size,
+    poisonedCount: poisonedDomains.size,
+    timestamp: new Date().toISOString()
+  });
+});
+
 // REST Health Check & Status Endpoint
 app.get('/api/status', (req, res) => {
-  res.json({
+  res.status(200).json({
     system: 'DoomWire Tactical Command Backend',
     status: 'ONLINE',
     blockedCount: blockedDomains.size,
