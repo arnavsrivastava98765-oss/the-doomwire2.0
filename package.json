@@ -9,8 +9,6 @@
     "dev:backend": "node backend/server.js",
     "build": "vite build",
     "preview": "vite preview",
-    "pdf": "node scripts/generate_pdf.cjs",
-    "build:pdf": "vite build && node scripts/generate_pdf.cjs",
     "start": "node backend/server.js"
   },
   "dependencies": {

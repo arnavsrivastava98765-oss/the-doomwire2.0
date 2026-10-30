@@ -31,10 +31,8 @@ import {
   Server,
   Sliders,
   X,
-  Palette,
-  Sparkles
+  Palette
 } from 'lucide-react';
-import PitchDeck from './PitchDeck.jsx';
 import { resolveRealDomainEcosystem } from './domainRecon.js';
 
 const getInitialBackendUrl = () => {
@@ -307,7 +305,6 @@ export default function App() {
   const [safeViewImg, setSafeViewImg] = useState(null);
   const [showSafeViewModal, setShowSafeViewModal] = useState(false);
   const [showInspectorModal, setShowInspectorModal] = useState(false);
-  const [showPitchDeck, setShowPitchDeck] = useState(() => typeof window !== 'undefined' && (window.location.search.includes('deck') || window.location.hash.includes('deck')));
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [muted, setMuted] = useState(false);
   const [autoRotate, setAutoRotate] = useState(true);
@@ -1094,22 +1091,6 @@ export default function App() {
 
         {/* Tactical Controls & Theme Switcher */}
         <div className="flex items-center gap-2">
-          {/* Pitch Deck Master Button */}
-          <button
-            onClick={() => setShowPitchDeck(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded border text-xs font-bold font-mono transition shadow-[0_0_15px_rgba(56,189,248,0.3)] hover:scale-105 active:scale-95"
-            style={{
-              borderColor: '#38bdf8',
-              color: '#38bdf8',
-              backgroundColor: 'rgba(56, 189, 248, 0.12)'
-            }}
-            title="Open 7-Slide Hackathon Master Deck & PDF Export"
-          >
-            <Layers className="w-3.5 h-3.5 animate-pulse text-cyan-400" />
-            <span className="hidden sm:inline">PITCH DECK</span>
-            <span className="text-[10px] text-cyan-300 font-bold bg-cyan-950/80 px-1 py-0.2 rounded border border-cyan-500/30">[7 SLIDES]</span>
-          </button>
-
           {/* Theme Switcher Button */}
           <button
             onClick={cycleTheme}
@@ -1885,9 +1866,6 @@ export default function App() {
           </div>
         </div>
       )}
-
-      {/* 7-Slide Hackathon Presentation Deck Overlay */}
-      {showPitchDeck && <PitchDeck onClose={() => setShowPitchDeck(false)} />}
     </div>
   );
 }
