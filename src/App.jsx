@@ -34,6 +34,7 @@ import {
   Palette,
   Sparkles
 } from 'lucide-react';
+import PitchDeck from './PitchDeck.jsx';
 
 const SOCKET_SERVER_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
 
@@ -333,78 +334,246 @@ const generateDynamicBeaconsForUrl = (inputUrl) => {
     );
   }
 
-  // Broad surveillance and edge pool tailored uniquely per target domain
+  // Full Global Surveillance, Data Broker & Edge CDN Pool
   const pool = [
+    {
+      domain: 'google-analytics.com',
+      company: 'Google LLC',
+      city: loc(3).city,
+      geo: loc(3).geo,
+      threatLevel: 'orange',
+      ip: ip(12),
+      trackerType: 'Client Analytics & Interaction Tracker',
+      leakedData: ['Client UUID Hash', 'Scroll Depth Heatmap', 'AudioContext Oscillator Metric']
+    },
     {
       domain: 'googletagmanager.com',
       company: 'Google LLC',
-      city: loc(6).city,
-      geo: loc(6).geo,
+      city: loc(4).city,
+      geo: loc(4).geo,
       threatLevel: 'yellow',
-      ip: ip(62),
+      ip: ip(16),
       trackerType: 'Tag Management & Dynamic Script Trigger',
       leakedData: ['Container Tag State Sync', 'Dynamic Script Injector', 'Event Listener Hooking']
     },
     {
-      domain: 'adnxs.com',
-      company: 'Xandr / Microsoft',
+      domain: 'doubleclick.net',
+      company: 'Google / DoubleClick',
+      city: loc(5).city,
+      geo: loc(5).geo,
+      threatLevel: 'red',
+      ip: ip(20),
+      trackerType: 'Real-Time Dynamic Ad Bidding',
+      leakedData: ['Ad Viewport Telemetry', 'RTB Demographic Bid Stream', 'Cross-Domain FLoC Vector']
+    },
+    {
+      domain: 'googleadservices.com',
+      company: 'Google LLC',
+      city: loc(6).city,
+      geo: loc(6).geo,
+      threatLevel: 'yellow',
+      ip: ip(24),
+      trackerType: 'Conversion Tracking Beacon',
+      leakedData: ['Google Conversion Token', 'Click Timestamp Vector', 'Account Association Hash']
+    },
+    {
+      domain: 'connect.facebook.net',
+      company: 'Meta Platforms Inc.',
       city: loc(7).city,
       geo: loc(7).geo,
       threatLevel: 'red',
-      ip: ip(66),
+      ip: ip(28),
+      trackerType: 'Cross-Site Social Identity Fingerprint',
+      leakedData: ['Meta Social Graph Sync Token', 'First-Party CNAME Cloak', 'Browser Micro-jitter Timers']
+    },
+    {
+      domain: 'clarity.ms',
+      company: 'Microsoft Corp',
+      city: loc(8).city,
+      geo: loc(8).geo,
+      threatLevel: 'orange',
+      ip: ip(32),
+      trackerType: 'Keystroke & Heatmap Recorder',
+      leakedData: ['Mouse Coordinate Vector Array', 'Form Field Keystroke Monitor', 'DOM Mutation Observer Log']
+    },
+    {
+      domain: 'hotjar.com',
+      company: 'Hotjar Ltd.',
+      city: loc(9).city,
+      geo: loc(9).geo,
+      threatLevel: 'orange',
+      ip: ip(36),
+      trackerType: 'Session Replay Spyware',
+      leakedData: ['DOM Keystroke Interceptor', 'Full-Page Session Playback', 'Cursor Heatmap Telemetry']
+    },
+    {
+      domain: 'criteo.com',
+      company: 'Criteo SA',
+      city: loc(10).city,
+      geo: loc(10).geo,
+      threatLevel: 'red',
+      ip: ip(40),
+      trackerType: 'Dynamic Price Scraping & Retargeting',
+      leakedData: ['Cross-Site Retargeting Graph', 'Unmasked WebGL GPU String', 'Battery Status Fingerprint']
+    },
+    {
+      domain: 'adnxs.com',
+      company: 'Xandr / Microsoft',
+      city: loc(11).city,
+      geo: loc(11).geo,
+      threatLevel: 'red',
+      ip: ip(44),
       trackerType: 'Programmatic Real-Time Bidder',
       leakedData: ['Cross-Domain Identity Exchange', 'High-Entropy Device Memory Probe', 'Cookie Sync Graph']
     },
     {
       domain: 'rubiconproject.com',
       company: 'Magnite Inc.',
-      city: loc(8).city,
-      geo: loc(8).geo,
+      city: loc(0).city,
+      geo: loc(0).geo,
       threatLevel: 'red',
-      ip: ip(70),
+      ip: ip(48),
       trackerType: 'DSP Identity Graph & Exchange',
       leakedData: ['DSP Cookie Sync Network', 'Unmasked Canvas Rendering Fingerprint', 'Cross-Device Matching']
     },
     {
+      domain: 'pubmatic.com',
+      company: 'PubMatic Inc.',
+      city: loc(1).city,
+      geo: loc(1).geo,
+      threatLevel: 'orange',
+      ip: ip(52),
+      trackerType: 'Bidstream Data Broker',
+      leakedData: ['Bidstream Audience Profile', 'Mobile Advertising ID Association', 'IP Geolocation Cluster']
+    },
+    {
+      domain: 'openx.net',
+      company: 'OpenX Software',
+      city: loc(2).city,
+      geo: loc(2).geo,
+      threatLevel: 'red',
+      ip: ip(56),
+      trackerType: 'Real-Time Ad Exchange & Bidder',
+      leakedData: ['RTB Auction Token', 'User Match ID Graph', 'Third-Party Cookie Syndicate']
+    },
+    {
+      domain: 'scorecardresearch.com',
+      company: 'Comscore Inc.',
+      city: loc(3).city,
+      geo: loc(3).geo,
+      threatLevel: 'orange',
+      ip: ip(60),
+      trackerType: 'Audience Census & Demographic Profiler',
+      leakedData: ['Mass Audience Reach Telemetry', 'ISP Subnet Profile', 'Reverse-DNS Beacon']
+    },
+    {
+      domain: 'amazon-adsystem.com',
+      company: 'Amazon Advertising',
+      city: loc(4).city,
+      geo: loc(4).geo,
+      threatLevel: 'yellow',
+      ip: ip(64),
+      trackerType: 'Commercial Graph & Header Bidding',
+      leakedData: ['Product Cart & Wishlist Telemetry', 'Consumer Intent Affinity Matrix', 'Device Concurrency Hash']
+    },
+    {
       domain: 'outbrain.com',
       company: 'Outbrain Inc.',
-      city: loc(9).city,
-      geo: loc(9).geo,
+      city: loc(5).city,
+      geo: loc(5).geo,
       threatLevel: 'yellow',
-      ip: ip(74),
+      ip: ip(68),
       trackerType: 'Native Recommendation Clickstream',
       leakedData: ['Behavioral Clickstream Recorder', 'Viewport Scroll Depth Vector', 'Referrer Exfiltration']
     },
     {
-      domain: 'cloudflare.net',
-      company: 'Cloudflare Inc.',
+      domain: 'taboola.com',
+      company: 'Taboola Inc.',
+      city: loc(6).city,
+      geo: loc(6).geo,
+      threatLevel: 'yellow',
+      ip: ip(72),
+      trackerType: 'Content Recommendation Tracker',
+      leakedData: ['Publisher Content Affinity Vector', 'Clickstream Trajectory Hash', 'Session Timing Delta']
+    },
+    {
+      domain: 'tiktok.com',
+      company: 'ByteDance Ltd.',
+      city: loc(7).city,
+      geo: loc(7).geo,
+      threatLevel: 'red',
+      ip: ip(76),
+      trackerType: 'Advanced Behavioral Match Pixel',
+      leakedData: ['TikTok Pixel Match Hash', 'Canvas Hash SHA-256', 'Clipboard Snooper Probe']
+    },
+    {
+      domain: 'id5-sync.com',
+      company: 'ID5 Technology',
+      city: loc(8).city,
+      geo: loc(8).geo,
+      threatLevel: 'red',
+      ip: ip(80),
+      trackerType: 'Universal ID Cookie Sync',
+      leakedData: ['Universal ID Identity Graph', 'Cross-Domain Deterministic Match', 'Encrypted Identity Envelope']
+    },
+    {
+      domain: 'onetrust.com',
+      company: 'OneTrust LLC',
+      city: loc(9).city,
+      geo: loc(9).geo,
+      threatLevel: 'yellow',
+      ip: ip(84),
+      trackerType: 'Consent & Cookie Synchronization',
+      leakedData: ['User Consent Preference Envelope', 'Jurisdiction Compliance Geolocation', 'Consent String Vector']
+    },
+    {
+      domain: 'optimizely.com',
+      company: 'Optimizely Inc.',
       city: loc(10).city,
       geo: loc(10).geo,
+      threatLevel: 'yellow',
+      ip: ip(88),
+      trackerType: 'A/B Testing & Profiler',
+      leakedData: ['Experiment Variant Token', 'User Cohort Bucket Hash', 'Micro-Interactions Timeline']
+    },
+    {
+      domain: 'cloudflare.net',
+      company: 'Cloudflare Inc.',
+      city: loc(11).city,
+      geo: loc(11).geo,
       threatLevel: 'green',
-      ip: ip(78),
+      ip: ip(92),
       trackerType: 'Anycast Edge DNS & Security Mesh',
       leakedData: ['DDoS Perimeter Challenge Token', 'TLS Session Resumption Ticket', 'Bot Management Verification']
     },
     {
       domain: 'fastly.net',
       company: 'Fastly Inc.',
-      city: loc(11).city,
-      geo: loc(11).geo,
+      city: loc(0).city,
+      geo: loc(0).geo,
       threatLevel: 'green',
-      ip: ip(82),
+      ip: ip(96),
       trackerType: 'Global Edge Cache Mirror',
       leakedData: ['HTTP/2 Multiplexing Stream Hash', 'Fastly POP Edge Routing Token']
+    },
+    {
+      domain: 'akamaized.net',
+      company: 'Akamai Technologies',
+      city: loc(1).city,
+      geo: loc(1).geo,
+      threatLevel: 'green',
+      ip: ip(100),
+      trackerType: 'Global Edge Network & CDN',
+      leakedData: ['Akamai Edge Server Fingerprint', 'Content Delivery Token', 'TCP Window Scale Telemetry']
     }
   ];
 
-  // Dynamically select extra domain-specific probes
-  const extraCount = 3 + (seed % 3);
-  for (let i = 0; i < extraCount; i++) {
-    const item = pool[(seed + i * 3) % pool.length];
+  // Append all surveillance and edge infrastructure nodes
+  pool.forEach((item) => {
     if (!beacons.some((b) => b.domain === item.domain)) {
       beacons.push(item);
     }
-  }
+  });
 
   return beacons;
 };
@@ -597,6 +766,7 @@ export default function App() {
   const [safeViewImg, setSafeViewImg] = useState(null);
   const [showSafeViewModal, setShowSafeViewModal] = useState(false);
   const [showInspectorModal, setShowInspectorModal] = useState(false);
+  const [showPitchDeck, setShowPitchDeck] = useState(() => typeof window !== 'undefined' && (window.location.search.includes('deck') || window.location.hash.includes('deck')));
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [muted, setMuted] = useState(false);
   const [autoRotate, setAutoRotate] = useState(true);
@@ -641,7 +811,7 @@ export default function App() {
   // Pre-seed tactical surveillance perimeter on load so the 3D globe is active immediately
   useEffect(() => {
     const seedPool = generateDynamicBeaconsForUrl(targetUrl || 'cnn.com');
-    const initialBeacons = seedPool.slice(0, 5).map((b, idx) => ({
+    const initialBeacons = seedPool.map((b, idx) => ({
       id: `init-${idx}`,
       domain: b.domain,
       company: b.company,
@@ -1036,10 +1206,10 @@ export default function App() {
         };
 
         if (!isSevered) {
-          setArcs((prev) => [...prev.slice(-50), newPkt]);
+          setArcs((prev) => [...prev.slice(-60), newPkt]);
         }
-        setPackets((prev) => [newPkt, ...prev.slice(0, 90)]);
-      }, 260);
+        setPackets((prev) => [newPkt, ...prev.slice(0, 100)]);
+      }, 125);
     }
   };
 
@@ -1401,6 +1571,22 @@ export default function App() {
 
         {/* Tactical Controls & Theme Switcher */}
         <div className="flex items-center gap-2">
+          {/* Pitch Deck Master Button */}
+          <button
+            onClick={() => setShowPitchDeck(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded border text-xs font-bold font-mono transition shadow-[0_0_15px_rgba(56,189,248,0.3)] hover:scale-105 active:scale-95"
+            style={{
+              borderColor: '#38bdf8',
+              color: '#38bdf8',
+              backgroundColor: 'rgba(56, 189, 248, 0.12)'
+            }}
+            title="Open 7-Slide Hackathon Master Deck & PDF Export"
+          >
+            <Layers className="w-3.5 h-3.5 animate-pulse text-cyan-400" />
+            <span className="hidden sm:inline">PITCH DECK</span>
+            <span className="text-[10px] text-cyan-300 font-bold bg-cyan-950/80 px-1 py-0.2 rounded border border-cyan-500/30">[7 SLIDES]</span>
+          </button>
+
           {/* Theme Switcher Button */}
           <button
             onClick={cycleTheme}
@@ -2070,6 +2256,9 @@ export default function App() {
           </div>
         </div>
       )}
+
+      {/* 7-Slide Hackathon Presentation Deck Overlay */}
+      {showPitchDeck && <PitchDeck onClose={() => setShowPitchDeck(false)} />}
     </div>
   );
 }

@@ -191,3 +191,62 @@ body {
 .animate-slide-in-right {
   animation: slideRightIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+/* =========================================================================
+   HIGH-DEFINITION 16:9 PRINT & PDF EXPORT STYLES
+   ========================================================================= */
+@media print {
+  @page {
+    size: 1920px 1080px;
+    margin: 0;
+  }
+
+  html, body {
+    width: 1920px !important;
+    height: 1080px !important;
+    background-color: #05070c !important;
+    color: #f8fafc !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    overflow: visible !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .screen-active-slide {
+    display: none !important;
+  }
+
+  .print-container {
+    display: block !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .print-slide {
+    width: 1920px !important;
+    height: 1080px !important;
+    page-break-after: always !important;
+    break-after: page !important;
+    padding: 48px 64px !important;
+    box-sizing: border-box !important;
+    background-color: #05070c !important;
+    background-image: 
+      radial-gradient(circle at 50% 50%, rgba(14, 116, 144, 0.12) 0%, #05070c 75%),
+      linear-gradient(to right, rgba(56, 189, 248, 0.03) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(56, 189, 248, 0.03) 1px, transparent 1px) !important;
+    background-size: 100% 100%, 40px 40px, 40px 40px !important;
+    border: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    overflow: hidden !important;
+    position: relative !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
+
