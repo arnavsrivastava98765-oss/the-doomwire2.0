@@ -2,11 +2,17 @@ FROM mcr.microsoft.com/playwright:v1.50.0-jammy
 
 WORKDIR /app
 
-# Copy backend dependencies
+# 1. Build Frontend Static Bundle
+COPY package*.json ./
+RUN npm install
+COPY index.html vite.config.js ./
+COPY src/ ./src/
+RUN npm run build
+
+# 2. Setup Backend Engine
+WORKDIR /app/backend
 COPY backend/package*.json ./
 RUN npm install --omit=dev
-
-# Copy backend source code
 COPY backend/ ./
 
 EXPOSE 5000

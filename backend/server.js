@@ -415,17 +415,17 @@ io.on('connection', (socket) => {
   });
 });
 
-// Root Health Check for Cloud Platforms (Render / Railway / Fly)
-app.get('/', (req, res) => {
-  res.status(200).json({
-    status: 'ONLINE',
-    system: 'DoomWire Tactical Command Backend',
-    service: 'Active Playwright Chromium Sandbox',
-    blockedCount: blockedDomains.size,
-    poisonedCount: poisonedDomains.size,
-    timestamp: new Date().toISOString()
-  });
-});
+const path = require('path');
+const fs = require('fs');
+
+// Serve static frontend bundle from dist
+const distPath = fs.existsSync(path.join(__dirname, '../dist'))
+  ? path.join(__dirname, '../dist')
+  : path.join(__dirname, './dist');
+
+if (fs.existsSync(distPath)) {
+  app.use(express.static(distPath));
+}
 
 // REST Health Check & Status Endpoint
 app.get('/api/status', (req, res) => {
@@ -435,6 +435,25 @@ app.get('/api/status', (req, res) => {
     blockedCount: blockedDomains.size,
     poisonedCount: poisonedDomains.size
   });
+});
+
+// Serve the 3D Web Application for any non-API web route
+app.use((req, res, next) => {
+  if (req.method === 'GET' && !req.path.startsWith('/api') && !req.path.startsWith('/socket.io')) {
+    const indexPath = path.join(distPath, 'index.html');
+    if (fs.existsSync(indexPath)) {
+      return res.sendFile(indexPath);
+    }
+    return res.status(200).json({
+      status: 'ONLINE',
+      system: 'DoomWire Tactical Command Backend',
+      service: 'Active Playwright Chromium Sandbox',
+      blockedCount: blockedDomains.size,
+      poisonedCount: poisonedDomains.size,
+      timestamp: new Date().toISOString()
+    });
+  }
+  next();
 });
 
 const PORT = process.env.PORT || 5000;

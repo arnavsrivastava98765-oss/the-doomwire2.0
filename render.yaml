@@ -6,7 +6,7 @@ services:
     dockerContext: .
     plan: free
     region: oregon
-    healthCheckPath: /
+    healthCheckPath: /api/status
     autoDeploy: true
     envVars:
       - key: PORT

@@ -1,0 +1,195 @@
+[
+  {
+    "site": "cnn.com",
+    "totalRequests": 108,
+    "thirdPartyRequests": 38,
+    "distinctCompanies": 26,
+    "distinctCountries": 8,
+    "redCount": 6,
+    "orangeCount": 5,
+    "redAndOrange": 11,
+    "companiesList": [
+      "Cnn Network",
+      "Optimizely Inc.",
+      "Magnite Inc.",
+      "Integral Ad Science",
+      "Google / DoubleClick",
+      "Chartbeat Network",
+      "Rezync Network",
+      "Wknd Network",
+      "Piano Network",
+      "Google Network",
+      "Full Circle Studies / Comscore",
+      "Quantcast Corp",
+      "Stripe Network",
+      "Zqtk Network",
+      "Permutive Network",
+      "Stickyadstv Network",
+      "Script Network",
+      "Wunderkind",
+      "Ugdturner Network",
+      "Btloader Network",
+      "Ml314 Network",
+      "Googleapis Network",
+      "Tinypass Network",
+      "Imrworldwide Network",
+      "Criteo SA",
+      "ID5 Technology"
+    ],
+    "countriesList": [
+      "Global",
+      "US",
+      "DE",
+      "IN",
+      "SG",
+      "GB",
+      "FR",
+      "UK"
+    ]
+  },
+  {
+    "site": "nytimes.com",
+    "totalRequests": 9,
+    "thirdPartyRequests": 8,
+    "distinctCompanies": 3,
+    "distinctCountries": 1,
+    "redCount": 0,
+    "orangeCount": 0,
+    "redAndOrange": 0,
+    "companiesList": [
+      "Nytimes Network",
+      "Captcha-delivery Network",
+      "Nyt Network"
+    ],
+    "countriesList": [
+      "US"
+    ]
+  },
+  {
+    "site": "reddit.com",
+    "totalRequests": 11,
+    "thirdPartyRequests": 8,
+    "distinctCompanies": 6,
+    "distinctCountries": 4,
+    "redCount": 0,
+    "orangeCount": 0,
+    "redAndOrange": 0,
+    "companiesList": [
+      "Reddit Network",
+      "Redditstatic Network",
+      "Redd Network",
+      "Rlcdn Network",
+      "Google LLC",
+      "Redditmedia Network"
+    ],
+    "countriesList": [
+      "Global",
+      "US",
+      "AU",
+      "DE"
+    ]
+  },
+  {
+    "site": "forbes.com",
+    "totalRequests": 6,
+    "thirdPartyRequests": 5,
+    "distinctCompanies": 2,
+    "distinctCountries": 1,
+    "redCount": 0,
+    "orangeCount": 0,
+    "redAndOrange": 0,
+    "companiesList": [
+      "Forbes Network",
+      "Captcha-delivery Network"
+    ],
+    "countriesList": [
+      "US"
+    ]
+  },
+  {
+    "site": "timesofindia.indiatimes.com",
+    "totalRequests": 1,
+    "thirdPartyRequests": 0,
+    "distinctCompanies": 1,
+    "distinctCountries": 1,
+    "redCount": 0,
+    "orangeCount": 0,
+    "redAndOrange": 0,
+    "companiesList": [
+      "Indiatimes Network"
+    ],
+    "countriesList": [
+      "VA"
+    ]
+  },
+  {
+    "site": "flipkart.com",
+    "totalRequests": 117,
+    "thirdPartyRequests": 109,
+    "distinctCompanies": 3,
+    "distinctCountries": 3,
+    "redCount": 0,
+    "orangeCount": 0,
+    "redAndOrange": 0,
+    "companiesList": [
+      "Flipkart Network",
+      "Flixcart Network",
+      "Newrelic Network"
+    ],
+    "countriesList": [
+      "IN",
+      "US",
+      "SG"
+    ]
+  },
+  {
+    "site": "moneycontrol.com",
+    "totalRequests": 1,
+    "thirdPartyRequests": 0,
+    "distinctCompanies": 1,
+    "distinctCountries": 1,
+    "redCount": 0,
+    "orangeCount": 0,
+    "redAndOrange": 0,
+    "companiesList": [
+      "Moneycontrol Network"
+    ],
+    "countriesList": [
+      "VA"
+    ]
+  },
+  {
+    "site": "ndtv.com",
+    "totalRequests": 1,
+    "thirdPartyRequests": 0,
+    "distinctCompanies": 1,
+    "distinctCountries": 1,
+    "redCount": 0,
+    "orangeCount": 0,
+    "redAndOrange": 0,
+    "companiesList": [
+      "Ndtv Network"
+    ],
+    "countriesList": [
+      "US"
+    ]
+  },
+  {
+    "site": "amazon.in",
+    "totalRequests": 2,
+    "thirdPartyRequests": 1,
+    "distinctCompanies": 2,
+    "distinctCountries": 2,
+    "redCount": 0,
+    "orangeCount": 0,
+    "redAndOrange": 0,
+    "companiesList": [
+      "Amazon Network",
+      "Awswaf Network"
+    ],
+    "countriesList": [
+      "AU",
+      "US"
+    ]
+  }
+]
