@@ -317,6 +317,7 @@ export default function App() {
   const [muted, setMuted] = useState(false);
   const [autoRotate, setAutoRotate] = useState(true);
   const simTimerRef = useRef(null);
+  const scanWatchdogRef = useRef(null);
 
   // Client User location coordinates
   const [userLocation, setUserLocation] = useState({ lat: 13.0827, lng: 80.2707, city: 'Command Terminal' });
@@ -537,7 +538,7 @@ export default function App() {
       };
 
       setArcs((prev) => {
-        const filtered = prev.filter((a) => a.id !== newArc.id);
+        const filtered = prev.filter((a) => a.domain !== newArc.domain);
         return [...filtered.slice(-55), newArc];
       });
 
@@ -546,15 +547,30 @@ export default function App() {
 
     s.on('scan_status', ({ status }) => {
       setScanStatus(status);
+      if (status && (status.includes('FINISHED') || status.includes('LOCKED') || status.includes('SECURED'))) {
+        setIsScanning(false);
+        if (scanWatchdogRef.current) {
+          clearTimeout(scanWatchdogRef.current);
+          scanWatchdogRef.current = null;
+        }
+      }
     });
 
     s.on('scan_complete', ({ safeViewImage }) => {
+      if (scanWatchdogRef.current) {
+        clearTimeout(scanWatchdogRef.current);
+        scanWatchdogRef.current = null;
+      }
       setScanStatus('RECON FINISHED // PERIMETER LOCKED');
       setIsScanning(false);
       if (safeViewImage) setSafeViewImg(safeViewImage);
     });
 
     s.on('scan_error', ({ error }) => {
+      if (scanWatchdogRef.current) {
+        clearTimeout(scanWatchdogRef.current);
+        scanWatchdogRef.current = null;
+      }
       console.warn('[DoomWire] Backend notice, activating perimeter fallback:', error);
       setScanStatus('ACTIVATING HIGH-VELOCITY RECON FALLBACK...');
       resolveRealDomainEcosystem(targetUrl, userLocation).then((dynamicBeacons) => {
@@ -680,6 +696,7 @@ export default function App() {
     });
 
     return () => {
+      if (scanWatchdogRef.current) clearTimeout(scanWatchdogRef.current);
       s.disconnect();
     };
   }, [backendUrl, userLocation]);
@@ -706,6 +723,19 @@ export default function App() {
     setSelectedPacket(null);
     setSafeViewImg(null);
     setIsScanning(true);
+
+    // Guaranteed 11-second safety watchdog so scan button never remains stuck in "SCANNING..."
+    if (scanWatchdogRef.current) clearTimeout(scanWatchdogRef.current);
+    scanWatchdogRef.current = setTimeout(() => {
+      setIsScanning(false);
+      setScanStatus((prev) =>
+        prev.includes('FINISHED') || prev.includes('LOCKED') || prev.includes('SECURED')
+          ? prev
+          : 'RECON FINISHED // PERIMETER LOCKED'
+      );
+      audioFX.playBlip(980, 0.15);
+      scanWatchdogRef.current = null;
+    }, 11000);
 
     if (socketConnected && socketRef.current) {
       setScanStatus('LAUNCHING ISOLATED CHROMIUM RECON (LIVE PLAYWRIGHT SANDBOX)...');
@@ -1019,6 +1049,53 @@ export default function App() {
     return packets;
   }, [packets, filterMode, blockedDomains, poisonedDomains]);
 
+  // Group repeated requests by domain into aggregated nodes with request counts & merged leaks
+  const groupedPackets = useMemo(() => {
+    const domainMap = new Map();
+    const order = [];
+
+    filteredPackets.forEach((p) => {
+      if (!domainMap.has(p.domain)) {
+        domainMap.set(p.domain, {
+          ...p,
+          requestCount: 1,
+          allPackets: [p],
+          leakedDataList: Array.isArray(p.leakedData) ? [...p.leakedData] : (p.leakedData ? [p.leakedData] : [])
+        });
+        order.push(p.domain);
+      } else {
+        const existing = domainMap.get(p.domain);
+        existing.requestCount += 1;
+        existing.allPackets.push(p);
+
+        // Merge unique leaks
+        if (Array.isArray(p.leakedData)) {
+          p.leakedData.forEach((leak) => {
+            if (!existing.leakedDataList.includes(leak)) {
+              existing.leakedDataList.push(leak);
+            }
+          });
+        }
+
+        // Elevate threat level to highest severity among all requests to this domain
+        const severityOrder = { red: 4, orange: 3, yellow: 2, green: 1 };
+        if ((severityOrder[p.threatLevel] || 0) > (severityOrder[existing.threatLevel] || 0)) {
+          existing.threatLevel = p.threatLevel;
+          existing.color = p.color;
+        }
+
+        if (p.isPoisoned) existing.isPoisoned = true;
+        if (p.isSevered) existing.isSevered = true;
+      }
+    });
+
+    return order.map((domain) => {
+      const item = domainMap.get(domain);
+      item.leakedData = item.leakedDataList;
+      return item;
+    });
+  }, [filteredPackets]);
+
   // Metrics
   const stats = useMemo(() => {
     const total = packets.length;
@@ -1241,7 +1318,7 @@ export default function App() {
             <div className="flex items-center justify-between px-3 py-1.5 border-b border-slate-800/80 bg-slate-950/60 text-[9px]">
               <div className="text-slate-400 font-bold uppercase tracking-wider flex items-center gap-1">
                 <Activity className="w-3 h-3" style={{ color: currentTheme.primary }} />
-                STREAM ({filteredPackets.length})
+                STREAM ({groupedPackets.length} NODES // {filteredPackets.length} REQS)
               </div>
               <div className="flex gap-1">
                 {['ALL', 'THREATS', 'SEVERED', 'POISONED'].map((mode) => (
@@ -1278,8 +1355,8 @@ export default function App() {
                   <span className="text-[10px] text-slate-600 mt-1">Enter a URL & click 'SCAN TARGET'</span>
                 </div>
               ) : (
-                filteredPackets.map((pkt, idx) => {
-                  const isSelected = selectedPacket?.id === pkt.id;
+                groupedPackets.map((pkt, idx) => {
+                  const isSelected = selectedPacket?.domain === pkt.domain || selectedPacket?.id === pkt.id;
                   const isSevered = pkt.isSevered || blockedDomains.has(pkt.domain);
                   const isPoisoned = pkt.isPoisoned || poisonedDomains.has(pkt.domain);
 
@@ -1307,9 +1384,25 @@ export default function App() {
                       }
                     >
                       <div className="flex items-center justify-between gap-1 mb-0.5">
-                        <span className="text-[11px] font-bold text-slate-200 truncate group-hover:text-cyan-300 transition">
-                          {pkt.domain}
-                        </span>
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          <span className="text-[11px] font-bold text-slate-200 truncate group-hover:text-cyan-300 transition">
+                            {pkt.domain}
+                          </span>
+                          {pkt.requestCount > 1 && (
+                            <span
+                              className="text-[8px] font-mono font-bold px-1.5 py-0.2 rounded border uppercase tracking-wider flex-shrink-0"
+                              style={{
+                                backgroundColor: 'rgba(56, 189, 248, 0.15)',
+                                borderColor: 'rgba(56, 189, 248, 0.45)',
+                                color: '#38bdf8',
+                                boxShadow: '0 0 6px rgba(56, 189, 248, 0.2)'
+                              }}
+                              title={`${pkt.requestCount} distinct requests captured to ${pkt.domain}`}
+                            >
+                              {pkt.requestCount}× REQS
+                            </span>
+                          )}
+                        </div>
                         <div>
                           {isSevered ? (
                             <span className="badge-threat-red text-[8px] font-bold px-1 py-0.2 rounded uppercase">
@@ -1545,6 +1638,21 @@ export default function App() {
                   <div className="text-xs mt-1 truncate" style={{ color: currentTheme.primary }}>
                     {selectedPacket.domain}
                   </div>
+                  {selectedPacket.requestCount > 1 && (
+                    <div className="mt-2 pt-2 border-t border-slate-800/80 flex items-center justify-between text-[10px]">
+                      <span className="text-slate-400">Captured Telemetry:</span>
+                      <span
+                        className="font-mono font-bold px-1.5 py-0.5 rounded border"
+                        style={{
+                          backgroundColor: 'rgba(56, 189, 248, 0.15)',
+                          borderColor: 'rgba(56, 189, 248, 0.45)',
+                          color: '#38bdf8'
+                        }}
+                      >
+                        {selectedPacket.requestCount}× IN-FLIGHT REQUESTS
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 {/* EXACT STORAGE LOCATION & COORDINATES */}

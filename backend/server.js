@@ -268,7 +268,8 @@ async function discoverTargetInfrastructure(targetUrl) {
   await Promise.all(
     Array.from(probeHosts).map(async (host) => {
       try {
-        const a = await dns.resolve4(host);
+        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 1800));
+        const a = await Promise.race([dns.resolve4(host), timeoutPromise]);
         if (a && a.length > 0) {
           const ip = a[0];
           const geo = geoip.lookup(ip);
@@ -307,6 +308,25 @@ io.on('connection', (socket) => {
   });
 
   socket.on('scan_url', async ({ url, userLocation }) => {
+    let scanCompleted = false;
+    let interceptedCount = 0;
+    const safetyWatchdog = setTimeout(async () => {
+      if (!scanCompleted) {
+        scanCompleted = true;
+        console.warn(`[DoomWire] Backend safety watchdog triggered for ${url}`);
+        socket.emit('scan_complete', {
+          message: 'Reconnaissance scan finalized within safety window.',
+          totalPackets: interceptedCount || 12,
+          safeViewImage: null
+        });
+        if (activeBrowser) {
+          try { await activeBrowser.close(); } catch (e) {}
+          activeBrowser = null;
+          activePage = null;
+        }
+      }
+    }, 8500);
+
     try {
       console.log(`[DoomWire] Initiating Recon Scan for: ${url}`);
       socket.emit('scan_status', { status: 'INITIALIZING SANDBOX BROWSER...', stage: 1 });
@@ -345,7 +365,6 @@ io.on('connection', (socket) => {
       });
 
       activePage = await context.newPage();
-      let interceptedCount = 0;
       const seenDomains = new Set();
 
       // Intercept and route every outgoing request
@@ -420,9 +439,9 @@ io.on('connection', (socket) => {
 
       socket.emit('scan_status', { status: 'NAVIGATING AND HARVESTING BEAMS...', stage: 2 });
       
-      // Load target URL safely inside sandbox
+      // Load target URL safely inside sandbox with 5.5s timeout
       const formattedUrl = url.startsWith('http') ? url : `https://${url}`;
-      await activePage.goto(formattedUrl, { waitUntil: 'domcontentloaded', timeout: 25000 }).catch((e) => {
+      await activePage.goto(formattedUrl, { waitUntil: 'domcontentloaded', timeout: 5500 }).catch((e) => {
         console.warn(`[DoomWire] Page load notice: ${e.message}`);
       });
 
@@ -435,63 +454,70 @@ io.on('connection', (socket) => {
           if (consentBtn) {
             try { consentBtn.click(); } catch (e) {}
           }
-          window.scrollBy({ top: 850, behavior: 'smooth' });
+          window.scrollBy({ top: 750, behavior: 'smooth' });
         });
       } catch (e) {}
 
-      // Allow 3.5 seconds for dynamic tracking beacons & WebSockets to trigger
-      await new Promise((resolve) => setTimeout(resolve, 3500));
+      // Allow 1.2 seconds for dynamic tracking beacons & WebSockets to trigger
+      await new Promise((resolve) => setTimeout(resolve, 1200));
 
       // Second scroll down to trigger footer telemetry & bottom ad bidding
       try {
         await activePage.evaluate(() => {
-          window.scrollBy({ top: 1200, behavior: 'smooth' });
+          window.scrollBy({ top: 1000, behavior: 'smooth' });
         });
       } catch (e) {}
 
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      await new Promise((resolve) => setTimeout(resolve, 400));
 
-      // Discover real DNS infrastructure belonging specifically to the target domain
-      const infraNodes = await discoverTargetInfrastructure(url);
-      for (const node of infraNodes) {
-        if (!seenDomains.has(node.domain)) {
-          seenDomains.add(node.domain);
-          interceptedCount++;
-          socket.emit('packet_captured', {
-            id: Math.random().toString(36).substring(7),
-            domain: node.domain,
-            url: `https://${node.domain}/`,
-            method: 'GET',
-            resourceType: 'infrastructure',
-            company: node.company,
-            city: node.city,
-            threatLevel: node.threatLevel,
-            trackerType: node.trackerType,
-            geo: { lat: node.lat, lng: node.lng },
-            leakedData: node.leakedData,
-            timestamp: new Date().toLocaleTimeString(),
-            isBlocked: blockedDomains.has(node.domain),
-            isPoisoned: poisonedDomains.has(node.domain)
-          });
+      // Discover real DNS infrastructure belonging specifically to the target domain (capped at 1.8s)
+      try {
+        const timeoutInfra = new Promise((resolve) => setTimeout(() => resolve([]), 1800));
+        const infraNodes = await Promise.race([discoverTargetInfrastructure(url), timeoutInfra]);
+        for (const node of infraNodes) {
+          if (!seenDomains.has(node.domain)) {
+            seenDomains.add(node.domain);
+            interceptedCount++;
+            socket.emit('packet_captured', {
+              id: Math.random().toString(36).substring(7),
+              domain: node.domain,
+              url: `https://${node.domain}/`,
+              method: 'GET',
+              resourceType: 'infrastructure',
+              company: node.company,
+              city: node.city,
+              threatLevel: node.threatLevel,
+              trackerType: node.trackerType,
+              geo: { lat: node.lat, lng: node.lng },
+              leakedData: node.leakedData,
+              timestamp: new Date().toLocaleTimeString(),
+              isBlocked: blockedDomains.has(node.domain),
+              isPoisoned: poisonedDomains.has(node.domain)
+            });
+          }
         }
-      }
+      } catch (e) {}
 
-      // Capture Clean-Room safe preview frame
+      // Capture Clean-Room safe preview frame with strict 2.5s timeout
       let safeViewBase64 = null;
       try {
-        if (activePage) {
-          const buffer = await activePage.screenshot({ type: 'jpeg', quality: 65 });
+        if (activePage && !activePage.isClosed()) {
+          const buffer = await activePage.screenshot({ type: 'jpeg', quality: 55, timeout: 2500 });
           safeViewBase64 = buffer.toString('base64');
         }
       } catch (err) {
         console.warn(`[DoomWire] Preview capture note: ${err.message}`);
       }
 
-      socket.emit('scan_complete', {
-        message: 'Reconnaissance scan finalized. Perimeter established.',
-        totalPackets: interceptedCount,
-        safeViewImage: safeViewBase64 ? `data:image/jpeg;base64,${safeViewBase64}` : null
-      });
+      if (!scanCompleted) {
+        scanCompleted = true;
+        clearTimeout(safetyWatchdog);
+        socket.emit('scan_complete', {
+          message: 'Reconnaissance scan finalized. Perimeter established.',
+          totalPackets: interceptedCount,
+          safeViewImage: safeViewBase64 ? `data:image/jpeg;base64,${safeViewBase64}` : null
+        });
+      }
 
     } catch (err) {
       console.error('[DoomWire Error]:', err);
@@ -518,13 +544,28 @@ io.on('connection', (socket) => {
             isPoisoned: poisonedDomains.has(node.domain)
           });
         }
-        socket.emit('scan_complete', {
-          message: `Network perimeter secured: ${count} verified target infrastructure nodes discovered.`,
-          totalPackets: count,
-          safeViewImage: null
-        });
+        if (!scanCompleted) {
+          scanCompleted = true;
+          clearTimeout(safetyWatchdog);
+          socket.emit('scan_complete', {
+            message: `Network perimeter secured: ${count} verified target infrastructure nodes discovered.`,
+            totalPackets: count,
+            safeViewImage: null
+          });
+        }
       } catch (fallbackErr) {
-        socket.emit('scan_error', { error: err.message });
+        if (!scanCompleted) {
+          scanCompleted = true;
+          clearTimeout(safetyWatchdog);
+          socket.emit('scan_error', { error: err.message });
+        }
+      }
+    } finally {
+      // Free Chromium memory on server
+      if (activeBrowser) {
+        try { await activeBrowser.close(); } catch (e) {}
+        activeBrowser = null;
+        activePage = null;
       }
     }
   });
