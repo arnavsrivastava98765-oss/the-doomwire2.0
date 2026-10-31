@@ -37,11 +37,12 @@ import { resolveRealDomainEcosystem, getThreatColor } from './domainRecon.js';
 
 const getInitialBackendUrl = () => {
   if (typeof window !== 'undefined') {
-    const saved = localStorage.getItem('doomwire_backend_url');
-    if (saved) return saved;
+    // If running on localhost or loopback, always connect directly to local real backend on port 5000
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
       return 'http://localhost:5000';
     }
+    const saved = localStorage.getItem('doomwire_backend_url');
+    if (saved) return saved;
   }
   return import.meta.env.VITE_BACKEND_URL || 'https://doomwire-engine.onrender.com';
 };
