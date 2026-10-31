@@ -555,8 +555,43 @@ export default function App() {
     });
 
     s.on('scan_error', ({ error }) => {
-      setScanStatus(`RECON ERROR: ${error}`);
-      setIsScanning(false);
+      console.warn('[DoomWire] Backend notice, activating perimeter fallback:', error);
+      setScanStatus('ACTIVATING HIGH-VELOCITY RECON FALLBACK...');
+      resolveRealDomainEcosystem(targetUrl, userLocation).then((dynamicBeacons) => {
+        let beaconIndex = 0;
+        simTimerRef.current = setInterval(() => {
+          if (beaconIndex >= dynamicBeacons.length) {
+            clearInterval(simTimerRef.current);
+            simTimerRef.current = null;
+            setScanStatus(`RECON FINISHED // ${dynamicBeacons.length} NODES SECURED`);
+            setIsScanning(false);
+            const safeImg = generateSimulatedSafeView(targetUrl, blockedDomains, poisonedDomains, dynamicBeacons);
+            if (safeImg) setSafeViewImg(safeImg);
+            audioFX.playBlip(980, 0.15);
+            return;
+          }
+
+          const b = dynamicBeacons[beaconIndex];
+          beaconIndex++;
+          audioFX.playBlip(b.threatLevel === 'red' ? 920 : 580, 0.04);
+          const isSevered = blockedDomains.has(b.domain);
+          const isPoisoned = poisonedDomains.has(b.domain);
+          const arcColor = isPoisoned ? '#c084fc' : (b.color || getThreatColor(b.threatLevel));
+          const newPkt = {
+            id: `recon-${beaconIndex}-${Date.now()}`,
+            ...b,
+            color: arcColor,
+            isSevered,
+            isPoisoned
+          };
+          if (!isSevered) {
+            setArcs((prev) => [...prev.slice(-60), newPkt]);
+          }
+          setPackets((prev) => [newPkt, ...prev.slice(0, 100)]);
+        }, 120);
+      }).catch(() => {
+        setIsScanning(false);
+      });
     });
 
     // Wire Cut

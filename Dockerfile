@@ -13,6 +13,7 @@ RUN npm run build
 WORKDIR /app/backend
 COPY backend/package*.json ./
 RUN npm install --omit=dev
+RUN npx playwright install chromium --with-deps
 COPY backend/ ./
 
 EXPOSE 5000
