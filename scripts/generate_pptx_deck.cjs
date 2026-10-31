@@ -75,7 +75,7 @@ async function createPresentation() {
 
     slide.addText(
       [
-        { text: 'by-Arnavvv  •  TACTICAL 3D CYBER-RADAR & IN-FLIGHT DECEPTION FIREWALL  •  LIVE AT RENDER', options: { fontFace: 'Courier New', fontSize: 8.5, color: THEME.slateMuted } }
+        { text: 'ENGINEERING: Arnav Shrivastava & Rudransh Rotela  •  DOOMWIRE v3.4  •  OBSIDIAN PROTOCOL', options: { fontFace: 'Courier New', fontSize: 8.5, color: THEME.slateMuted } }
       ],
       { x: 0.6, y: 7.05, w: 10.0, h: 0.3, align: 'left', margin: 0 }
     );
@@ -108,26 +108,26 @@ async function createPresentation() {
     // Tactical Pill Badge
     slide.addShape(pptx.ShapeType.roundRect, {
       x: 1.0,
-      y: 1.0,
-      w: 4.8,
-      h: 0.38,
+      y: 0.9,
+      w: 5.2,
+      h: 0.35,
       rectRadius: 0.1,
       fill: { color: '0F172A' },
       line: { color: THEME.cyan, width: 1 }
     });
     slide.addText(
-      'HACKATHON SUBMISSION // CYBERSECURITY & PRIVACY',
-      { x: 1.0, y: 1.0, w: 4.8, h: 0.38, fontFace: 'Courier New', fontSize: 8.5, bold: true, color: THEME.cyan, align: 'center' }
+      'HACKATHON SUBMISSION // CYBERSECURITY & PRIVACY TRACK',
+      { x: 1.0, y: 0.9, w: 5.2, h: 0.35, fontFace: 'Courier New', fontSize: 8.5, bold: true, color: THEME.cyan, align: 'center' }
     );
 
     // Hero Title
     slide.addText('DOOMWIRE', {
       x: 1.0,
-      y: 1.5,
+      y: 1.35,
       w: 11.0,
-      h: 1.1,
+      h: 1.0,
       fontFace: 'Trebuchet MS',
-      fontSize: 54,
+      fontSize: 52,
       bold: true,
       color: THEME.white,
       margin: 0
@@ -136,11 +136,11 @@ async function createPresentation() {
     // Subtitle
     slide.addText('Tactical 3D Cyber-Radar, In-Flight Packet X-Ray & Autonomous Deception Firewall', {
       x: 1.0,
-      y: 2.65,
+      y: 2.38,
       w: 11.0,
-      h: 0.45,
+      h: 0.4,
       fontFace: 'Trebuchet MS',
-      fontSize: 16,
+      fontSize: 15,
       bold: true,
       color: THEME.cyanSoft,
       margin: 0
@@ -149,21 +149,48 @@ async function createPresentation() {
     // The Judge-Stopping Hook Callout Box
     slide.addShape(pptx.ShapeType.rect, {
       x: 1.0,
-      y: 3.3,
+      y: 2.9,
       w: 11.3,
-      h: 1.25,
+      h: 1.2,
       fill: { color: '030712' },
       line: { color: THEME.cyan, width: 1.5 }
     });
 
     slide.addText(
       [
-        { text: 'THE CORE HOOK:  ', options: { fontFace: 'Courier New', fontSize: 11, bold: true, color: THEME.cyan } },
-        { text: '"You cannot defend what you cannot see."\n', options: { fontFace: 'Trebuchet MS', fontSize: 14, bold: true, color: THEME.white } },
-        { text: 'We transformed invisible surveillance and third-party data broker exfiltration into an interactive 3D WebGL command war room with active weaponized countermeasures.', options: { fontFace: 'Trebuchet MS', fontSize: 11, color: THEME.slateLight } }
+        { text: 'THE CORE HOOK:  ', options: { fontFace: 'Courier New', fontSize: 10.5, bold: true, color: THEME.cyan } },
+        { text: '"You cannot defend what you cannot see."\n', options: { fontFace: 'Trebuchet MS', fontSize: 13.5, bold: true, color: THEME.white } },
+        { text: 'We transformed invisible surveillance and third-party data broker exfiltration into an interactive 3D WebGL command war room with active weaponized countermeasures.', options: { fontFace: 'Trebuchet MS', fontSize: 10.5, color: THEME.slateLight } }
       ],
-      { x: 1.2, y: 3.45, w: 10.9, h: 0.95, margin: 0 }
+      { x: 1.2, y: 3.02, w: 10.9, h: 0.95, margin: 0 }
     );
+
+    // Team Member Cards on Slide 1
+    const teamW = 5.5;
+    const members = [
+      { name: 'Arnav Shrivastava', role: 'Team Lead & Systems Architect', color: THEME.cyan },
+      { name: 'Rudransh Rotela', role: 'Cyber Security & Threat Intel Lead', color: THEME.purple }
+    ];
+
+    members.forEach((m, idx) => {
+      const mx = 1.0 + idx * 5.8;
+      slide.addShape(pptx.ShapeType.rect, {
+        x: mx,
+        y: 4.25,
+        w: teamW,
+        h: 0.85,
+        fill: { color: THEME.panelBg },
+        line: { color: m.color, width: 1.2 }
+      });
+
+      slide.addText(
+        [
+          { text: `👤  ${m.name}  `, options: { fontFace: 'Trebuchet MS', fontSize: 12, bold: true, color: THEME.white } },
+          { text: `•  ${m.role}`, options: { fontFace: 'Courier New', fontSize: 9.5, color: m.color } }
+        ],
+        { x: mx + 0.2, y: 4.4, w: teamW - 0.4, h: 0.55, margin: 0 }
+      );
+    });
 
     // 3 Feature Badges Across Bottom
     const badgeW = 3.6;
@@ -177,19 +204,19 @@ async function createPresentation() {
       const bx = 1.0 + idx * (badgeW + 0.25);
       slide.addShape(pptx.ShapeType.rect, {
         x: bx,
-        y: 4.8,
+        y: 5.25,
         w: badgeW,
-        h: 1.35,
+        h: 1.2,
         fill: { color: THEME.panelBg },
         line: { color: b.color, width: 1 }
       });
 
       slide.addText(
         [
-          { text: `● ${b.title}\n`, options: { fontFace: 'Courier New', fontSize: 10, bold: true, color: b.color } },
-          { text: b.desc, options: { fontFace: 'Trebuchet MS', fontSize: 9.5, color: THEME.slateLight } }
+          { text: `● ${b.title}\n`, options: { fontFace: 'Courier New', fontSize: 9.5, bold: true, color: b.color } },
+          { text: b.desc, options: { fontFace: 'Trebuchet MS', fontSize: 9, color: THEME.slateLight } }
         ],
-        { x: bx + 0.2, y: 4.95, w: badgeW - 0.4, h: 1.05, margin: 0 }
+        { x: bx + 0.15, y: 5.35, w: badgeW - 0.3, h: 0.95, margin: 0 }
       );
     });
 
