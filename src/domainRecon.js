@@ -139,14 +139,13 @@ const KNOWN_ECOSYSTEMS = {
     nodes: [
       { domain: 'whatsapp.com', type: 'Primary Messaging Origin', threat: 'green', company: 'Meta Platforms Global Edge', leaks: ['Session Auth Nonce', 'Web Client Build Hash', 'HTTP/3 TLS 1.3 Handshake'] },
       { domain: 'web.whatsapp.com', type: 'Web Client Portal & Messaging Frame', threat: 'green', company: 'Meta Platforms Edge', leaks: ['QR Authentication Handshake', 'Local IndexedDB Sync Token', 'Client Storage Beacon'] },
-      { domain: 'connect.facebook.net', type: 'Meta Social Graph & Pixel SDK', threat: 'red', company: 'Meta Platforms Inc.', leaks: ['Meta Social Graph Sync Token', 'Cross-Domain Pixel Cookie (fbp)', 'Browser Hardware Fingerprint'] },
-      { domain: 'graph.facebook.com', type: 'Meta Commercial Identity Graph API', threat: 'red', company: 'Meta Platforms Inc.', leaks: ['Cross-App Advertising ID', 'Audience Network Identity Vector', 'Device Fingerprint Envelope'] },
+      { domain: 'static.whatsapp.net', type: 'Frontend Framework & Wasm Cryptography Bundles', threat: 'green', company: 'Meta Edge CDN (Dublin/Global)', leaks: ['WASM Crypto Engine Hash', 'E2EE Signal Protocol Module', 'UI Asset Cache Token'] },
+      { domain: 'mmg.whatsapp.net', type: 'Multicast Media & Encrypted Attachment Relay', threat: 'green', company: 'Meta Global Media Edge', leaks: ['Media Chunk Auth Token', 'Encrypted Ciphertext Stream', 'Bitrate QoS Vector'] },
       { domain: 'crashlogs.whatsapp.net', type: 'Client Diagnostic & Telemetry Collector', threat: 'orange', company: 'WhatsApp Telemetry Pipeline', leaks: ['Exception Stack Trace', 'Client Memory Pressure Telemetry', 'OS Kernel Build ID'] },
       { domain: 'dit.whatsapp.net', type: 'Data Ingestion Telemetry Stream', threat: 'orange', company: 'Meta Infrastructure Data', leaks: ['Heartbeat RTT Timing', 'WebSocket Reconnection Metric', 'Device Battery & Network State'] },
-      { domain: 'google-analytics.com', type: 'Web Traffic Telemetry', threat: 'yellow', company: 'Google LLC', leaks: ['Client UUID Hash', 'Campaign Referral Attribution', 'Session Duration Timer'] },
-      { domain: 'googletagmanager.com', type: 'Tag Orchestration & Trigger', threat: 'yellow', company: 'Google LLC', leaks: ['GTM Container Version', 'Event Trigger Macro', 'Client User-Agent Probe'] },
-      { domain: 'pps.whatsapp.net', type: 'Profile Photos & Media Relay Mesh', threat: 'green', company: 'Meta Distributed Edge', leaks: ['Encrypted Media Token', 'Thumbnail Content Hash', 'Edge Cache Hit Status'] },
-      { domain: 'criteo.com', type: 'Retargeting Engine & Pixel Probe', threat: 'red', company: 'Criteo SA', leaks: ['Cross-Site Attribution Token', 'DOM Clickstream Coordinates', 'Unmasked WebGL Shader'] }
+      { domain: 'pps.whatsapp.net', type: 'Profile Photos & Status Relay Mesh', threat: 'green', company: 'Meta Distributed Edge', leaks: ['Encrypted Media Token', 'Thumbnail Content Hash', 'Edge Cache Hit Status'] },
+      { domain: 'graph.facebook.com', type: 'Meta Commercial Identity Graph API', threat: 'red', company: 'Meta Platforms Inc.', leaks: ['Cross-App Advertising ID', 'Audience Network Identity Vector', 'Device Fingerprint Envelope'] },
+      { domain: 'connect.facebook.net', type: 'Meta Social Graph & Pixel SDK', threat: 'red', company: 'Meta Platforms Inc.', leaks: ['Meta Social Graph Sync Token', 'Cross-Domain Pixel Cookie (fbp)', 'Browser Hardware Fingerprint'] }
     ]
   },
   'flipkart.com': {
@@ -478,116 +477,95 @@ export async function resolveRealDomainEcosystem(inputUrl, userLocation = { lat:
       }
     }
 
-    // Curated Diverse Multi-Corporate Surveillance Ecosystem (Real Distinct Companies)
-    const CORE_SURVEILLANCE_ENTITIES = [
-      {
-        domain: 'doubleclick.net',
-        company: 'Google LLC / DoubleClick',
-        type: 'Programmatic Real-Time Ad Auction & Bidding',
-        threat: 'red',
-        leaks: ['Unmasked Hardware WebGL Hash', 'Targeting Audience Affinity Token', 'Real-Time Bidstream Price']
-      },
-      {
-        domain: 'connect.facebook.net',
-        company: 'Meta Platforms Inc.',
-        type: 'Cross-Site Social Graph & Identity Beacon',
-        threat: 'red',
-        leaks: ['Meta Social Graph Sync Token (fbp)', 'Cross-Domain Pixel Cookie', 'Browser Hardware Concurrency Profile']
-      },
-      {
-        domain: 'criteo.com',
-        company: 'Criteo SA',
-        type: 'Behavioral Retargeting & Cookie Sync Graph',
-        threat: 'red',
-        leaks: ['Product Browse History Attribution', 'Third-Party Cookie Sync Envelope', 'DOM Clickstream Coordinates']
-      },
-      {
-        domain: 'pubmatic.com',
-        company: 'PubMatic Inc.',
-        type: 'Supply-Side Platform (SSP) Real-Time Data Broker',
-        threat: 'red',
-        leaks: ['Header Bidding Floor Currency', 'Client IP Geo-Coordinates Hash', 'Ad Exchange Auction Identifier']
-      },
-      {
-        domain: 'clarity.ms',
-        company: 'Microsoft Corp',
-        type: 'Session Replay, Keystroke & Heatmap Recorder',
-        threat: 'orange',
-        leaks: ['DOM Cursor & Keystroke Velocity', 'Session Replay Interaction Chunks', 'Screen Display Resolution & Depth']
-      },
-      {
-        domain: 'hotjar.com',
-        company: 'Hotjar Ltd.',
-        type: 'Behavioral Heatmap & Keystroke Spyware',
-        threat: 'orange',
-        leaks: ['DOM Mutation Observer Stream', 'Micro-Jitter Cursor Acceleration', 'Active Form Focus Vector']
-      },
-      {
-        domain: 'scorecardresearch.com',
-        company: 'Comscore Inc.',
-        type: 'Mass Audience Census & Reach Telemetry Beacon',
-        threat: 'orange',
-        leaks: ['Mass Audience Reach Telemetry', 'ISP Subnet Profile Envelope', 'Reverse-DNS Beacon Sync']
-      },
-      {
-        domain: 'google-analytics.com',
-        company: 'Google LLC',
-        type: 'Behavioral Traffic Analytics & Telemetry',
-        threat: 'yellow',
-        leaks: ['Client Universal Unique ID (cid)', 'Session Heartbeat Timer', 'Referral Campaign Attribution']
-      },
-      {
-        domain: 'googletagmanager.com',
-        company: 'Google LLC',
-        type: 'Tag Execution & Dynamic Trigger Orchestrator',
-        threat: 'yellow',
-        leaks: ['Container Macro Execution Script', 'Client User-Agent Probe', 'Event Trigger Dispatch Token']
-      },
-      {
-        domain: 'onetrust.com',
-        company: 'OneTrust Privacy LLC',
-        type: 'Privacy Regulatory Consent & Cookie Tracker',
-        threat: 'yellow',
-        leaks: ['TCF v2.2 Consent String Hash', 'Jurisdiction Enforcement Beacon', 'Opt-out Exemption Matrix']
-      },
-      {
-        domain: 'amazon-adsystem.com',
-        company: 'Amazon Advertising',
-        type: 'Commercial Purchase Graph & Ad Retargeter',
-        threat: 'yellow',
-        leaks: ['Commercial Purchase Intent Vector', 'Category Affinity Matrix', 'Device Architecture Identifier']
-      },
-      {
-        domain: 'cloudfront.net',
-        company: 'Amazon Web Services',
-        type: 'Global Edge Content Delivery Network (CDN)',
-        threat: 'green',
-        leaks: ['Edge Cache Hit Status', 'Dynamic Asset Hash', 'Content-Encoding Compression Header']
-      }
+    // Step 3: GENUINE SUBDOMAIN & INFRASTRUCTURE DISCOVERY FOR TARGET
+    const subPrefixes = [
+      { sub: 'api', type: 'REST & GraphQL API Gateway', threat: 'yellow' },
+      { sub: 'cdn', type: 'Content Delivery Network Edge', threat: 'green' },
+      { sub: 'static', type: 'Static Frontend Framework Bundles', threat: 'green' },
+      { sub: 'media', type: 'High-Bitrate Media & Image CDN', threat: 'green' },
+      { sub: 'auth', type: 'OAuth Identity & SSO Gateway', threat: 'yellow' },
+      { sub: 'assets', type: 'Digital Asset Distribution Shard', threat: 'green' },
+      { sub: 'login', type: 'Authentication & Credential Exchange', threat: 'yellow' },
+      { sub: 'app', type: 'Application Core Microservice', threat: 'green' },
+      { sub: 'events', type: 'Telemetry & Event Stream Collector', threat: 'orange' },
+      { sub: 'v', type: 'Video Streaming Edge Infrastructure', threat: 'green' },
+      { sub: 'preview', type: 'Content Preview & Rendering Gateway', threat: 'green' },
+      { sub: 'm', type: 'Mobile Application API Shard', threat: 'green' },
+      { sub: 'gql', type: 'GraphQL State Synchronization Mesh', threat: 'yellow' },
+      { sub: 'collector', type: 'Client Telemetry & Error Beacon', threat: 'orange' },
+      { sub: 'alb', type: 'Audience & Ad Infrastructure Load Balancer', threat: 'red' },
+      { sub: 'edition', type: 'Regional Edition Content Distributor', threat: 'green' }
     ];
 
-    CORE_SURVEILLANCE_ENTITIES.forEach((entity, idx) => {
-      if (entity.domain !== cleanDomain && !cleanDomain.endsWith(entity.domain)) {
-        const loc = GLOBAL_POP_LOCATIONS[(resolvedNodes.length + idx * 3) % GLOBAL_POP_LOCATIONS.length];
-        resolvedNodes.push({
-          domain: entity.domain,
-          company: entity.company,
-          city: loc.city,
-          geo: { lat: loc.lat, lng: loc.lng },
-          threatLevel: entity.threat,
-          ip: `${23 + Math.floor(rand(idx + 10) * 170)}.${15 + Math.floor(rand(idx + 11) * 190)}.${10 + Math.floor(rand(idx + 12) * 220)}.${5 + Math.floor(rand(idx + 13) * 240)}`,
-          trackerType: entity.type,
-          leakedData: entity.leaks,
-          startLat: userLocation.lat,
-          startLng: userLocation.lng,
-          endLat: loc.lat,
-          endLng: loc.lng,
-          color: getThreatColor(entity.threat),
-          isSevered: false,
-          isPoisoned: false
-        });
-      }
+    // Query real DNS-over-HTTPS for subdomains in parallel
+    const subResults = await Promise.all(
+      subPrefixes.map(async (item) => {
+        const subHost = `${item.sub}.${cleanDomain}`;
+        const ips = await queryDnsOverHttps(subHost);
+        if (ips && ips.length > 0) {
+          return { host: subHost, ip: ips[0], ...item };
+        }
+        return null;
+      })
+    );
+
+    subResults.filter(Boolean).forEach((item, idx) => {
+      const loc = GLOBAL_POP_LOCATIONS[(resolvedNodes.length + idx * 2) % GLOBAL_POP_LOCATIONS.length];
+      resolvedNodes.push({
+        domain: item.host,
+        company: `${brandName} ${item.sub.toUpperCase()} Node`,
+        city: loc.city,
+        geo: { lat: loc.lat, lng: loc.lng },
+        threatLevel: item.threat,
+        ip: item.ip,
+        trackerType: item.type,
+        leakedData: [
+          `DNS Host Verified: ${item.host}`,
+          `IP Binding: ${item.ip}`,
+          `Protocol: HTTPS TLS 1.3 / HTTP/3`,
+          `Traffic Vector: Authenticated Platform Subresource`
+        ],
+        startLat: userLocation.lat,
+        startLng: userLocation.lng,
+        endLat: loc.lat,
+        endLng: loc.lng,
+        color: getThreatColor(item.threat),
+        isSevered: false,
+        isPoisoned: false
+      });
     });
+
+    // Also include any real third-party resources discovered from live page scraping
+    if (scrapedResources && scrapedResources.length > 0) {
+      scrapedResources.slice(0, 15).forEach((scrapedHost, idx) => {
+        if (!resolvedNodes.some((n) => n.domain === scrapedHost)) {
+          const sig = TRACKER_SIGNATURES[scrapedHost] || {};
+          const loc = GLOBAL_POP_LOCATIONS[(resolvedNodes.length + idx * 3) % GLOBAL_POP_LOCATIONS.length];
+          const threat = sig.threat || (scrapedHost.includes('ad') ? 'red' : scrapedHost.includes('track') || scrapedHost.includes('analytics') ? 'orange' : 'yellow');
+          resolvedNodes.push({
+            domain: scrapedHost,
+            company: sig.company || deriveCompanyFromDomain(scrapedHost),
+            city: loc.city,
+            geo: { lat: loc.lat, lng: loc.lng },
+            threatLevel: threat,
+            ip: `${104 + Math.floor(rand(idx + 15) * 80)}.${20 + Math.floor(rand(idx + 16) * 180)}.${10 + Math.floor(rand(idx + 17) * 200)}.${15 + Math.floor(rand(idx + 18) * 200)}`,
+            trackerType: sig.type || 'Third-Party Web Subresource',
+            leakedData: [
+              `Scraped Target Dependency: ${scrapedHost}`,
+              `In-Flight DOM Script / Beacon Probe`,
+              `Third-Party Connection Exfiltration`
+            ],
+            startLat: userLocation.lat,
+            startLng: userLocation.lng,
+            endLat: loc.lat,
+            endLng: loc.lng,
+            color: getThreatColor(threat),
+            isSevered: false,
+            isPoisoned: false
+          });
+        }
+      });
+    }
   }
 
   return resolvedNodes;
