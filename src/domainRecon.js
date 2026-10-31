@@ -298,6 +298,16 @@ async function queryDnsRecord(domain, type = 'A') {
 }
 
 /**
+ * Threat gradient generator: Emerging from terminal cyan to authentic threat endpoint
+ */
+export function getThreatGradientColor(threatLevel) {
+  if (threatLevel === 'red') return ['#00e5ff', '#ff0055'];
+  if (threatLevel === 'orange') return ['#00e5ff', '#ff7700'];
+  if (threatLevel === 'yellow') return ['#00e5ff', '#fbbf24'];
+  return ['#00e5ff', '#00ff88'];
+}
+
+/**
  * MASTER EXPORT: Resolves genuine, authentic server infrastructure for any URL
  */
 export async function resolveRealDomainEcosystem(inputUrl, userLocation = { lat: 13.0827, lng: 80.2707 }) {
@@ -356,7 +366,7 @@ export async function resolveRealDomainEcosystem(inputUrl, userLocation = { lat:
         startLng: userLocation.lng,
         endLat: loc.lat,
         endLng: loc.lng,
-        color: node.threat === 'red' ? '#ff0055' : node.threat === 'orange' ? '#ff7700' : node.threat === 'yellow' ? '#fbbf24' : '#00f0ff',
+        color: getThreatGradientColor(node.threat),
         isSevered: false,
         isPoisoned: false
       });
@@ -384,7 +394,7 @@ export async function resolveRealDomainEcosystem(inputUrl, userLocation = { lat:
       startLng: userLocation.lng,
       endLat: originLoc.lat,
       endLng: originLoc.lng,
-      color: '#00f0ff',
+      color: getThreatGradientColor('green'),
       isSevered: false,
       isPoisoned: false
     });
@@ -406,7 +416,7 @@ export async function resolveRealDomainEcosystem(inputUrl, userLocation = { lat:
         startLng: userLocation.lng,
         endLat: loc.lat,
         endLng: loc.lng,
-        color: '#00f0ff',
+        color: getThreatGradientColor('green'),
         isSevered: false,
         isPoisoned: false
       });
@@ -429,7 +439,7 @@ export async function resolveRealDomainEcosystem(inputUrl, userLocation = { lat:
         startLng: userLocation.lng,
         endLat: loc.lat,
         endLng: loc.lng,
-        color: '#00f0ff',
+        color: getThreatGradientColor('green'),
         isSevered: false,
         isPoisoned: false
       });
@@ -453,7 +463,7 @@ export async function resolveRealDomainEcosystem(inputUrl, userLocation = { lat:
         startLng: userLocation.lng,
         endLat: loc.lat,
         endLng: loc.lng,
-        color: '#fbbf24',
+        color: getThreatGradientColor('yellow'),
         isSevered: false,
         isPoisoned: false
       });
@@ -489,7 +499,7 @@ export async function resolveRealDomainEcosystem(inputUrl, userLocation = { lat:
         startLng: userLocation.lng,
         endLat: loc.lat,
         endLng: loc.lng,
-        color: threat === 'red' ? '#ff0055' : threat === 'orange' ? '#ff7700' : threat === 'yellow' ? '#fbbf24' : '#00f0ff',
+        color: getThreatGradientColor(threat),
         isSevered: false,
         isPoisoned: false
       });
@@ -532,7 +542,7 @@ export async function resolveRealDomainEcosystem(inputUrl, userLocation = { lat:
           startLng: userLocation.lng,
           endLat: loc.lat,
           endLng: loc.lng,
-          color: item.threat === 'red' ? '#ff0055' : item.threat === 'orange' ? '#ff7700' : '#fbbf24',
+          color: getThreatGradientColor(item.threat),
           isSevered: false,
           isPoisoned: false
         });
@@ -562,7 +572,7 @@ export async function resolveRealDomainEcosystem(inputUrl, userLocation = { lat:
             startLng: userLocation.lng,
             endLat: loc.lat,
             endLng: loc.lng,
-            color: fb.threat === 'yellow' ? '#fbbf24' : '#00f0ff',
+            color: getThreatGradientColor(fb.threat),
             isSevered: false,
             isPoisoned: false
           });

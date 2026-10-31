@@ -33,14 +33,17 @@ import {
   X,
   Palette
 } from 'lucide-react';
-import { resolveRealDomainEcosystem } from './domainRecon.js';
+import { resolveRealDomainEcosystem, getThreatGradientColor } from './domainRecon.js';
 
 const getInitialBackendUrl = () => {
   if (typeof window !== 'undefined') {
     const saved = localStorage.getItem('doomwire_backend_url');
     if (saved) return saved;
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      return 'http://localhost:5000';
+    }
   }
-  return import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+  return import.meta.env.VITE_BACKEND_URL || 'https://doomwire-engine.onrender.com';
 };
 
 // 4 Minimalist Dark Aesthetic Themes with Colored Hairline Borders
@@ -511,18 +514,7 @@ export default function App() {
       const isSevered = blockedDomains.has(pkt.domain);
       const isPoisoned = poisonedDomains.has(pkt.domain);
 
-      let arcColor = '#00ff88';
-      if (isSevered) {
-        arcColor = 'rgba(255, 0, 85, 0.2)';
-      } else if (isPoisoned) {
-        arcColor = '#c084fc';
-      } else if (pkt.threatLevel === 'red') {
-        arcColor = '#ff0055';
-      } else if (pkt.threatLevel === 'orange') {
-        arcColor = '#ff7700';
-      } else if (pkt.threatLevel === 'yellow') {
-        arcColor = '#fbbf24';
-      }
+      const arcColor = isPoisoned ? ['#c084fc', '#ec4899'] : getThreatGradientColor(pkt.threatLevel);
 
       const newArc = {
         id: pkt.id,
@@ -705,12 +697,7 @@ export default function App() {
           const isSevered = blockedDomains.has(b.domain);
           const isPoisoned = poisonedDomains.has(b.domain);
 
-          let arcColor = b.color;
-          if (isSevered) {
-            arcColor = 'rgba(255, 0, 85, 0.2)';
-          } else if (isPoisoned) {
-            arcColor = '#c084fc';
-          }
+          const arcColor = isPoisoned ? ['#c084fc', '#ec4899'] : (b.color || getThreatGradientColor(b.threatLevel));
 
           const newPkt = {
             id: `recon-${beaconIndex}-${Date.now()}`,
@@ -795,7 +782,7 @@ export default function App() {
       return next;
     });
     setArcs((prev) =>
-      prev.map((a) => (a.domain === domain ? { ...a, color: '#c084fc', isPoisoned: true, isSevered: false } : a))
+      prev.map((a) => (a.domain === domain ? { ...a, color: ['#c084fc', '#ec4899'], isPoisoned: true, isSevered: false } : a))
     );
     setPackets((prev) =>
       prev.map((p) => (p.domain === domain ? { ...p, isPoisoned: true, isSevered: false } : p))
@@ -826,6 +813,23 @@ export default function App() {
     if (selectedPacket?.domain === domain) {
       setSelectedPacket((prev) => ({ ...prev, isSevered: false, isPoisoned: false }));
     }
+
+    setArcs((prev) => {
+      const exists = prev.some((a) => a.domain === domain);
+      if (exists) {
+        return prev.map((a) =>
+          a.domain === domain
+            ? { ...a, color: getThreatGradientColor(a.threatLevel), isPoisoned: false, isSevered: false }
+            : a
+        );
+      }
+      const pkt = packets.find((p) => p.domain === domain) || (selectedPacket?.domain === domain ? selectedPacket : null);
+      if (pkt) {
+        return [...prev, { ...pkt, color: getThreatGradientColor(pkt.threatLevel), isPoisoned: false, isSevered: false }];
+      }
+      return prev;
+    });
+
     if (!safeViewImg || !safeViewImg.startsWith('data:image/jpeg')) {
       const safeImg = generateSimulatedSafeView(targetUrl, nextBlocked, nextPoisoned, packets);
       if (safeImg) setSafeViewImg(safeImg);
@@ -874,7 +878,7 @@ export default function App() {
       unique.forEach((d) => newBlocked.delete(d));
       setBlockedDomains(newBlocked);
       setArcs((prev) =>
-        prev.map((a) => (unique.includes(a.domain) ? { ...a, color: '#c084fc', isPoisoned: true, isSevered: false } : a))
+        prev.map((a) => (unique.includes(a.domain) ? { ...a, color: ['#c084fc', '#ec4899'], isPoisoned: true, isSevered: false } : a))
       );
       setPackets((prev) =>
         prev.map((p) => (unique.includes(p.domain) ? { ...p, isPoisoned: true, isSevered: false } : p))
@@ -936,7 +940,7 @@ export default function App() {
       maxR: 3.5,
       propagationSpeed: 2.2,
       repeatPeriod: 1200,
-      color: arc.isPoisoned ? '#c084fc' : arc.color
+      color: arc.isPoisoned ? '#c084fc' : (Array.isArray(arc.color) ? arc.color[1] : arc.color)
     }));
   }, [arcs]);
 
@@ -953,7 +957,7 @@ export default function App() {
           lng: p.geo.lng,
           text: `${p.company} (${p.city})`,
           size: 0.9,
-          color: p.isPoisoned ? '#c084fc' : p.threatLevel === 'red' ? '#ff0055' : currentTheme.primary,
+          color: p.isPoisoned ? '#c084fc' : p.threatLevel === 'red' ? '#ff0055' : p.threatLevel === 'orange' ? '#ff7700' : p.threatLevel === 'yellow' ? '#fbbf24' : '#00ff88',
           packet: p
         });
       }
