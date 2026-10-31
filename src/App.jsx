@@ -48,7 +48,7 @@ const getInitialBackendUrl = () => {
     const saved = localStorage.getItem('doomwire_backend_url');
     if (saved) return saved;
   }
-  return import.meta.env.VITE_BACKEND_URL || 'https://doomwire-engine.onrender.com';
+  return import.meta.env.VITE_BACKEND_URL || 'https://the-doomwire2-0-2.onrender.com';
 };
 
 // 4 Minimalist Dark Aesthetic Themes with Colored Hairline Borders
@@ -1823,7 +1823,7 @@ export default function App() {
                     type="text"
                     value={customUrlInput}
                     onChange={(e) => setCustomUrlInput(e.target.value)}
-                    placeholder="https://doomwire-engine.onrender.com"
+                    placeholder="https://the-doomwire2-0-2.onrender.com"
                     className="flex-1 bg-black/80 border border-slate-700 rounded px-3 py-2 text-slate-100 font-mono text-xs focus:outline-none focus:border-cyan-400"
                   />
                   <button
