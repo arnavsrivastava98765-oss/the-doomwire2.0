@@ -298,14 +298,15 @@ async function queryDnsRecord(domain, type = 'A') {
 }
 
 /**
- * Threat gradient generator: Emerging from terminal cyan to authentic threat endpoint
+ * Solid threat color generator: Entire wire is a single vibrant color
  */
-export function getThreatGradientColor(threatLevel) {
-  if (threatLevel === 'red') return ['#00e5ff', '#ff0055'];
-  if (threatLevel === 'orange') return ['#00e5ff', '#ff7700'];
-  if (threatLevel === 'yellow') return ['#00e5ff', '#fbbf24'];
-  return ['#00e5ff', '#00ff88'];
+export function getThreatColor(threatLevel) {
+  if (threatLevel === 'red') return '#ff0055';
+  if (threatLevel === 'orange') return '#ff7700';
+  if (threatLevel === 'yellow') return '#fbbf24';
+  return '#00ff88';
 }
+export const getThreatGradientColor = getThreatColor;
 
 /**
  * MASTER EXPORT: Resolves genuine, authentic server infrastructure for any URL

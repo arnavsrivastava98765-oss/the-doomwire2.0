@@ -33,7 +33,7 @@ import {
   X,
   Palette
 } from 'lucide-react';
-import { resolveRealDomainEcosystem, getThreatGradientColor } from './domainRecon.js';
+import { resolveRealDomainEcosystem, getThreatColor } from './domainRecon.js';
 
 const getInitialBackendUrl = () => {
   if (typeof window !== 'undefined') {
@@ -514,7 +514,7 @@ export default function App() {
       const isSevered = blockedDomains.has(pkt.domain);
       const isPoisoned = poisonedDomains.has(pkt.domain);
 
-      const arcColor = isPoisoned ? ['#c084fc', '#ec4899'] : getThreatGradientColor(pkt.threatLevel);
+      const arcColor = isPoisoned ? '#c084fc' : getThreatColor(pkt.threatLevel);
 
       const newArc = {
         id: pkt.id,
@@ -697,7 +697,7 @@ export default function App() {
           const isSevered = blockedDomains.has(b.domain);
           const isPoisoned = poisonedDomains.has(b.domain);
 
-          const arcColor = isPoisoned ? ['#c084fc', '#ec4899'] : (b.color || getThreatGradientColor(b.threatLevel));
+          const arcColor = isPoisoned ? '#c084fc' : (b.color || getThreatColor(b.threatLevel));
 
           const newPkt = {
             id: `recon-${beaconIndex}-${Date.now()}`,
@@ -782,7 +782,7 @@ export default function App() {
       return next;
     });
     setArcs((prev) =>
-      prev.map((a) => (a.domain === domain ? { ...a, color: ['#c084fc', '#ec4899'], isPoisoned: true, isSevered: false } : a))
+      prev.map((a) => (a.domain === domain ? { ...a, color: '#c084fc', isPoisoned: true, isSevered: false } : a))
     );
     setPackets((prev) =>
       prev.map((p) => (p.domain === domain ? { ...p, isPoisoned: true, isSevered: false } : p))
@@ -819,13 +819,13 @@ export default function App() {
       if (exists) {
         return prev.map((a) =>
           a.domain === domain
-            ? { ...a, color: getThreatGradientColor(a.threatLevel), isPoisoned: false, isSevered: false }
+            ? { ...a, color: getThreatColor(a.threatLevel), isPoisoned: false, isSevered: false }
             : a
         );
       }
       const pkt = packets.find((p) => p.domain === domain) || (selectedPacket?.domain === domain ? selectedPacket : null);
       if (pkt) {
-        return [...prev, { ...pkt, color: getThreatGradientColor(pkt.threatLevel), isPoisoned: false, isSevered: false }];
+        return [...prev, { ...pkt, color: getThreatColor(pkt.threatLevel), isPoisoned: false, isSevered: false }];
       }
       return prev;
     });
@@ -878,7 +878,7 @@ export default function App() {
       unique.forEach((d) => newBlocked.delete(d));
       setBlockedDomains(newBlocked);
       setArcs((prev) =>
-        prev.map((a) => (unique.includes(a.domain) ? { ...a, color: ['#c084fc', '#ec4899'], isPoisoned: true, isSevered: false } : a))
+        prev.map((a) => (unique.includes(a.domain) ? { ...a, color: '#c084fc', isPoisoned: true, isSevered: false } : a))
       );
       setPackets((prev) =>
         prev.map((p) => (unique.includes(p.domain) ? { ...p, isPoisoned: true, isSevered: false } : p))
