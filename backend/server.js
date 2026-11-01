@@ -439,9 +439,9 @@ io.on('connection', (socket) => {
 
       socket.emit('scan_status', { status: 'NAVIGATING AND HARVESTING BEAMS...', stage: 2 });
       
-      // Load target URL safely inside sandbox with 5.5s timeout
+      // Load target URL safely inside sandbox with commit strategy for immediate packet interception
       const formattedUrl = url.startsWith('http') ? url : `https://${url}`;
-      await activePage.goto(formattedUrl, { waitUntil: 'domcontentloaded', timeout: 5500 }).catch((e) => {
+      await activePage.goto(formattedUrl, { waitUntil: 'commit', timeout: 6000 }).catch((e) => {
         console.warn(`[DoomWire] Page load notice: ${e.message}`);
       });
 
@@ -458,8 +458,8 @@ io.on('connection', (socket) => {
         });
       } catch (e) {}
 
-      // Allow 1.2 seconds for dynamic tracking beacons & WebSockets to trigger
-      await new Promise((resolve) => setTimeout(resolve, 1200));
+      // Allow 1.6 seconds for dynamic tracking beacons & ad auctions to trigger
+      await new Promise((resolve) => setTimeout(resolve, 1600));
 
       // Second scroll down to trigger footer telemetry & bottom ad bidding
       try {

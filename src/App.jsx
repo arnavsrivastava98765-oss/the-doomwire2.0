@@ -519,30 +519,59 @@ export default function App() {
 
       const isSevered = blockedDomains.has(pkt.domain);
       const isPoisoned = poisonedDomains.has(pkt.domain);
-
       const arcColor = isPoisoned ? '#c084fc' : getThreatColor(pkt.threatLevel);
 
-      const newArc = {
-        id: pkt.id,
-        domain: pkt.domain,
-        company: pkt.company,
-        startLat: userLocation.lat,
-        startLng: userLocation.lng,
-        endLat: pkt.geo.lat,
-        endLng: pkt.geo.lng,
-        color: arcColor,
-        threatLevel: pkt.threatLevel,
-        isSevered,
-        isPoisoned,
-        ...pkt
-      };
-
       setArcs((prev) => {
-        const filtered = prev.filter((a) => a.domain !== newArc.domain);
-        return [...filtered.slice(-55), newArc];
+        // Multi-lane cyber highway: allow multiple distinct parallel laser beams per server/domain
+        const existingForDomain = prev.filter((a) => a.domain === pkt.domain);
+        const laneIndex = existingForDomain.length;
+
+        // Keep up to 4 parallel lanes per domain to prevent boundless clutter while showing full activity
+        let baseList = prev;
+        if (laneIndex >= 4) {
+          const firstDomainIndex = prev.findIndex((a) => a.domain === pkt.domain);
+          if (firstDomainIndex !== -1) {
+            baseList = [...prev.slice(0, firstDomainIndex), ...prev.slice(firstDomainIndex + 1)];
+          }
+        }
+
+        // Procedural micro-jitter: offset secondary wires by 0.75° - 1.8° so each stream is clearly visible
+        const laneAngle = (laneIndex * 1.35) + 0.45;
+        const jitterDist = laneIndex === 0 ? 0 : 0.75 + (laneIndex * 0.45);
+        const targetLat = (pkt.geo?.lat ?? 0) + Math.sin(laneAngle) * jitterDist;
+        const targetLng = (pkt.geo?.lng ?? 0) + Math.cos(laneAngle) * jitterDist;
+        const arcAltitude = 0.22 + ((laneIndex % 4) * 0.09);
+
+        const newArc = {
+          id: pkt.id || `arc-${Date.now()}-${Math.random().toString(36).substring(7)}`,
+          domain: pkt.domain,
+          company: pkt.company,
+          startLat: userLocation.lat,
+          startLng: userLocation.lng,
+          endLat: targetLat,
+          endLng: targetLng,
+          color: arcColor,
+          threatLevel: pkt.threatLevel,
+          altitude: arcAltitude,
+          laneIndex,
+          isSevered,
+          isPoisoned,
+          ...pkt
+        };
+
+        if (isSevered) return baseList;
+        return [...baseList.slice(-65), newArc];
       });
 
-      setPackets((prev) => [newArc, ...prev.slice(0, 90)]);
+      setPackets((prev) => {
+        const newPkt = {
+          ...pkt,
+          color: arcColor,
+          isSevered,
+          isPoisoned
+        };
+        return [newPkt, ...prev.slice(0, 90)];
+      });
     });
 
     s.on('scan_status', ({ status }) => {
@@ -1002,16 +1031,25 @@ export default function App() {
     globeRef.current.pointOfView({ lat: 20, lng: 0, altitude: 2.5 }, 550);
   };
 
-  // Target impact radar rings
+  // Target impact radar rings (1 clean pulsating radar ring per destination cluster)
   const ringsData = useMemo(() => {
-    return arcs.map((arc) => ({
-      lat: arc.endLat,
-      lng: arc.endLng,
-      maxR: 3.5,
-      propagationSpeed: 2.2,
-      repeatPeriod: 1200,
-      color: arc.isPoisoned ? '#c084fc' : (Array.isArray(arc.color) ? arc.color[1] : arc.color)
-    }));
+    const seen = new Set();
+    const result = [];
+    arcs.forEach((arc) => {
+      const key = `${Math.round(arc.endLat)}_${Math.round(arc.endLng)}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        result.push({
+          lat: arc.endLat,
+          lng: arc.endLng,
+          maxR: 3.5,
+          propagationSpeed: 2.2,
+          repeatPeriod: 1200,
+          color: arc.isPoisoned ? '#c084fc' : (Array.isArray(arc.color) ? arc.color[1] : arc.color)
+        });
+      }
+    });
+    return result;
   }, [arcs]);
 
   // Real-time server labels mapped directly onto 3D Earth
@@ -1465,9 +1503,8 @@ export default function App() {
             arcColor="color"
             arcDashLength={0.45}
             arcDashGap={0.2}
-            arcDashAnimateTime={1300}
-            arcStroke={0.65}
-            arcAltitudeAutoScale={0.45}
+            arcStroke={(d) => (d.laneIndex === 0 ? 0.75 : 0.52)}
+            arcAltitude={(d) => d.altitude || 0.30}
             onArcClick={(arc) => selectAndFocusPacket(arc)}
             // Animated impact radar rings
             ringsData={ringsData}
