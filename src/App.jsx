@@ -1503,8 +1503,9 @@ export default function App() {
             arcColor="color"
             arcDashLength={0.45}
             arcDashGap={0.2}
+            arcDashAnimateTime={1400}
             arcStroke={(d) => (d.laneIndex === 0 ? 0.75 : 0.52)}
-            arcAltitude={(d) => d.altitude || 0.30}
+            arcAltitudeAutoScale={0.45}
             onArcClick={(arc) => selectAndFocusPacket(arc)}
             // Animated impact radar rings
             ringsData={ringsData}
