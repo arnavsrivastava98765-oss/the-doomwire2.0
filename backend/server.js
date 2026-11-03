@@ -70,6 +70,126 @@ const TRACKER_RADAR = {
   'googlesyndication.com': { company: 'Google AdSense / Publisher Network', type: 'Display Ad Network', threat: 'red', defaultCity: 'Mountain View, US', lat: 37.422, lng: -122.084 }
 };
 
+// Global Country-Code Top-Level Domain (ccTLD) Geo-Registry
+const CCTLD_GEO_REGISTRY = {
+  de: { country: 'DE', city: 'Frankfurt am Main, DE', lat: 50.1109, lng: 8.6821 },
+  uk: { country: 'GB', city: 'London, UK', lat: 51.5074, lng: -0.1278 },
+  fr: { country: 'FR', city: 'Paris, FR', lat: 48.8566, lng: 2.3522 },
+  eu: { country: 'EU', city: 'Amsterdam / Frankfurt, EU', lat: 52.3676, lng: 4.9041 },
+  ch: { country: 'CH', city: 'Zurich, CH', lat: 47.3769, lng: 8.5417 },
+  nl: { country: 'NL', city: 'Amsterdam, NL', lat: 52.3676, lng: 4.9041 },
+  in: { country: 'IN', city: 'Mumbai / Maharashtra, IN', lat: 19.0760, lng: 72.8777 },
+  jp: { country: 'JP', city: 'Tokyo, JP', lat: 35.6762, lng: 139.6503 },
+  au: { country: 'AU', city: 'Sydney, AU', lat: -33.8688, lng: 151.2093 },
+  ca: { country: 'CA', city: 'Toronto, CA', lat: 43.6532, lng: -79.3832 },
+  br: { country: 'BR', city: 'São Paulo, BR', lat: -23.5505, lng: -46.6333 },
+  se: { country: 'SE', city: 'Stockholm, SE', lat: 59.3293, lng: 18.0686 },
+  es: { country: 'ES', city: 'Madrid, ES', lat: 40.4168, lng: -3.7038 },
+  it: { country: 'IT', city: 'Milan, IT', lat: 45.4642, lng: 9.1900 },
+  sg: { country: 'SG', city: 'Singapore, SG', lat: 1.3521, lng: 103.8198 },
+  ru: { country: 'RU', city: 'Moscow, RU', lat: 55.7558, lng: 37.6173 },
+  ae: { country: 'AE', city: 'Dubai, AE', lat: 25.2048, lng: 55.2708 },
+  sa: { country: 'SA', city: 'Riyadh, SA', lat: 24.7136, lng: 46.6753 },
+  kr: { country: 'KR', city: 'Seoul, KR', lat: 37.5665, lng: 126.9780 },
+  cn: { country: 'CN', city: 'Beijing, CN', lat: 39.9042, lng: 116.4074 },
+  mx: { country: 'MX', city: 'Mexico City, MX', lat: 19.4326, lng: -99.1332 },
+  ie: { country: 'IE', city: 'Dublin, IE', lat: 53.3498, lng: -6.2603 },
+  at: { country: 'AT', city: 'Vienna, AT', lat: 48.2082, lng: 16.3738 },
+  be: { country: 'BE', city: 'Brussels, BE', lat: 50.8503, lng: 4.3517 },
+  pl: { country: 'PL', city: 'Warsaw, PL', lat: 52.2297, lng: 21.0122 },
+  no: { country: 'NO', city: 'Oslo, NO', lat: 59.9139, lng: 10.7522 },
+  fi: { country: 'FI', city: 'Helsinki, FI', lat: 60.1699, lng: 24.9384 },
+  dk: { country: 'DK', city: 'Copenhagen, DK', lat: 55.6761, lng: 12.5683 }
+};
+
+// Global International Brand & Enterprise Registry
+const GLOBAL_BRAND_REGISTRY = {
+  // German Financial Institutions & Enterprises
+  'deutsche-bank': { company: 'Deutsche Bank AG', city: 'Frankfurt am Main, DE', lat: 50.1109, lng: 8.6821 },
+  'db.com': { company: 'Deutsche Bank AG', city: 'Frankfurt am Main, DE', lat: 50.1109, lng: 8.6821 },
+  'commerzbank': { company: 'Commerzbank AG', city: 'Frankfurt am Main, DE', lat: 50.1109, lng: 8.6821 },
+  'sparkasse': { company: 'Sparkassen-Finanzgruppe', city: 'Berlin / Frankfurt, DE', lat: 52.5200, lng: 13.4050 },
+  'dasp': { company: 'Sparkassen-Finanzportal', city: 'Berlin, DE', lat: 52.5200, lng: 13.4050 },
+  'volkswagen': { company: 'Volkswagen AG', city: 'Wolfsburg, DE', lat: 52.4227, lng: 9.7865 },
+  'bmw': { company: 'BMW Group', city: 'Munich, DE', lat: 48.1774, lng: 11.5583 },
+  'siemens': { company: 'Siemens AG', city: 'Munich, DE', lat: 48.1351, lng: 11.5820 },
+  'sap': { company: 'SAP SE', city: 'Walldorf, DE', lat: 49.2934, lng: 8.6424 },
+  'allianz': { company: 'Allianz SE', city: 'Munich, DE', lat: 48.1351, lng: 11.5820 },
+  'lufthansa': { company: 'Deutsche Lufthansa AG', city: 'Frankfurt, DE', lat: 50.1109, lng: 8.6821 },
+  'bayer': { company: 'Bayer AG', city: 'Leverkusen, DE', lat: 51.0459, lng: 7.0192 },
+  'postbank': { company: 'Deutsche Postbank', city: 'Bonn, DE', lat: 50.7374, lng: 7.0982 },
+
+  // UK Banks & Media
+  'barclays': { company: 'Barclays PLC', city: 'London, UK', lat: 51.5074, lng: -0.1278 },
+  'hsbc': { company: 'HSBC Holdings PLC', city: 'London, UK', lat: 51.5074, lng: -0.1278 },
+  'lloyds': { company: 'Lloyds Banking Group', city: 'London, UK', lat: 51.5074, lng: -0.1278 },
+  'natwest': { company: 'NatWest Group', city: 'Edinburgh / London, UK', lat: 55.9533, lng: -3.1883 },
+  'bbc': { company: 'British Broadcasting Corp (BBC)', city: 'London, UK', lat: 51.5186, lng: -0.1438 },
+
+  // French Banks & Brands
+  'bnp': { company: 'BNP Paribas SA', city: 'Paris, FR', lat: 48.8566, lng: 2.3522 },
+  'societegenerale': { company: 'Société Générale', city: 'Paris, FR', lat: 48.8566, lng: 2.3522 },
+  'credit-agricole': { company: 'Crédit Agricole Group', city: 'Paris, FR', lat: 48.8566, lng: 2.3522 },
+
+  // Swiss Banks
+  'ubs': { company: 'UBS Group AG', city: 'Zurich, CH', lat: 47.3769, lng: 8.5417 },
+  'credit-suisse': { company: 'Credit Suisse / UBS', city: 'Zurich, CH', lat: 47.3769, lng: 8.5417 },
+
+  // Spanish Banks
+  'santander': { company: 'Banco Santander SA', city: 'Madrid, ES', lat: 40.4168, lng: -3.7038 },
+  'bbva': { company: 'BBVA SA', city: 'Madrid, ES', lat: 40.4168, lng: -3.7038 },
+
+  // Dutch Banks
+  'ing': { company: 'ING Groep NV', city: 'Amsterdam, NL', lat: 52.3676, lng: 4.9041 },
+  'rabobank': { company: 'Rabobank', city: 'Utrecht, NL', lat: 52.0907, lng: 5.1214 },
+
+  // Indian Financial & Tech
+  'sbi': { company: 'State Bank of India', city: 'Mumbai, IN', lat: 19.0760, lng: 72.8777 },
+  'hdfc': { company: 'HDFC Bank Ltd', city: 'Mumbai, IN', lat: 19.0760, lng: 72.8777 },
+  'icici': { company: 'ICICI Bank Ltd', city: 'Mumbai, IN', lat: 19.0760, lng: 72.8777 },
+  'tata': { company: 'Tata Group', city: 'Mumbai, IN', lat: 19.0760, lng: 72.8777 },
+  'infosys': { company: 'Infosys Ltd', city: 'Bengaluru, IN', lat: 12.9716, lng: 77.5946 },
+
+  // Japanese Companies & Banks
+  'sony': { company: 'Sony Group Corp', city: 'Tokyo, JP', lat: 35.6762, lng: 139.6503 },
+  'mufg': { company: 'Mitsubishi UFJ Financial Group', city: 'Tokyo, JP', lat: 35.6762, lng: 139.6503 },
+  'mitsu': { company: 'Mitsubishi Group', city: 'Tokyo, JP', lat: 35.6762, lng: 139.6503 },
+  'smbc': { company: 'Sumitomo Mitsui Banking', city: 'Tokyo, JP', lat: 35.6762, lng: 139.6503 }
+};
+
+// Resolve geographic coordinates and authentic entity name from TLD and Brand registry
+function resolveTldOrBrand(domain) {
+  const d = domain.toLowerCase();
+
+  // 1. Check Global Brand Registry
+  for (const [key, val] of Object.entries(GLOBAL_BRAND_REGISTRY)) {
+    if (d.includes(key)) {
+      return {
+        company: val.company,
+        city: val.city,
+        lat: val.lat,
+        lng: val.lng
+      };
+    }
+  }
+
+  // 2. Check Country Code TLD
+  const parts = d.split('.');
+  const tld = parts.length > 1 ? parts[parts.length - 1] : '';
+  const secondTld = parts.length > 2 ? parts[parts.length - 2] : '';
+  const matchedTld = CCTLD_GEO_REGISTRY[tld] || CCTLD_GEO_REGISTRY[secondTld];
+  if (matchedTld) {
+    return {
+      company: deriveCompanyFromDomain(domain),
+      city: matchedTld.city,
+      lat: matchedTld.lat,
+      lng: matchedTld.lng
+    };
+  }
+
+  return null;
+}
+
 // Clean company name from domain if not in static radar
 function deriveCompanyFromDomain(domain) {
   const parts = domain.replace(/^www\./, '').split('.');
@@ -125,7 +245,8 @@ async function resolveIntelligence(domain, fullUrl = '', resourceType = 'other')
     }
   }
 
-  const derivedCompany = deriveCompanyFromDomain(domain);
+  const tldOrBrand = resolveTldOrBrand(domain);
+  const derivedCompany = tldOrBrand ? tldOrBrand.company : deriveCompanyFromDomain(domain);
   const derivedThreat = classifyThreat(domain, fullUrl, resourceType);
 
   // Live DNS & offline GeoIP lookup
@@ -135,11 +256,30 @@ async function resolveIntelligence(domain, fullUrl = '', resourceType = 'other')
     const geo = geoip.lookup(ip);
 
     if (geo && geo.ll) {
+      // Detect MaxMind's Anycast US center fallback ([37.751, -97.822] in Kansas)
+      const isGenericUsAnycast =
+        geo.country === 'US' &&
+        (!geo.city || (geo.ll[0] >= 37.0 && geo.ll[0] <= 38.0 && geo.ll[1] <= -95.0 && geo.ll[1] >= -99.0));
+
+      if (isGenericUsAnycast && tldOrBrand) {
+        // OVERRIDE: Do not place an international institution/domain in the middle of Kansas/Mexico!
+        const result = {
+          company: tldOrBrand.company,
+          city: tldOrBrand.city,
+          lat: tldOrBrand.lat,
+          lng: tldOrBrand.lng,
+          type: derivedThreat === 'red' ? 'Real-Time Ad Exchange / Telemetry' : 'Origin / Edge CDN Gateway',
+          threat: derivedThreat
+        };
+        intelCache.set(domain, result);
+        return result;
+      }
+
       const result = {
         company: derivedCompany,
-        city: `${geo.city || 'Edge Node'}, ${geo.country || 'Global'}`,
-        lat: geo.ll[0],
-        lng: geo.ll[1],
+        city: tldOrBrand && isGenericUsAnycast ? tldOrBrand.city : `${geo.city || 'Edge Node'}, ${geo.country || 'Global'}`,
+        lat: tldOrBrand && isGenericUsAnycast ? tldOrBrand.lat : geo.ll[0],
+        lng: tldOrBrand && isGenericUsAnycast ? tldOrBrand.lng : geo.ll[1],
         type: derivedThreat === 'red' ? 'Real-Time Ad Exchange / Telemetry' : derivedThreat === 'orange' ? 'Analytics & Telemetry Beacon' : 'Host API & Asset Gateway',
         threat: derivedThreat
       };
@@ -150,7 +290,20 @@ async function resolveIntelligence(domain, fullUrl = '', resourceType = 'other')
     // DNS resolution failure or private IP fallback
   }
 
-  // Consistent hash-based coordinates across the globe for unknown/distributed servers
+  // Consistent fallback for unknown or unresolvable domains
+  if (tldOrBrand) {
+    const result = {
+      company: tldOrBrand.company,
+      city: tldOrBrand.city,
+      lat: tldOrBrand.lat,
+      lng: tldOrBrand.lng,
+      type: 'Origin / Edge CDN Server',
+      threat: derivedThreat
+    };
+    intelCache.set(domain, result);
+    return result;
+  }
+
   const hash = domain.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
   const fallbackLocations = [
     { city: 'London, UK', lat: 51.5074, lng: -0.1278 },
@@ -278,9 +431,9 @@ async function discoverTargetInfrastructure(targetUrl) {
             domain: host,
             ip: ip,
             company: intel.company,
-            city: geo && geo.city ? `${geo.city}, ${geo.country || 'Global'}` : intel.city,
-            lat: geo && geo.ll ? geo.ll[0] : intel.lat,
-            lng: geo && geo.ll ? geo.ll[1] : intel.lng,
+            city: intel.city,
+            lat: intel.lat,
+            lng: intel.lng,
             threatLevel: intel.threat,
             trackerType: intel.type,
             leakedData: [
