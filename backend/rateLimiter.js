@@ -135,7 +135,10 @@ function expressHttpRateLimiter(req, res, next) {
  * Returns CORS origin validator matching permitted production & development hosts
  */
 function getCorsOriginValidator() {
-  const allowedConfig = process.env.ALLOWED_ORIGINS;
+  const allowedConfig = process.env.ALLOWED_ORIGINS || process.env.ALLOWED_ORIGIN;
+  if (!allowedConfig || allowedConfig.trim() === '*') {
+    return (origin, callback) => callback(null, true);
+  }
   const configuredOrigins = allowedConfig
     ? allowedConfig.split(',').map((o) => o.trim().toLowerCase())
     : [];

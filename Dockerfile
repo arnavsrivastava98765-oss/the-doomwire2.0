@@ -18,6 +18,7 @@ COPY backend/ ./
 
 # Copy built frontend static dist into backend dist path
 COPY --from=frontend-builder /app/dist /app/dist
+COPY --from=frontend-builder /app/dist /app/backend/dist
 
 # Secure Non-Root Execution
 RUN chown -R pwuser:pwuser /app

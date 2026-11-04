@@ -54,7 +54,13 @@ const getInitialBackendUrl = () => {
       return window.location.origin;
     }
     const saved = localStorage.getItem('doomwire_backend_url');
-    if (saved) return saved;
+    if (saved) {
+      if (window.location.protocol === 'https:' && saved.startsWith('http://localhost')) {
+        // Prevent mixed content block on production HTTPS
+      } else {
+        return saved;
+      }
+    }
   }
   return import.meta.env.VITE_BACKEND_URL || 'https://the-doomwire2-0-2.onrender.com';
 };
