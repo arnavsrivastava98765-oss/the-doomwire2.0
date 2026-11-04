@@ -34,6 +34,14 @@ import {
   Palette
 } from 'lucide-react';
 import { resolveRealDomainEcosystem, getThreatColor } from './domainRecon.js';
+import { THEMES } from './utils/themes.js';
+import { audioFX } from './utils/audio.js';
+import { generateQuickDomainNodes, generateSimulatedSafeView } from './utils/safeViewRenderer.js';
+import NavigationPod from './components/NavigationPod.jsx';
+import SpectrumLegend from './components/SpectrumLegend.jsx';
+import InspectorModal from './components/InspectorModal.jsx';
+import SafeViewModal from './components/SafeViewModal.jsx';
+import ServerModal from './components/ServerModal.jsx';
 
 const getInitialBackendUrl = () => {
   if (typeof window !== 'undefined') {
@@ -51,253 +59,12 @@ const getInitialBackendUrl = () => {
   return import.meta.env.VITE_BACKEND_URL || 'https://the-doomwire2-0-2.onrender.com';
 };
 
-// 4 Minimalist Dark Aesthetic Themes with Colored Hairline Borders
-const THEMES = {
-  OBSIDIAN_BLUE: {
-    id: 'OBSIDIAN_BLUE',
-    name: 'OBSIDIAN // BLUE',
-    tag: 'TACTICAL BLUE',
-    primary: '#38bdf8',
-    primaryGlow: 'rgba(56, 189, 248, 0.25)',
-    secondary: '#60a5fa',
-    atmosphere: '#0284c7',
-    radarColor: '#38bdf8',
-    border: 'rgba(56, 189, 248, 0.28)',
-    surfaceBg: 'rgba(8, 12, 22, 0.88)'
-  },
-  DEEP_VIOLET: {
-    id: 'DEEP_VIOLET',
-    name: 'VOID // PURPLE',
-    tag: 'PURPLISH BLACK',
-    primary: '#c084fc',
-    primaryGlow: 'rgba(192, 132, 252, 0.25)',
-    secondary: '#ec4899',
-    atmosphere: '#7e22ce',
-    radarColor: '#c084fc',
-    border: 'rgba(192, 132, 252, 0.3)',
-    surfaceBg: 'rgba(14, 8, 24, 0.88)'
-  },
-  CRIMSON_PROTOCOL: {
-    id: 'CRIMSON_PROTOCOL',
-    name: 'CRIMSON // RED',
-    tag: 'STEALTH RED',
-    primary: '#f43f5e',
-    primaryGlow: 'rgba(244, 63, 94, 0.25)',
-    secondary: '#fb7185',
-    atmosphere: '#be123c',
-    radarColor: '#f43f5e',
-    border: 'rgba(244, 63, 94, 0.3)',
-    surfaceBg: 'rgba(16, 7, 10, 0.88)'
-  },
-  NEO_EMERALD: {
-    id: 'NEO_EMERALD',
-    name: 'EMERALD // BLACK',
-    tag: 'TACTICAL SAGE',
-    primary: '#10b981',
-    primaryGlow: 'rgba(16, 185, 129, 0.25)',
-    secondary: '#34d399',
-    atmosphere: '#047857',
-    radarColor: '#10b981',
-    border: 'rgba(16, 185, 129, 0.28)',
-    surfaceBg: 'rgba(6, 14, 9, 0.88)'
-  }
-};
-
-// Lightweight synchronous fallback for instant safe-room preview wireframe
-const generateQuickDomainNodes = (inputUrl) => {
-  let domain = 'target-perimeter.com';
-  try {
-    const formatted = inputUrl.startsWith('http') ? inputUrl : `https://${inputUrl}`;
-    domain = new URL(formatted).hostname.toLowerCase().replace(/^www\./, '');
-  } catch (e) {
-    domain = inputUrl.replace(/^https?:\/\//, '').split('/')[0].replace(/^www\./, '').toLowerCase() || 'target-perimeter.com';
-  }
-  const parts = domain.split('.');
-  const brand = parts.length >= 2 ? parts[parts.length - 2].toUpperCase() : 'HOST';
-  return [
-    { domain: domain, company: `${brand} Origin Host`, trackerType: 'Primary Web Origin', threatLevel: 'green' },
-    { domain: `api.${domain}`, company: `${brand} Platform Services`, trackerType: 'REST & GraphQL API Gateway', threatLevel: 'yellow' },
-    { domain: `cdn.${domain}`, company: `${brand} Global Edge`, trackerType: 'Content Delivery Network Edge', threatLevel: 'green' },
-    { domain: `auth.${domain}`, company: `${brand} Identity Mesh`, trackerType: 'SSO & OAuth Identity Provider', threatLevel: 'yellow' }
-  ];
-};
-
-// Generates an interactive, tactical Safe-Room preview in-memory via HTML5 Canvas
-const generateSimulatedSafeView = (url, severedSet = new Set(), poisonedSet = new Set(), customBeacons = []) => {
-  const canvas = document.createElement('canvas');
-  canvas.width = 1200;
-  canvas.height = 700;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return null;
-
-  const displayUrl = (url || 'https://domain-target.com').trim();
-  let cleanDomain = 'domain-target.com';
-  try {
-    cleanDomain = new URL(displayUrl.startsWith('http') ? displayUrl : `https://${displayUrl}`).hostname;
-  } catch (e) {
-    cleanDomain = displayUrl.replace(/^https?:\/\//, '').split('/')[0] || 'domain-target.com';
-  }
-
-  // Tactical Dark Background
-  ctx.fillStyle = '#070b14';
-  ctx.fillRect(0, 0, 1200, 700);
-
-  // Chrome Header
-  ctx.fillStyle = '#0f172a';
-  ctx.fillRect(0, 0, 1200, 52);
-  ctx.fillStyle = '#ef4444'; ctx.beginPath(); ctx.arc(26, 26, 6, 0, Math.PI * 2); ctx.fill();
-  ctx.fillStyle = '#f59e0b'; ctx.beginPath(); ctx.arc(46, 26, 6, 0, Math.PI * 2); ctx.fill();
-  ctx.fillStyle = '#10b981'; ctx.beginPath(); ctx.arc(66, 26, 6, 0, Math.PI * 2); ctx.fill();
-
-  // URL Bar with actual user-requested URL
-  ctx.fillStyle = '#1e293b';
-  if (ctx.roundRect) ctx.roundRect(100, 12, 850, 28, 6); else ctx.fillRect(100, 12, 850, 28);
-  ctx.fill();
-  ctx.fillStyle = '#10b981';
-  ctx.font = 'bold 12px monospace';
-  ctx.fillText('🛡️ [DOOMWIRE ISOLATED SANDBOX] -> ' + (displayUrl.startsWith('http') ? displayUrl : `https://${displayUrl}`), 120, 31);
-
-  // Status Badge
-  ctx.fillStyle = '#00f0ff';
-  ctx.font = 'bold 11px monospace';
-  ctx.fillText('ACTIVE FIREWALL DEFENSE', 980, 31);
-
-  // Main Page Content Area (Sanitized Wireframe tailored to target domain)
-  ctx.fillStyle = '#0f172a';
-  ctx.fillRect(50, 80, 730, 220);
-  ctx.strokeStyle = '#334155';
-  ctx.strokeRect(50, 80, 730, 220);
-
-  ctx.fillStyle = '#38bdf8';
-  ctx.font = 'bold 22px system-ui, sans-serif';
-  ctx.fillText(`DOM PURIFIED: ${cleanDomain.toUpperCase()}`, 80, 130);
-  ctx.fillStyle = '#94a3b8';
-  ctx.font = '13px system-ui, sans-serif';
-  ctx.fillText(`Target perimeter at ${cleanDomain} analyzed inside isolated execution sandbox.`, 80, 165);
-  ctx.fillText('Real-time network surveillance, ad auctions, cross-site fingerprinters, and cookie syncs isolated.', 80, 190);
-  ctx.fillStyle = '#10b981';
-  ctx.font = 'bold 12px monospace';
-  ctx.fillText(`FIREWALL STATUS: ${severedSet.size} WIRES CUT // ${poisonedSet.size} WIRES POISONED`, 80, 240);
-
-  // Dynamic Surveillance Slots derived from actual target beacons
-  const pool = customBeacons.length > 0 ? customBeacons : generateQuickDomainNodes(displayUrl);
-  const dangerNodes = pool.filter((b) => b.threatLevel === 'red' || b.threatLevel === 'orange' || b.threatLevel === 'yellow');
-  const selectedNodes = (dangerNodes.length >= 4 ? dangerNodes : pool).slice(0, 4);
-
-  const slotCoords = [
-    { x: 810, y: 80, w: 340, h: 220 },
-    { x: 810, y: 320, w: 340, h: 320 },
-    { x: 50, y: 320, w: 730, h: 140 },
-    { x: 50, y: 480, w: 730, h: 160 }
-  ];
-
-  selectedNodes.forEach((node, idx) => {
-    const coords = slotCoords[idx];
-    if (!coords) return;
-
-    const isSev = severedSet.has(node.domain);
-    const isPois = poisonedSet.has(node.domain);
-
-    ctx.fillStyle = isSev ? 'rgba(239, 68, 68, 0.12)' : isPois ? 'rgba(192, 132, 252, 0.15)' : 'rgba(30, 41, 59, 0.7)';
-    ctx.fillRect(coords.x, coords.y, coords.w, coords.h);
-    ctx.lineWidth = 1.5;
-    ctx.strokeStyle = isSev ? '#ef4444' : isPois ? '#c084fc' : '#475569';
-    ctx.strokeRect(coords.x, coords.y, coords.w, coords.h);
-
-    ctx.fillStyle = isSev ? '#ef4444' : isPois ? '#c084fc' : '#f87171';
-    ctx.font = 'bold 12px monospace';
-    const label = isSev ? '✂ SEVERED WIRE // NETWORK PACKET DROPPED' : isPois ? '☠ POISONED // DIFFERENTIAL NOISE INJECTED' : '⚠ SURVEILLANCE BEACON IDENTIFIED';
-    ctx.fillText(label, coords.x + 16, coords.y + 32);
-
-    ctx.fillStyle = '#cbd5e1';
-    ctx.font = '11px monospace';
-    ctx.fillText(`Target: ${node.domain} [${node.company || node.trackerType}]`, coords.x + 16, coords.y + 55);
-
-    ctx.fillStyle = '#94a3b8';
-    ctx.font = '10px monospace';
-    const sub = isSev ? 'Connection sinkholed by DoomWire DNS firewall.' : isPois ? 'Fingerprint replaced with high-entropy cryptographic noise.' : (node.trackerType || 'Active exfiltration vector monitored on 3D radar.');
-    ctx.fillText(sub, coords.x + 16, coords.y + 78);
-  });
-
-  return canvas.toDataURL('image/png');
-};
-
-// Web Audio Tactical Synthesizer
-class TacticalAudio {
-  constructor() {
-    this.ctx = null;
-    this.muted = false;
-  }
-
-  init() {
-    if (!this.ctx) {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (AudioCtx) this.ctx = new AudioCtx();
-    }
-  }
-
-  playBlip(freq = 650, duration = 0.05) {
-    if (this.muted || !this.ctx) return;
-    try {
-      if (this.ctx.state === 'suspended') this.ctx.resume();
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-      gain.gain.setValueAtTime(0.04, this.ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + duration);
-      osc.connect(gain);
-      gain.connect(this.ctx.destination);
-      osc.start();
-      osc.stop(this.ctx.currentTime + duration);
-    } catch (e) {}
-  }
-
-  playSever() {
-    if (this.muted || !this.ctx) return;
-    try {
-      if (this.ctx.state === 'suspended') this.ctx.resume();
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
-      osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(750, this.ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(60, this.ctx.currentTime + 0.22);
-      gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
-      gain.gain.linearRampToValueAtTime(0.001, this.ctx.currentTime + 0.22);
-      osc.connect(gain);
-      gain.connect(this.ctx.destination);
-      osc.start();
-      osc.stop(this.ctx.currentTime + 0.22);
-    } catch (e) {}
-  }
-
-  playPoison() {
-    if (this.muted || !this.ctx) return;
-    try {
-      if (this.ctx.state === 'suspended') this.ctx.resume();
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(280, this.ctx.currentTime);
-      osc.frequency.linearRampToValueAtTime(900, this.ctx.currentTime + 0.12);
-      osc.frequency.linearRampToValueAtTime(400, this.ctx.currentTime + 0.26);
-      gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
-      gain.gain.linearRampToValueAtTime(0.001, this.ctx.currentTime + 0.26);
-      osc.connect(gain);
-      gain.connect(this.ctx.destination);
-      osc.start();
-      osc.stop(this.ctx.currentTime + 0.26);
-    } catch (e) {}
-  }
-}
-
-const audioFX = new TacticalAudio();
-
 export default function App() {
   const [currentThemeKey, setCurrentThemeKey] = useState('OBSIDIAN_BLUE');
   const currentTheme = THEMES[currentThemeKey];
 
   const [socketConnected, setSocketConnected] = useState(false);
+  const [isWakingServer, setIsWakingServer] = useState(false);
   const [backendUrl, setBackendUrl] = useState(getInitialBackendUrl);
   const [showServerModal, setShowServerModal] = useState(false);
   const [customUrlInput, setCustomUrlInput] = useState(backendUrl);
@@ -490,6 +257,36 @@ export default function App() {
     }, 300);
     return () => clearTimeout(timer);
   }, [configureGlobeLighting, globeDimensions]);
+
+  // Keep-Warm Ping & Cold-Start Detector (for Render free-tier hibernation)
+  useEffect(() => {
+    if (!backendUrl) return;
+    let isCancelled = false;
+
+    const checkServerHealth = async () => {
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 3500);
+        const res = await fetch(`${backendUrl}/api/status`, { signal: controller.signal });
+        clearTimeout(timeout);
+        if (res.ok && !isCancelled) {
+          setIsWakingServer(false);
+        }
+      } catch (err) {
+        if (!isCancelled && !socketConnected) {
+          setIsWakingServer(true);
+        }
+      }
+    };
+
+    checkServerHealth();
+    // Ping every 5 minutes while browser tab is open to prevent idle sleep
+    const keepWarmTimer = setInterval(checkServerHealth, 300000);
+    return () => {
+      isCancelled = true;
+      clearInterval(keepWarmTimer);
+    };
+  }, [backendUrl, socketConnected]);
 
   // Socket.io Connection & Events
   useEffect(() => {
@@ -1302,12 +1099,12 @@ export default function App() {
             <span
               className="w-2.5 h-2.5 rounded-full animate-pulse"
               style={{
-                backgroundColor: socketConnected ? '#10b981' : '#00f0ff',
-                boxShadow: socketConnected ? '0 0 10px rgba(16, 185, 129, 0.8)' : '0 0 10px rgba(0, 240, 255, 0.6)'
+                backgroundColor: socketConnected ? '#10b981' : isWakingServer ? '#fbbf24' : '#00f0ff',
+                boxShadow: socketConnected ? '0 0 10px rgba(16, 185, 129, 0.8)' : isWakingServer ? '0 0 10px rgba(251, 191, 36, 0.8)' : '0 0 10px rgba(0, 240, 255, 0.6)'
               }}
             ></span>
-            <span className="text-[10px] font-bold font-mono tracking-wider hidden sm:inline" style={{ color: socketConnected ? '#34d399' : '#38bdf8' }}>
-              {socketConnected ? 'CLOUD ENGINE // ONLINE' : 'RADAR // STANDALONE'}
+            <span className="text-[10px] font-bold font-mono tracking-wider hidden sm:inline" style={{ color: socketConnected ? '#34d399' : isWakingServer ? '#fbbf24' : '#38bdf8' }}>
+              {socketConnected ? 'CLOUD ENGINE // ONLINE' : isWakingServer ? 'WAKING ENGINE (~20s)...' : 'RADAR // STANDALONE'}
             </span>
             <Server className="w-3.5 h-3.5 text-slate-400 ml-0.5" />
           </button>
@@ -1525,250 +1322,34 @@ export default function App() {
           />
 
           {/* Theme Indicator & Spectrum (Top-Right HUD Overlay) */}
-          <div
-            className="absolute top-4 right-4 tactical-panel p-2.5 rounded-lg border text-xs backdrop-blur-md shadow-2xl z-10 max-w-[210px]"
-            style={{ borderColor: currentTheme.border }}
-          >
-            <div className="text-[9px] font-bold uppercase tracking-wider mb-2 flex items-center gap-1.5" style={{ color: currentTheme.primary }}>
-              <Layers className="w-3 h-3" />
-              SURVEILLANCE SPECTRUM
-            </div>
-            <div className="space-y-1 text-[10px]">
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[#00ff88] shadow-[0_0_6px_#00ff88]"></span>
-                <span className="text-slate-300">Clean Content</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[#fbbf24] shadow-[0_0_6px_#fbbf24]"></span>
-                <span className="text-slate-300">Ad / Profiler</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[#ff7700] shadow-[0_0_6px_#ff7700]"></span>
-                <span className="text-slate-300">Session Replay</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[#ff0055] shadow-[0_0_6px_#ff0055]"></span>
-                <span className="text-slate-300">Malicious/FP</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[#c084fc] shadow-[0_0_6px_#c084fc]"></span>
-                <span className="text-purple-300 font-bold">Poisoned Decoy</span>
-              </div>
-            </div>
-          </div>
+          <SpectrumLegend currentTheme={currentTheme} />
 
           {/* On-Screen Camera Navigation Pod */}
-          <div
-            className="absolute right-4 top-48 tactical-panel p-1.5 rounded-lg border flex flex-col gap-1 z-10 shadow-xl"
-            style={{ borderColor: currentTheme.border }}
-          >
-            <button
-              onClick={zoomIn}
-              className="p-1.5 rounded hover:bg-white/10 text-slate-300 transition"
-              title="Zoom In"
-            >
-              <ZoomIn className="w-4 h-4" />
-            </button>
-            <button
-              onClick={zoomOut}
-              className="p-1.5 rounded hover:bg-white/10 text-slate-300 transition"
-              title="Zoom Out"
-            >
-              <ZoomOut className="w-4 h-4" />
-            </button>
-            <div className="w-full h-px bg-slate-800 my-0.5"></div>
-            <button
-              onClick={shiftUp}
-              className="p-1.5 rounded hover:bg-white/10 text-slate-300 transition"
-              title="Shift Up"
-            >
-              <ChevronUp className="w-4 h-4" />
-            </button>
-            <div className="flex gap-1">
-              <button
-                onClick={shiftLeft}
-                className="p-1.5 rounded hover:bg-white/10 text-slate-300 transition"
-                title="Shift Left"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-              <button
-                onClick={shiftRight}
-                className="p-1.5 rounded hover:bg-white/10 text-slate-300 transition"
-                title="Shift Right"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
-            <button
-              onClick={shiftDown}
-              className="p-1.5 rounded hover:bg-white/10 text-slate-300 transition"
-              title="Shift Down"
-            >
-              <ChevronDown className="w-4 h-4" />
-            </button>
-            <div className="w-full h-px bg-slate-800 my-0.5"></div>
-            <button
-              onClick={resetCamera}
-              className="p-1.5 rounded hover:bg-white/10 text-slate-300 transition"
-              title="Reset Orbit"
-            >
-              <Compass className="w-4 h-4" style={{ color: currentTheme.primary }} />
-            </button>
-            <button
-              onClick={() => setAutoRotate(!autoRotate)}
-              className="p-1.5 rounded transition"
-              style={{
-                color: autoRotate ? currentTheme.primary : '#64748b',
-                background: autoRotate ? 'rgba(0,0,0,0.5)' : 'transparent'
-              }}
-              title="Toggle Auto Rotation"
-            >
-              <RotateCw className={`w-4 h-4 ${autoRotate ? 'animate-spin' : ''}`} style={{ animationDuration: '8s' }} />
-            </button>
-          </div>
+          <NavigationPod
+            currentTheme={currentTheme}
+            zoomIn={zoomIn}
+            zoomOut={zoomOut}
+            shiftUp={shiftUp}
+            shiftDown={shiftDown}
+            shiftLeft={shiftLeft}
+            shiftRight={shiftRight}
+            resetCamera={resetCamera}
+            autoRotate={autoRotate}
+            setAutoRotate={setAutoRotate}
+          />
         </main>
 
         {/* SLIDING PACKET X-RAY MODAL */}
-        {showInspectorModal && selectedPacket && (
-          <aside
-            className="absolute right-0 top-0 bottom-0 w-80 md:w-96 tactical-panel border-l p-5 z-30 flex flex-col justify-between shadow-2xl animate-slide-in-right overflow-y-auto"
-            style={{ borderColor: currentTheme.border }}
-          >
-            <div>
-              <div className="flex justify-between items-center border-b pb-2.5 mb-3" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
-                <div className="flex items-center gap-2">
-                  <Terminal className="w-4 h-4" style={{ color: currentTheme.primary }} />
-                  <h2 className="text-xs font-bold tracking-wider uppercase" style={{ color: currentTheme.primary }}>
-                    PACKET X-RAY INSPECTOR
-                  </h2>
-                </div>
-                <button
-                  onClick={() => setShowInspectorModal(false)}
-                  className="text-slate-400 hover:text-white font-bold text-sm transition p-1"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-
-              <div className="space-y-3 text-xs">
-                {/* Destination Entity */}
-                <div className="bg-black/70 p-3 rounded-lg border border-slate-800">
-                  <div className="text-[9px] text-slate-500 uppercase tracking-wider mb-1">
-                    Destination Surveillance Entity
-                  </div>
-                  <div className="text-sm font-bold text-slate-100 flex items-center justify-between">
-                    <span>{selectedPacket.company}</span>
-                    <span
-                      className={`text-[8px] font-bold px-1.5 py-0.5 rounded uppercase ${
-                        selectedPacket.threatLevel === 'red'
-                          ? 'badge-threat-red'
-                          : selectedPacket.threatLevel === 'orange'
-                          ? 'badge-threat-orange'
-                          : selectedPacket.threatLevel === 'yellow'
-                          ? 'badge-threat-yellow'
-                          : 'badge-threat-green'
-                      }`}
-                    >
-                      {selectedPacket.threatLevel}
-                    </span>
-                  </div>
-                  <div className="text-xs mt-1 truncate" style={{ color: currentTheme.primary }}>
-                    {selectedPacket.domain}
-                  </div>
-                  {selectedPacket.requestCount > 1 && (
-                    <div className="mt-2 pt-2 border-t border-slate-800/80 flex items-center justify-between text-[10px]">
-                      <span className="text-slate-400">Captured Telemetry:</span>
-                      <span
-                        className="font-mono font-bold px-1.5 py-0.5 rounded border"
-                        style={{
-                          backgroundColor: 'rgba(56, 189, 248, 0.15)',
-                          borderColor: 'rgba(56, 189, 248, 0.45)',
-                          color: '#38bdf8'
-                        }}
-                      >
-                        {selectedPacket.requestCount}× IN-FLIGHT REQUESTS
-                      </span>
-                    </div>
-                  )}
-                </div>
-
-                {/* EXACT STORAGE LOCATION & COORDINATES */}
-                <div
-                  className="bg-black/70 p-3 rounded-lg border space-y-1.5"
-                  style={{
-                    borderColor: currentTheme.border
-                  }}
-                >
-                  <div className="text-[9px] font-bold uppercase tracking-wider flex items-center gap-1.5" style={{ color: currentTheme.primary }}>
-                    <MapPin className="w-3.5 h-3.5" style={{ color: currentTheme.primary }} />
-                    EXACT SERVER DESTINATION & STORAGE
-                  </div>
-                  <div className="flex items-center justify-between text-slate-300">
-                    <span className="text-slate-400">Server City:</span>
-                    <span className="font-bold text-slate-100">{selectedPacket.city}</span>
-                  </div>
-                  <div className="flex items-center justify-between text-slate-300">
-                    <span className="text-slate-400">Exact Coordinates:</span>
-                    <span className="font-bold font-mono" style={{ color: currentTheme.primary }}>
-                      {selectedPacket.geo?.lat?.toFixed(4)}°, {selectedPacket.geo?.lng?.toFixed(4)}°
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between text-slate-300">
-                    <span className="text-slate-400">Tracking Vector:</span>
-                    <span className="text-orange-400 font-bold">{selectedPacket.trackerType}</span>
-                  </div>
-                </div>
-
-                {/* Harvested Leaks */}
-                <div className="bg-black/70 p-3 rounded-lg border border-slate-800">
-                  <div className="text-[9px] text-red-400 font-bold uppercase tracking-wider mb-2 flex items-center gap-1">
-                    <AlertTriangle className="w-3.5 h-3.5" />
-                    HARVESTED DEVICE & BEHAVIORAL LEAKS
-                  </div>
-                  <ul className="space-y-1.5 text-slate-300 text-[10px]">
-                    {selectedPacket.leakedData?.map((item, i) => (
-                      <li key={i} className="flex items-start gap-1.5 bg-slate-950/70 p-1.5 rounded border border-slate-900">
-                        <span className="text-red-400 font-bold">▸</span>
-                        <span className="leading-snug">{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            </div>
-
-            {/* In-drawer action buttons */}
-            <div className="space-y-2 pt-3 border-t mt-3" style={{ borderColor: 'rgba(255,255,255,0.1)' }}>
-              {blockedDomains.has(selectedPacket.domain) || selectedPacket.isSevered ? (
-                <button
-                  onClick={() => restoreWire(selectedPacket.domain)}
-                  className="w-full bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold py-2 rounded flex items-center justify-center gap-2 transition text-xs border border-slate-600"
-                >
-                  <CheckCircle2 className="w-3.5 h-3.5 text-green-400" />
-                  RESTORE WIRE CONNECTION
-                </button>
-              ) : (
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    onClick={() => cutTheWire(selectedPacket.domain)}
-                    className="w-full bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 text-white font-bold py-2 rounded flex items-center justify-center gap-1.5 transition text-xs shadow-lg"
-                  >
-                    <Scissors className="w-3.5 h-3.5" />
-                    CUT WIRE
-                  </button>
-                  <button
-                    onClick={() => poisonTheWire(selectedPacket.domain)}
-                    className="w-full bg-gradient-to-r from-purple-700 to-indigo-700 hover:from-purple-600 hover:to-indigo-600 text-white font-bold py-2 rounded flex items-center justify-center gap-1.5 transition text-xs shadow-lg"
-                  >
-                    <Skull className="w-3.5 h-3.5" />
-                    POISON WIRE
-                  </button>
-                </div>
-              )}
-            </div>
-          </aside>
-        )}
+        <InspectorModal
+          showInspectorModal={showInspectorModal}
+          setShowInspectorModal={setShowInspectorModal}
+          selectedPacket={selectedPacket}
+          currentTheme={currentTheme}
+          blockedDomains={blockedDomains}
+          restoreWire={restoreWire}
+          cutTheWire={cutTheWire}
+          poisonTheWire={poisonTheWire}
+        />
       </div>
 
       {/* 3. BOTTOM COMMAND DOCK: Destination Storage Coordinates & Wire Controls */}
@@ -1808,8 +1389,8 @@ export default function App() {
                 </span>
               </div>
             ) : (
-              <div className="text-xs text-slate-500 font-sans italic">
-                Awaiting reconnaissance scan to locate surveillance servers...
+              <div className="text-xs text-slate-500 font-sans italic" title="Educational Observability: Categories describe functional network roles (ads, analytics, telemetry) derived from public datasets.">
+                Awaiting reconnaissance scan to map network endpoints...
               </div>
             )}
           </div>
@@ -1913,149 +1494,23 @@ export default function App() {
       </footer>
 
       {/* 4. MODAL: Clean-Room Safe View */}
-      {showSafeViewModal && safeViewImg && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
-          <div
-            className="tactical-panel w-full max-w-4xl max-h-[88vh] rounded-xl flex flex-col overflow-hidden border shadow-2xl"
-            style={{ borderColor: currentTheme.border }}
-          >
-            <div className="p-3.5 border-b flex items-center justify-between bg-black/60" style={{ borderColor: 'rgba(255,255,255,0.1)' }}>
-              <div className="flex items-center gap-2">
-                <ShieldAlert className="w-4 h-4 text-emerald-400" />
-                <h3 className="text-xs font-bold text-slate-100">
-                  CLEAN-ROOM PURIFIED SAFE VIEW
-                </h3>
-                <span className="text-[9px] px-2 py-0.5 rounded bg-emerald-950/80 border border-emerald-500/40 text-emerald-400 font-bold">
-                  DEFANGED BROWSER SANDBOX
-                </span>
-              </div>
-              <button
-                onClick={() => setShowSafeViewModal(false)}
-                className="text-slate-400 hover:text-white font-bold text-sm px-2 py-1"
-              >
-                ✕
-              </button>
-            </div>
-            <div className="flex-1 overflow-auto p-4 flex items-center justify-center bg-slate-950">
-              <img
-                src={safeViewImg}
-                alt="Defanged Clean-Room Preview"
-                className="max-w-full max-h-[68vh] rounded border border-slate-800 shadow-2xl object-contain"
-              />
-            </div>
-            <div className="p-3 bg-black/70 border-t flex items-center justify-between text-xs text-slate-400" style={{ borderColor: 'rgba(255,255,255,0.1)' }}>
-              <span>All severed surveillance trackers stripped before network arrival.</span>
-              <button
-                onClick={() => setShowSafeViewModal(false)}
-                className="px-3 py-1 font-bold rounded text-slate-950 transition"
-                style={{
-                  backgroundColor: currentTheme.primary
-                }}
-              >
-                Close Preview
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <SafeViewModal
+        showSafeViewModal={showSafeViewModal}
+        setShowSafeViewModal={setShowSafeViewModal}
+        safeViewImg={safeViewImg}
+        currentTheme={currentTheme}
+      />
 
       {/* 5. MODAL: Cloud Backend & Engine Configuration */}
-      {showServerModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div
-            className="tactical-panel w-full max-w-lg rounded-xl flex flex-col overflow-hidden border shadow-2xl"
-            style={{ borderColor: currentTheme.border }}
-          >
-            <div className="p-3.5 border-b flex items-center justify-between bg-black/70" style={{ borderColor: 'rgba(255,255,255,0.1)' }}>
-              <div className="flex items-center gap-2">
-                <Server className="w-4 h-4" style={{ color: currentTheme.primary }} />
-                <h3 className="text-xs font-bold text-slate-100 tracking-wider">
-                  DOOMWIRE CLOUD ENGINE LINK
-                </h3>
-              </div>
-              <button
-                onClick={() => setShowServerModal(false)}
-                className="text-slate-400 hover:text-white font-bold text-sm px-2 py-1"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="p-5 flex flex-col gap-4 text-xs text-slate-300 bg-slate-950/90">
-              <div className="p-3 rounded-lg border border-slate-800 bg-black/50 flex items-center justify-between">
-                <div>
-                  <div className="text-[10px] font-mono text-slate-400 uppercase tracking-widest">Active Pipeline State</div>
-                  <div className="font-bold font-mono text-sm mt-0.5" style={{ color: socketConnected ? '#34d399' : '#38bdf8' }}>
-                    {socketConnected ? '⚡ CLOUD PLAYWRIGHT SANDBOX ACTIVE' : '🛡️ ZERO-SERVER DOH ENGINE ACTIVE'}
-                  </div>
-                </div>
-                <span
-                  className="w-3 h-3 rounded-full animate-ping"
-                  style={{ backgroundColor: socketConnected ? '#10b981' : '#00f0ff' }}
-                />
-              </div>
-
-              <div>
-                <label className="text-[11px] font-mono text-slate-400 block mb-1.5 uppercase tracking-wider">
-                  Cloud Backend WebSocket URL (Render / Railway / Localhost)
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={customUrlInput}
-                    onChange={(e) => setCustomUrlInput(e.target.value)}
-                    placeholder="https://the-doomwire2-0-2.onrender.com"
-                    className="flex-1 bg-black/80 border border-slate-700 rounded px-3 py-2 text-slate-100 font-mono text-xs focus:outline-none focus:border-cyan-400"
-                  />
-                  <button
-                    onClick={() => {
-                      const trimmed = customUrlInput.trim();
-                      setBackendUrl(trimmed);
-                      if (typeof window !== 'undefined') {
-                        localStorage.setItem('doomwire_backend_url', trimmed);
-                      }
-                      setShowServerModal(false);
-                    }}
-                    className="px-4 py-2 font-bold font-mono text-slate-950 rounded transition"
-                    style={{ backgroundColor: currentTheme.primary }}
-                  >
-                    LINK
-                  </button>
-                </div>
-              </div>
-
-              <div className="text-[11px] text-slate-400 leading-relaxed border-t border-slate-800/80 pt-3">
-                <span className="text-slate-200 font-semibold">Deployment Blueprint:</span>
-                <ul className="list-disc pl-4 mt-1.5 space-y-1">
-                  <li><strong>Render Free Web Service:</strong> Connect this repo to Render.com. It reads <code>render.yaml</code> and builds the isolated Chromium sandbox automatically.</li>
-                  <li><strong>Zero-Server Standalone:</strong> When no container is connected, DOOMWIRE resolves real Google DNS-over-HTTPS records and scrapes live third-party tracking scripts in any browser.</li>
-                </ul>
-              </div>
-
-              <div className="flex items-center justify-between pt-2">
-                <button
-                  onClick={() => {
-                    setCustomUrlInput('http://localhost:5000');
-                    setBackendUrl('http://localhost:5000');
-                    if (typeof window !== 'undefined') {
-                      localStorage.setItem('doomwire_backend_url', 'http://localhost:5000');
-                    }
-                  }}
-                  className="text-[10px] text-slate-500 hover:text-slate-300 underline font-mono"
-                >
-                  Reset to localhost:5000
-                </button>
-                <button
-                  onClick={() => setShowServerModal(false)}
-                  className="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 rounded font-mono text-[11px]"
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <ServerModal
+        showServerModal={showServerModal}
+        setShowServerModal={setShowServerModal}
+        currentTheme={currentTheme}
+        socketConnected={socketConnected}
+        customUrlInput={customUrlInput}
+        setCustomUrlInput={setCustomUrlInput}
+        setBackendUrl={setBackendUrl}
+      />
     </div>
   );
 }

@@ -2,15 +2,24 @@
   "manifest_version": 3,
   "name": "DoomWire Companion Shield",
   "version": "1.0.0",
-  "description": "Active native firewall companion for DoomWire 3D Cyber-Radar. Enforces Cut-the-Wire rules across your browser.",
+  "description": "Active native firewall companion for DoomWire 3D Cyber-Radar. Enforces Cut-the-Wire rules across your browser using declarativeNetRequest.",
   "permissions": [
     "declarativeNetRequest",
     "declarativeNetRequestFeedback",
-    "storage"
+    "storage",
+    "alarms"
   ],
   "host_permissions": [
     "<all_urls>"
   ],
+  "externally_connectable": {
+    "matches": [
+      "http://localhost:5173/*",
+      "http://localhost:5000/*",
+      "http://127.0.0.1:5173/*",
+      "http://127.0.0.1:5000/*"
+    ]
+  },
   "background": {
     "service_worker": "background.js"
   },

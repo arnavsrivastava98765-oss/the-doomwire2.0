@@ -1147,8 +1147,48 @@ async function buildCanvaProDeck() {
     margin: { top: 0, right: 0, bottom: 0, left: 0 }
   });
 
+  // Export individual slide PNGs for Canva / Google Slides / direct viewing
+  const slidesDir = path.join(__dirname, '..', 'presentation_slides');
+  if (!fs.existsSync(slidesDir)) fs.mkdirSync(slidesDir, { recursive: true });
+
+  const slideElements = await page.$$('.slide');
+  console.log(`[DOOMWIRE] Capturing ${slideElements.length} individual high-res slide images...`);
+  const slideNames = [
+    'Slide_1_Title_and_Hook',
+    'Slide_2_Problem_Statement',
+    'Slide_3_Core_Solution',
+    'Slide_4_Architecture_Bento',
+    'Slide_5_Live_Benchmarks',
+    'Slide_6_Competitive_Moat',
+    'Slide_7_Roadmap_and_Climax'
+  ];
+
+  for (let i = 0; i < slideElements.length; i++) {
+    const slidePath = path.join(slidesDir, `${slideNames[i] || `Slide_${i + 1}`}.png`);
+    await slideElements[i].screenshot({ path: slidePath, type: 'png' });
+    console.log(`  -> Saved ${slideNames[i]}.png`);
+  }
+
   await browser.close();
   try { fs.unlinkSync(htmlPath); } catch (e) {}
+
+  // Replicate to user's OneDrive Desktop and Downloads
+  const userDesktop = 'C:\\Users\\arnav\\OneDrive\\Desktop';
+  const userDownloads = 'C:\\Users\\arnav\\Downloads';
+  const targetPdfName = 'DOOMWIRE_HACKATHON_DECK.pdf';
+
+  try {
+    if (fs.existsSync(userDesktop)) {
+      fs.copyFileSync(pdfPath, path.join(userDesktop, targetPdfName));
+      console.log(`[DOOMWIRE] Synced latest PDF to Desktop: ${path.join(userDesktop, targetPdfName)}`);
+    }
+    if (fs.existsSync(userDownloads)) {
+      fs.copyFileSync(pdfPath, path.join(userDownloads, targetPdfName));
+      console.log(`[DOOMWIRE] Synced latest PDF to Downloads: ${path.join(userDownloads, targetPdfName)}`);
+    }
+  } catch (err) {
+    console.warn('[DOOMWIRE] Copy notice:', err.message);
+  }
 
   console.log(`[DOOMWIRE] Master Canva-Grade PDF Deck successfully created at: ${pdfPath}`);
 }

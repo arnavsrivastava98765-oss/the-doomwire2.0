@@ -146,165 +146,165 @@ const KNOWN_ECOSYSTEMS = {
   'github.com': {
     brand: 'GitHub / Microsoft',
     nodes: [
-      { domain: 'github.com', type: 'Primary Web Origin & Code Host', threat: 'green', company: 'GitHub, Inc. (Microsoft Azure)', leaks: ['HTTP/3 TLS 1.3 Handshake', 'GitHub Session Cookie (user_session)', 'CSRF Token Vector'] },
-      { domain: 'github.githubassets.com', type: 'Frontend Framework & Static Bundles', threat: 'green', company: 'Fastly Edge CDN', leaks: ['Static Asset Hash', 'Cache-Control Immutable Token', 'Browser Font Fingerprint Probe'] },
-      { domain: 'avatars.githubusercontent.com', type: 'Global User Avatar CDN', threat: 'green', company: 'Fastly Global Edge', leaks: ['Image ETag Validator', 'Referrer Path Vector', 'Client TCP Window Scale'] },
-      { domain: 'api.github.com', type: 'REST & GraphQL API Gateway', threat: 'yellow', company: 'GitHub Platform Services', leaks: ['OAuth Bearer Token Scope', 'API Rate-Limit Quota Tracker', 'User-Agent Telemetry'] },
-      { domain: 'collector.github.com', type: 'Client Telemetry & Error Beacon', threat: 'orange', company: 'Microsoft Azure Analytics', leaks: ['DOM Action Breadcrumbs', 'Frontend Error Telemetry', 'Client UUID Hash'] },
-      { domain: 'alive.github.com', type: 'Real-Time WebSocket State Sync', threat: 'yellow', company: 'GitHub Realtime Services', leaks: ['Persistent WebSocket Handshake', 'Active Tab Focus Beacon', 'Session Heartbeat'] },
-      { domain: 'objects.githubusercontent.com', type: 'Raw File & Binary Release Storage', threat: 'green', company: 'Amazon Web Services (S3)', leaks: ['AWS SigV4 Presigned Token', 'Release Asset Hash', 'Content-Disposition'] },
-      { domain: 'copilot.github.com', type: 'Copilot AI Model & Telemetry Gateway', threat: 'orange', company: 'Microsoft / OpenAI Mesh', leaks: ['IDE Environment Metadata', 'Prompt Telemetry Stream', 'Latency RTT Probe'] },
-      { domain: 'pipelines.actions.githubusercontent.com', type: 'GitHub Actions Workflow Orchestrator', threat: 'yellow', company: 'Microsoft Azure Pipelines', leaks: ['Action Runner Authentication Token', 'Workflow Run ID Hash', 'Job Queue Latency'] },
-      { domain: 'support.github.com', type: 'Customer Support & Knowledge Portal', threat: 'yellow', company: 'Salesforce Service Cloud', leaks: ['Support Identity Token', 'Knowledge Base Search Query', 'Session Cookie'] }
+      { domain: 'github.com', type: 'Primary Web Origin & Code Host', threat: 'green', company: 'GitHub, Inc. (Microsoft Azure)', leaks: ['Primary Web Origin Endpoint', 'HTTPS / TLS Encrypted Connection', 'Application Session Endpoint'] },
+      { domain: 'github.githubassets.com', type: 'Frontend Framework & Static Bundles', threat: 'green', company: 'Fastly Edge CDN', leaks: ['Static Asset CDN Delivery', 'Cache-Control Header', 'Static Script & Stylesheet Distribution'] },
+      { domain: 'avatars.githubusercontent.com', type: 'Global User Avatar CDN', threat: 'green', company: 'Fastly Global Edge', leaks: ['Image Asset Delivery', 'Static Media Cache', 'User Profile Avatars'] },
+      { domain: 'api.github.com', type: 'REST & GraphQL API Gateway', threat: 'yellow', company: 'GitHub Platform Services', leaks: ['API Gateway Endpoint', 'REST / GraphQL Protocol', 'Client Platform Requests'] },
+      { domain: 'collector.github.com', type: 'Client Telemetry & Error Beacon', threat: 'orange', company: 'Microsoft Azure Analytics', leaks: ['Client Diagnostics Endpoint', 'Frontend Error Logging', 'Application Health Telemetry'] },
+      { domain: 'alive.github.com', type: 'Real-Time WebSocket State Sync', threat: 'yellow', company: 'GitHub Realtime Services', leaks: ['Real-Time WebSocket Protocol', 'Client Notification Channel', 'Session Synchronization'] },
+      { domain: 'objects.githubusercontent.com', type: 'Raw File & Binary Release Storage', threat: 'green', company: 'Amazon Web Services (S3)', leaks: ['Cloud Object Storage', 'Binary Release Distribution', 'Content-Disposition Delivery'] },
+      { domain: 'copilot.github.com', type: 'Copilot AI Model & Telemetry Gateway', threat: 'orange', company: 'Microsoft / OpenAI Mesh', leaks: ['AI Service Endpoint', 'IDE Client Integration', 'Service Diagnostics'] },
+      { domain: 'pipelines.actions.githubusercontent.com', type: 'GitHub Actions Workflow Orchestrator', threat: 'yellow', company: 'Microsoft Azure Pipelines', leaks: ['CI/CD Orchestration Gateway', 'Workflow Coordination', 'Job Queue Service'] },
+      { domain: 'support.github.com', type: 'Customer Support & Knowledge Portal', threat: 'yellow', company: 'Salesforce Service Cloud', leaks: ['Customer Support Portal', 'Knowledge Base Service', 'Authentication Routing'] }
     ]
   },
   'reddit.com': {
     brand: 'Reddit Inc.',
     nodes: [
-      { domain: 'reddit.com', type: 'Primary Community Origin', threat: 'green', company: 'Reddit Core Infrastructure', leaks: ['Session Token (token_v2)', 'Subreddit Affinity Cookie', 'TLS 1.3 Handshake'] },
-      { domain: 'gql.reddit.com', type: 'GraphQL State Synchronization Mesh', threat: 'yellow', company: 'Fastly Edge Mesh', leaks: ['GraphQL Query Signature', 'Feed Pagination Cursor', 'User Identity UUID'] },
-      { domain: 'styles.redditmedia.com', type: 'Subreddit CSS & Banner Assets', threat: 'green', company: 'Fastly Media CDN', leaks: ['CSS Cache ETag', 'Subreddit Theme ID', 'Display Scaling Probe'] },
-      { domain: 'preview.redd.it', type: 'Media & Thumbnail Delivery', threat: 'green', company: 'Reddit Media Storage (AWS)', leaks: ['Image Content Hash', 'Client Viewport Probe', 'Bandwidth Estimation'] },
-      { domain: 'v.redd.it', type: 'High-Bitrate Video Streaming Edge', threat: 'green', company: 'Fastly Video Edge', leaks: ['HLS Video Chunk Request', 'Video Buffer Health Telemetry', 'Resolution Scaling'] },
-      { domain: 'redditstatic.com', type: 'Static JS Framework & Shards', threat: 'green', company: 'Fastly Edge CDN', leaks: ['Webpack Chunk Hash', 'Client Runtime Version', 'Browser Feature Detection'] },
-      { domain: 'alb.reddit.com', type: 'Audience Measurement & Ad Pixel', threat: 'red', company: 'Reddit Ads Service', leaks: ['Subreddit Interaction History', 'Demographic Cohort Vector', 'Ad Click Identifier'] },
-      { domain: 'events.reddit.com', type: 'Real-Time Clickstream Telemetry', threat: 'orange', company: 'Reddit Telemetry Pipeline', leaks: ['DOM Scroll Depth Vector', 'Vote & Upvote Trajectory', 'Post View Duration Timer'] },
-      { domain: 'ads.reddit.com', type: 'Programmatic Ad Bidding Exchange', threat: 'red', company: 'Reddit Commercial Graph', leaks: ['Header Bidding Auction Token', 'Targeting Parameter Sync', 'Unmasked WebGL Hash'] },
-      { domain: 'pixel.reddit.com', type: 'Conversion Attribution Tracker', threat: 'red', company: 'Reddit Ads Service', leaks: ['Cross-Domain Conversion Token', 'Referrer Exfiltration Vector', 'Client Fingerprint'] }
+      { domain: 'reddit.com', type: 'Primary Community Origin', threat: 'green', company: 'Reddit Core Infrastructure', leaks: ['Primary Web Origin Endpoint', 'HTTPS / TLS Encrypted Connection', 'User Session Routing'] },
+      { domain: 'gql.reddit.com', type: 'GraphQL State Synchronization Mesh', threat: 'yellow', company: 'Fastly Edge Mesh', leaks: ['GraphQL API Mesh', 'Feed Query Resolution', 'State Synchronization'] },
+      { domain: 'styles.redditmedia.com', type: 'Subreddit CSS & Banner Assets', threat: 'green', company: 'Fastly Media CDN', leaks: ['Static Theme Stylesheets', 'Subreddit Banner Media', 'CDN Edge Caching'] },
+      { domain: 'preview.redd.it', type: 'Media & Thumbnail Delivery', threat: 'green', company: 'Reddit Media Storage (AWS)', leaks: ['Media Delivery Service', 'Thumbnail Image CDN', 'Image Asset Distribution'] },
+      { domain: 'v.redd.it', type: 'High-Bitrate Video Streaming Edge', threat: 'green', company: 'Fastly Video Edge', leaks: ['Video Streaming Edge', 'HLS Chunk Distribution', 'Adaptive Bitrate Delivery'] },
+      { domain: 'redditstatic.com', type: 'Static JS Framework & Shards', threat: 'green', company: 'Fastly Edge CDN', leaks: ['Static Script Bundles', 'Frontend Framework Distribution', 'Client Runtime Caching'] },
+      { domain: 'alb.reddit.com', type: 'Audience Measurement & Ad Pixel', threat: 'red', company: 'Reddit Ads Service', leaks: ['Advertising Measurement Beacon', 'Ad Impression Tracking', 'Campaign ID Verification'] },
+      { domain: 'events.reddit.com', type: 'Real-Time Clickstream Telemetry', threat: 'orange', company: 'Reddit Telemetry Pipeline', leaks: ['Client Event Ingestion', 'Interaction Telemetry Stream', 'Product Usage Diagnostics'] },
+      { domain: 'ads.reddit.com', type: 'Programmatic Ad Bidding Exchange', threat: 'red', company: 'Reddit Commercial Graph', leaks: ['Programmatic Ad Exchange', 'Ad Placement Bid Request', 'Targeting Signal Evaluation'] },
+      { domain: 'pixel.reddit.com', type: 'Conversion Attribution Tracker', threat: 'red', company: 'Reddit Ads Service', leaks: ['Conversion Attribution Beacon', 'Referrer Path Parameter', 'Campaign Attribution Token'] }
     ]
   },
   'cnn.com': {
     brand: 'CNN / Warner Bros. Discovery',
     nodes: [
-      { domain: 'cnn.com', type: 'Editorial News Origin', threat: 'green', company: 'WarnerMedia Global Network', leaks: ['Edition Preference Cookie', 'Session ID Token', 'HTTP/3 TLS Negotiated'] },
-      { domain: 'edition.cnn.com', type: 'International News Shard', threat: 'green', company: 'Fastly Anycast CDN', leaks: ['Geo-Targeted Content Header', 'Language Preference Matrix', 'TCP Latency Profile'] },
-      { domain: 'cdn.cnn.com', type: 'Static Articles & Media CDN', threat: 'green', company: 'Fastly Edge CDN', leaks: ['Article Content Cache Token', 'Editorial Asset Hash', 'Cache-Control Header'] },
-      { domain: 'turner.com', type: 'Turner Broadcasting Media Services', threat: 'yellow', company: 'Warner Bros. Discovery', leaks: ['Broadcasting Network Token', 'Video Stream Authorization', 'Client Hardware Vector'] },
-      { domain: 'warnermediacdn.com', type: 'High-Def Video Pipeline', threat: 'green', company: 'Akamai Global Edge', leaks: ['HLS Video Stream Chunk', 'Bitrate Adaptation Telemetry', 'Client Buffer Monitor'] },
-      { domain: 'ugdturner.com', type: 'User Graph Data & Telemetry Collector', threat: 'orange', company: 'Turner Data Platform', leaks: ['Reading Habit Matrix', 'Article Read-Time Vector', 'Audience Segment ID'] },
-      { domain: 'criteo.com', type: 'Cross-Site Behavioral Retargeter', threat: 'red', company: 'Criteo SA', leaks: ['Cross-Domain Retargeting Pixel', 'Unmasked Canvas GPU String', 'DOM Clickstream Coordinates'] },
-      { domain: 'scorecardresearch.com', type: 'Mass Audience Census Beacon', threat: 'orange', company: 'Comscore Inc.', leaks: ['Mass Audience Reach Telemetry', 'ISP Subnet Profile', 'Reverse-DNS Beacon'] },
-      { domain: 'chartbeat.com', type: 'Real-Time Editorial Attention Tracker', threat: 'orange', company: 'Chartbeat Inc.', leaks: ['Active Tab Reading Seconds', 'Scroll Position Depth Vector', 'Mouse Movement Jitter'] },
-      { domain: 'krxd.net', type: 'Krux Data Management Platform', threat: 'red', company: 'Salesforce DMP', leaks: ['Cross-Device Identity Envelope', 'Third-Party Cookie Sync Graph', 'Consumer Profile Hash'] },
-      { domain: 'cookielaw.org', type: 'Privacy Consent & Cookie Enforcement', threat: 'yellow', company: 'OneTrust Privacy LLC', leaks: ['TCF v2.2 Consent String', 'Jurisdiction Enforcement Beacon', 'Opt-out Matrix'] }
+      { domain: 'cnn.com', type: 'Editorial News Origin', threat: 'green', company: 'WarnerMedia Global Network', leaks: ['Primary News Web Origin', 'HTTPS / TLS Encrypted Connection', 'Editorial Content Delivery'] },
+      { domain: 'edition.cnn.com', type: 'International News Shard', threat: 'green', company: 'Fastly Anycast CDN', leaks: ['Regional News Distribution', 'Anycast Edge Routing', 'Content Localization'] },
+      { domain: 'cdn.cnn.com', type: 'Static Articles & Media CDN', threat: 'green', company: 'Fastly Edge CDN', leaks: ['Static Asset CDN', 'Article Media Delivery', 'Edge Caching Headers'] },
+      { domain: 'turner.com', type: 'Turner Broadcasting Media Services', threat: 'yellow', company: 'Warner Bros. Discovery', leaks: ['Media Services Infrastructure', 'Video Stream Authorization', 'Broadcasting Network API'] },
+      { domain: 'warnermediacdn.com', type: 'High-Def Video Pipeline', threat: 'green', company: 'Akamai Global Edge', leaks: ['Video Distribution Pipeline', 'HLS Video Segments', 'Media Delivery Edge'] },
+      { domain: 'ugdturner.com', type: 'User Graph Data & Telemetry Collector', threat: 'orange', company: 'Turner Data Platform', leaks: ['Audience Measurement Endpoint', 'Content Interaction Metrics', 'Reader Engagement Telemetry'] },
+      { domain: 'criteo.com', type: 'Cross-Site Behavioral Retargeter', threat: 'red', company: 'Criteo SA', leaks: ['Third-Party Ad Network', 'Dynamic Retargeting Beacon', 'Cross-Domain Cookie Sync'] },
+      { domain: 'scorecardresearch.com', type: 'Mass Audience Census Beacon', threat: 'orange', company: 'Comscore Inc.', leaks: ['Audience Measurement Beacon', 'Web Traffic Census', 'Pageview Counter Endpoint'] },
+      { domain: 'chartbeat.com', type: 'Real-Time Editorial Attention Tracker', threat: 'orange', company: 'Chartbeat Inc.', leaks: ['Editorial Analytics Sensor', 'Reading Engagement Metrics', 'Active Reader Telemetry'] },
+      { domain: 'krxd.net', type: 'Krux Data Management Platform', threat: 'red', company: 'Salesforce DMP', leaks: ['Data Management Platform (DMP)', 'Audience Segment Sync', 'Third-Party Identifier Sync'] },
+      { domain: 'cookielaw.org', type: 'Privacy Consent & Cookie Enforcement', threat: 'yellow', company: 'OneTrust Privacy LLC', leaks: ['Consent Management Platform (CMP)', 'Regulatory Compliance Beacon', 'Cookie Preference State'] }
     ]
   },
   'nytimes.com': {
     brand: 'The New York Times',
     nodes: [
-      { domain: 'nytimes.com', type: 'Editorial Core Origin', threat: 'green', company: 'The New York Times Company', leaks: ['Subscriber Auth Token', 'Metered Access Cookie', 'TLS 1.3 Handshake'] },
-      { domain: 'static01.nyt.com', type: 'Interactive Graphics & Editorial CDN', threat: 'green', company: 'Fastly Global Edge', leaks: ['Interactive Viz Code Chunk', 'Typography Font Asset Hash', 'Content ETag'] },
-      { domain: 'purr.nytimes.com', type: 'Purr Behavioral Telemetry Pipeline', threat: 'orange', company: 'NYT Data Systems', leaks: ['Article Read-Time Telemetry', 'Paragraph Scroll Velocity', 'User Cohort Token'] },
-      { domain: 'mwcm.nyt.com', type: 'Meter & Paywall Enforcement Gateway', threat: 'orange', company: 'NYT Subscription Gateway', leaks: ['Paywall Read Count Cookie', 'Subscriber Verification Token', 'Device Hash'] },
-      { domain: 'et.nytimes.com', type: 'Event Tracking Analytics Beacon', threat: 'yellow', company: 'Google Cloud Platform', leaks: ['Client UUID Hash', 'Click Navigation Path', 'Viewport Dimensions'] },
-      { domain: 'samizdat-graphql.nytimes.com', type: 'Editorial GraphQL Delivery Mesh', threat: 'yellow', company: 'Fastly Edge Mesh', leaks: ['GraphQL Content Query', 'Author Byline Taxonomy', 'Section Category Filter'] },
-      { domain: 'meter-svc.nytimes.com', type: 'Subscription Verification Service', threat: 'yellow', company: 'Amazon Web Services', leaks: ['Subscription Entitlement Token', 'User Account ID Hash', 'Active License Status'] }
+      { domain: 'nytimes.com', type: 'Editorial Core Origin', threat: 'green', company: 'The New York Times Company', leaks: ['Primary Web Origin Endpoint', 'HTTPS / TLS Encrypted Connection', 'Subscriber Session Endpoint'] },
+      { domain: 'static01.nyt.com', type: 'Interactive Graphics & Editorial CDN', threat: 'green', company: 'Fastly Global Edge', leaks: ['Static Media & Graphics CDN', 'Typography Asset Distribution', 'Interactive Code Chunks'] },
+      { domain: 'purr.nytimes.com', type: 'Purr Behavioral Telemetry Pipeline', threat: 'orange', company: 'NYT Data Systems', leaks: ['Reading Telemetry Pipeline', 'Engagement Metric Ingestion', 'Application Event Stream'] },
+      { domain: 'mwcm.nyt.com', type: 'Meter & Paywall Enforcement Gateway', threat: 'orange', company: 'NYT Subscription Gateway', leaks: ['Subscription Metering Service', 'Access Entitlement Verification', 'Paywall Status Check'] },
+      { domain: 'et.nytimes.com', type: 'Event Tracking Analytics Beacon', threat: 'yellow', company: 'Google Cloud Platform', leaks: ['Client Event Tracking', 'Navigation Flow Telemetry', 'Page Analytics Ingestion'] },
+      { domain: 'samizdat-graphql.nytimes.com', type: 'Editorial GraphQL Delivery Mesh', threat: 'yellow', company: 'Fastly Edge Mesh', leaks: ['GraphQL Content Mesh', 'Editorial Taxonomy Query', 'Article Metadata API'] },
+      { domain: 'meter-svc.nytimes.com', type: 'Subscription Verification Service', threat: 'yellow', company: 'Amazon Web Services', leaks: ['Subscription Verification API', 'Account Entitlement Token', 'Active License Status'] }
     ]
   },
   'youtube.com': {
     brand: 'YouTube / Alphabet',
     nodes: [
-      { domain: 'youtube.com', type: 'Video Platform Origin', threat: 'green', company: 'Google LLC', leaks: ['Google Account Auth Token (SAPISID)', 'Account Channel ID', 'TLS 1.3 Handshake'] },
-      { domain: 'googlevideo.com', type: 'High-Bitrate Video Streaming Edge', threat: 'green', company: 'Google Global Cache (GGC)', leaks: ['Adaptive Video Chunk Request', 'Playback QoS Telemetry', 'Audio Stream Token'] },
-      { domain: 'ytimg.com', type: 'Video Thumbnails & Poster CDN', threat: 'green', company: 'Google Static Edge', leaks: ['Thumbnail Image Hash', 'WebP Frame Validator', 'Cache Validation ETag'] },
-      { domain: 'youtubei.googleapis.com', type: 'Internal YouTube Core API', threat: 'yellow', company: 'Google Platform Services', leaks: ['Watch-Time Heartbeat Telemetry', 'Player State Machine Event', 'Client Context JSON'] },
-      { domain: 'play.google.com', type: 'Digital Rights & License Token Gateway', threat: 'yellow', company: 'Google LLC', leaks: ['Widevine DRM Certificate', 'License Validation Vector', 'Device Architecture'] },
-      { domain: 'fonts.gstatic.com', type: 'Google Web Fonts CDN', threat: 'green', company: 'Google LLC', leaks: ['Font Subset Request', 'Client OS Typography Profile', 'TCP Round-Trip Time'] },
-      { domain: 'doubleclick.net', type: 'Real-Time Video Ad Auction', threat: 'red', company: 'Google / DoubleClick', leaks: ['Video Ad Break Auction Bid', 'Demographic Targeting Vector', 'Watch Intent Graph'] }
+      { domain: 'youtube.com', type: 'Video Platform Origin', threat: 'green', company: 'Google LLC', leaks: ['Primary Video Origin', 'HTTPS / TLS Encrypted Connection', 'Google Account Routing'] },
+      { domain: 'googlevideo.com', type: 'High-Bitrate Video Streaming Edge', threat: 'green', company: 'Google Global Cache (GGC)', leaks: ['Video Stream Delivery', 'Adaptive Chunk Distribution', 'Playback Quality Metrics'] },
+      { domain: 'ytimg.com', type: 'Video Thumbnails & Poster CDN', threat: 'green', company: 'Google Static Edge', leaks: ['Video Poster Asset CDN', 'Thumbnail Image Cache', 'Media ETag Validator'] },
+      { domain: 'youtubei.googleapis.com', type: 'Internal YouTube Core API', threat: 'yellow', company: 'Google Platform Services', leaks: ['Core Video Platform API', 'Playback State Coordination', 'Client Context Verification'] },
+      { domain: 'play.google.com', type: 'Digital Rights & License Token Gateway', threat: 'yellow', company: 'Google LLC', leaks: ['Digital Rights Management (DRM)', 'Stream License Authorization', 'Client Verification Service'] },
+      { domain: 'fonts.gstatic.com', type: 'Google Web Fonts CDN', threat: 'green', company: 'Google LLC', leaks: ['Web Font Delivery CDN', 'Static Typography Assets', 'Global Edge Caching'] },
+      { domain: 'doubleclick.net', type: 'Real-Time Video Ad Auction', threat: 'red', company: 'Google / DoubleClick', leaks: ['Third-Party Ad Serving Network', 'Ad Placement Impression', 'Publisher Ad Identifier'] }
     ]
   },
   'amazon.com': {
     brand: 'Amazon.com Inc.',
     nodes: [
-      { domain: 'amazon.com', type: 'Retail Marketplace Origin', threat: 'green', company: 'Amazon Web Services', leaks: ['Session Token (session-id)', 'Amazon Prime Status', 'Cart State Cookie'] },
-      { domain: 'media-amazon.com', type: 'Product Imagery & Video CDN', threat: 'green', company: 'Amazon CloudFront Edge', leaks: ['Product Media Hash', 'Image Zoom Shard', 'Cache Validation ETag'] },
-      { domain: 'ssl-images-amazon.com', type: 'Secure Checkout & Asset Mirror', threat: 'green', company: 'Amazon CloudFront Edge', leaks: ['Secure Asset Signature', 'TLS Cipher List', 'Client Architecture'] },
-      { domain: 'fls-na.amazon.com', type: 'Fraud & Telemetry Sensor Service', threat: 'orange', company: 'Amazon Security Systems', leaks: ['Device Fingerprint Envelope', 'Mouse Movement Velocity', 'Browser Micro-Jitter'] },
-      { domain: 'aax-us-east.amazon-adsystem.com', type: 'Amazon AdSystem Real-Time Bidder', threat: 'red', company: 'Amazon Advertising', leaks: ['Product Purchase Intent Graph', 'Category Affinity Matrix', 'Bidstream ID'] },
-      { domain: 'completion.amazon.com', type: 'Live Search Autocomplete Engine', threat: 'yellow', company: 'Amazon Search Services', leaks: ['Real-Time Keystroke Query', 'Search Suggestion Category', 'Typing Latency'] },
-      { domain: 'assoc-amazon.com', type: 'Affiliate Attribution Tracking', threat: 'yellow', company: 'Amazon Associates', leaks: ['Affiliate Tag Identifier', 'Referral Commission Token', 'Entry URL Vector'] }
+      { domain: 'amazon.com', type: 'Retail Marketplace Origin', threat: 'green', company: 'Amazon Web Services', leaks: ['Retail Marketplace Web Origin', 'HTTPS / TLS Encrypted Connection', 'Session Routing'] },
+      { domain: 'media-amazon.com', type: 'Product Imagery & Video CDN', threat: 'green', company: 'Amazon CloudFront Edge', leaks: ['Product Media CDN', 'Image Asset Distribution', 'CloudFront Edge Delivery'] },
+      { domain: 'ssl-images-amazon.com', type: 'Secure Checkout & Asset Mirror', threat: 'green', company: 'Amazon CloudFront Edge', leaks: ['Secure Asset CDN Mirror', 'Encrypted Asset Delivery', 'Static Resource Cache'] },
+      { domain: 'fls-na.amazon.com', type: 'Fraud & Telemetry Sensor Service', threat: 'orange', company: 'Amazon Security Systems', leaks: ['Application Security Telemetry', 'Client Environment Diagnostics', 'Service Integrity Sensor'] },
+      { domain: 'aax-us-east.amazon-adsystem.com', type: 'Amazon AdSystem Real-Time Bidder', threat: 'red', company: 'Amazon Advertising', leaks: ['Amazon AdSystem Endpoint', 'Ad Placement Bid Request', 'Campaign Identifier'] },
+      { domain: 'completion.amazon.com', type: 'Live Search Autocomplete Engine', threat: 'yellow', company: 'Amazon Search Services', leaks: ['Search Autocomplete API', 'Query Prediction Service', 'Search Index Coordination'] },
+      { domain: 'assoc-amazon.com', type: 'Affiliate Attribution Tracking', threat: 'yellow', company: 'Amazon Associates', leaks: ['Affiliate Referral Tracking', 'Commission Attribution Endpoint', 'Campaign Parameter'] }
     ]
   },
   'netflix.com': {
     brand: 'Netflix Inc.',
     nodes: [
-      { domain: 'netflix.com', type: 'Streaming Service Origin', threat: 'green', company: 'Netflix Open Connect', leaks: ['Netflix User Token (NetflixId)', 'Profile Identifier', 'TLS 1.3 Handshake'] },
-      { domain: 'nflxext.com', type: 'UI Application Framework CDN', threat: 'green', company: 'Amazon CloudFront Edge', leaks: ['React UI Bundle Hash', 'Localized Language Shard', 'Theme Metadata'] },
-      { domain: 'nflximg.net', type: 'Movie Box Art & Artwork CDN', threat: 'green', company: 'Netflix Open Connect Edge', leaks: ['Artwork Thumbnail Hash', 'Poster Display Aspect Ratio', 'ETag Validator'] },
-      { domain: 'nflxvideo.net', type: 'Open Connect Video Edge Appliance', threat: 'green', company: 'Netflix Open Connect Edge', leaks: ['Encoded Video Chunk Request', 'Buffer Health Metrics', 'Bitrate Adaptive Vector'] },
-      { domain: 'ichnaea.netflix.com', type: 'User Journey & Playback Telemetry', threat: 'orange', company: 'Netflix Telemetry Services', leaks: ['Play/Pause Interaction Timestamp', 'Playback Position Seconds', 'Device Profiler'] },
-      { domain: 'customerevents.netflix.com', type: 'Viewing Analytics & Recommendation Bus', threat: 'yellow', company: 'Amazon Web Services', leaks: ['Viewing Completion Percentage', 'Title Carousel Interaction', 'Search Query'] }
+      { domain: 'netflix.com', type: 'Streaming Service Origin', threat: 'green', company: 'Netflix Open Connect', leaks: ['Primary Streaming Origin', 'HTTPS / TLS Encrypted Connection', 'User Session Routing'] },
+      { domain: 'nflxext.com', type: 'UI Application Framework CDN', threat: 'green', company: 'Amazon CloudFront Edge', leaks: ['UI Framework Bundles', 'Static Script Distribution', 'Localized Resource CDN'] },
+      { domain: 'nflximg.net', type: 'Movie Box Art & Artwork CDN', threat: 'green', company: 'Netflix Open Connect Edge', leaks: ['Artwork & Thumbnail CDN', 'Box Art Image Distribution', 'Open Connect Appliance Cache'] },
+      { domain: 'nflxvideo.net', type: 'Open Connect Video Edge Appliance', threat: 'green', company: 'Netflix Open Connect Edge', leaks: ['Video Stream Chunk Distribution', 'Open Connect Delivery Edge', 'Adaptive Bitrate Stream'] },
+      { domain: 'ichnaea.netflix.com', type: 'User Journey & Playback Telemetry', threat: 'orange', company: 'Netflix Telemetry Services', leaks: ['Playback Diagnostic Stream', 'Client Quality of Service Metrics', 'Application Event Logging'] },
+      { domain: 'customerevents.netflix.com', type: 'Viewing Analytics & Recommendation Bus', threat: 'yellow', company: 'Amazon Web Services', leaks: ['Product Analytics Bus', 'Recommendation Interaction Event', 'Feature Usage Telemetry'] }
     ]
   },
   'spotify.com': {
     brand: 'Spotify Technology S.A.',
     nodes: [
-      { domain: 'spotify.com', type: 'Audio Streaming Origin', threat: 'green', company: 'Google Cloud Platform', leaks: ['Spotify Auth Token (sp_dc)', 'User Country Code', 'TLS 1.3 Handshake'] },
-      { domain: 'scdn.co', type: 'Album Artwork & Media CDN', threat: 'green', company: 'Fastly Global Edge', leaks: ['Album Art Image Hash', 'Color Palette Extraction Token', 'Cache ETag'] },
-      { domain: 'dealer.spotify.com', type: 'Real-Time WebSocket Message Broker', threat: 'yellow', company: 'Google Cloud Platform', leaks: ['Connect Device State Sync', 'Active Playback Node ID', 'Volume Level Beacon'] },
-      { domain: 'spclient.wg.spotify.com', type: 'Playback Client Gateway & Audio DRM', threat: 'yellow', company: 'Spotify Core Services', leaks: ['Audio Track License Token', 'Stream URL Resolution Ticket', 'Bitrate Negotiator'] },
-      { domain: 'api-partner.spotify.com', type: 'Partner Metadata & Search Synchronizer', threat: 'yellow', company: 'Google Cloud Platform', leaks: ['Search Autocomplete Query', 'Artist Metadata Envelope', 'Playlist Revision Hash'] }
+      { domain: 'spotify.com', type: 'Audio Streaming Origin', threat: 'green', company: 'Google Cloud Platform', leaks: ['Primary Audio Service Origin', 'HTTPS / TLS Encrypted Connection', 'User Session Routing'] },
+      { domain: 'scdn.co', type: 'Album Artwork & Media CDN', threat: 'green', company: 'Fastly Global Edge', leaks: ['Album Artwork Delivery', 'Static Media Asset CDN', 'Edge Cache Distribution'] },
+      { domain: 'dealer.spotify.com', type: 'Real-Time WebSocket Message Broker', threat: 'yellow', company: 'Google Cloud Platform', leaks: ['Real-Time WebSocket Gateway', 'Device State Synchronization', 'Active Player Coordination'] },
+      { domain: 'spclient.wg.spotify.com', type: 'Playback Client Gateway & Audio DRM', threat: 'yellow', company: 'Spotify Core Services', leaks: ['Playback Client Gateway', 'Audio Stream License Endpoint', 'Client API Coordination'] },
+      { domain: 'api-partner.spotify.com', type: 'Partner Metadata & Search Synchronizer', threat: 'yellow', company: 'Google Cloud Platform', leaks: ['Partner Metadata API', 'Search Autocomplete Service', 'Music Catalog Metadata'] }
     ]
   },
   'wikipedia.org': {
     brand: 'Wikimedia Foundation',
     nodes: [
-      { domain: 'wikipedia.org', type: 'Encyclopedic Knowledge Origin', threat: 'green', company: 'Wikimedia Foundation (Equinix)', leaks: ['CentralAuth Token (centralauth_User)', 'Language Edition Header', 'TLS 1.3 Handshake'] },
-      { domain: 'upload.wikimedia.org', type: 'Free Media & Archival Image CDN', threat: 'green', company: 'Wikimedia Foundation Caching Edge', leaks: ['Media Hash Validator', 'Thumbnail Resolution Parameter', 'Cache ETag'] },
-      { domain: 'en.wikipedia.org', type: 'English Language Shard Node', threat: 'green', company: 'Wikimedia Foundation', leaks: ['Article Revision ID', 'Skin Preference Cookie', 'Client Accept-Encoding'] },
-      { domain: 'login.wikimedia.org', type: 'CentralAuth Single Sign-On Gateway', threat: 'yellow', company: 'Wikimedia Foundation', leaks: ['Unified Login Credential Envelope', 'OAuth 2.0 Token Scope', 'Session Nonce'] },
-      { domain: 'eventgate.wikimedia.org', type: 'Public Anonymous Event Metrics Bus', threat: 'yellow', company: 'Wikimedia Foundation', leaks: ['Anonymous Edit Telemetry', 'Page Performance Metric (TTFB)', 'Navigation Type'] }
+      { domain: 'wikipedia.org', type: 'Encyclopedic Knowledge Origin', threat: 'green', company: 'Wikimedia Foundation (Equinix)', leaks: ['Primary Encyclopedia Origin', 'HTTPS / TLS Encrypted Connection', 'Content Edition Routing'] },
+      { domain: 'upload.wikimedia.org', type: 'Free Media & Archival Image CDN', threat: 'green', company: 'Wikimedia Foundation Caching Edge', leaks: ['Archival Media & Image CDN', 'Wikimedia Commons Asset Cache', 'Static Content Validator'] },
+      { domain: 'en.wikipedia.org', type: 'English Language Shard Node', threat: 'green', company: 'Wikimedia Foundation', leaks: ['Regional Language Edition', 'Article Content Delivery', 'Public MediaWiki Service'] },
+      { domain: 'login.wikimedia.org', type: 'CentralAuth Single Sign-On Gateway', threat: 'yellow', company: 'Wikimedia Foundation', leaks: ['Single Sign-On (CentralAuth)', 'Account Authentication Routing', 'Session Validation'] },
+      { domain: 'eventgate.wikimedia.org', type: 'Public Anonymous Event Metrics Bus', threat: 'yellow', company: 'Wikimedia Foundation', leaks: ['Public Anonymous Metrics Bus', 'Performance Event Ingestion', 'Anonymous Usage Telemetry'] }
     ]
   },
   'whatsapp.com': {
     brand: 'WhatsApp / Meta Platforms',
     nodes: [
-      { domain: 'whatsapp.com', type: 'Primary Messaging Origin', threat: 'green', company: 'Meta Platforms Global Edge', leaks: ['Session Auth Nonce', 'Web Client Build Hash', 'HTTP/3 TLS 1.3 Handshake'] },
-      { domain: 'web.whatsapp.com', type: 'Web Client Portal & Messaging Frame', threat: 'green', company: 'Meta Platforms Edge', leaks: ['QR Authentication Handshake', 'Local IndexedDB Sync Token', 'Client Storage Beacon'] },
-      { domain: 'static.whatsapp.net', type: 'Frontend Framework & Wasm Cryptography Bundles', threat: 'green', company: 'Meta Edge CDN (Dublin/Global)', leaks: ['WASM Crypto Engine Hash', 'E2EE Signal Protocol Module', 'UI Asset Cache Token'] },
-      { domain: 'mmg.whatsapp.net', type: 'Multicast Media & Encrypted Attachment Relay', threat: 'green', company: 'Meta Global Media Edge', leaks: ['Media Chunk Auth Token', 'Encrypted Ciphertext Stream', 'Bitrate QoS Vector'] },
-      { domain: 'crashlogs.whatsapp.net', type: 'Client Diagnostic & Telemetry Collector', threat: 'orange', company: 'WhatsApp Telemetry Pipeline', leaks: ['Exception Stack Trace', 'Client Memory Pressure Telemetry', 'OS Kernel Build ID'] },
-      { domain: 'dit.whatsapp.net', type: 'Data Ingestion Telemetry Stream', threat: 'orange', company: 'Meta Infrastructure Data', leaks: ['Heartbeat RTT Timing', 'WebSocket Reconnection Metric', 'Device Battery & Network State'] },
-      { domain: 'pps.whatsapp.net', type: 'Profile Photos & Status Relay Mesh', threat: 'green', company: 'Meta Distributed Edge', leaks: ['Encrypted Media Token', 'Thumbnail Content Hash', 'Edge Cache Hit Status'] },
-      { domain: 'graph.facebook.com', type: 'Meta Commercial Identity Graph API', threat: 'red', company: 'Meta Platforms Inc.', leaks: ['Cross-App Advertising ID', 'Audience Network Identity Vector', 'Device Fingerprint Envelope'] },
-      { domain: 'connect.facebook.net', type: 'Meta Social Graph & Pixel SDK', threat: 'red', company: 'Meta Platforms Inc.', leaks: ['Meta Social Graph Sync Token', 'Cross-Domain Pixel Cookie (fbp)', 'Browser Hardware Fingerprint'] }
+      { domain: 'whatsapp.com', type: 'Primary Messaging Origin', threat: 'green', company: 'Meta Platforms Global Edge', leaks: ['Primary Web Messaging Origin', 'HTTPS / TLS Encrypted Connection', 'Platform Landing Service'] },
+      { domain: 'web.whatsapp.com', type: 'Web Client Portal & Messaging Frame', threat: 'green', company: 'Meta Platforms Edge', leaks: ['Web Client Application Portal', 'Client Session Framework', 'Local State Coordination'] },
+      { domain: 'static.whatsapp.net', type: 'Frontend Framework & Wasm Cryptography Bundles', threat: 'green', company: 'Meta Edge CDN (Dublin/Global)', leaks: ['WASM Cryptography Bundles', 'Static Web Application Scripts', 'Global Edge CDN Delivery'] },
+      { domain: 'mmg.whatsapp.net', type: 'Multicast Media & Encrypted Attachment Relay', threat: 'green', company: 'Meta Global Media Edge', leaks: ['Encrypted Media Relay', 'Attachment Distribution Edge', 'Content Streaming Relay'] },
+      { domain: 'crashlogs.whatsapp.net', type: 'Client Diagnostic & Telemetry Collector', threat: 'orange', company: 'WhatsApp Telemetry Pipeline', leaks: ['Client Crash Diagnostic Ingestion', 'Application Error Reporting', 'Platform Stability Telemetry'] },
+      { domain: 'dit.whatsapp.net', type: 'Data Ingestion Telemetry Stream', threat: 'orange', company: 'Meta Infrastructure Data', leaks: ['Data Ingestion Stream', 'Connection Reliability Metrics', 'Client Telemetry Service'] },
+      { domain: 'pps.whatsapp.net', type: 'Profile Photos & Status Relay Mesh', threat: 'green', company: 'Meta Distributed Edge', leaks: ['Profile Media Distribution', 'Encrypted Avatar Asset Relay', 'Edge Content Cache'] },
+      { domain: 'graph.facebook.com', type: 'Meta Commercial Identity Graph API', threat: 'red', company: 'Meta Platforms Inc.', leaks: ['Meta Graph API Endpoint', 'Identity Graph Service', 'Cross-App Integration API'] },
+      { domain: 'connect.facebook.net', type: 'Meta Social Graph & Pixel SDK', threat: 'red', company: 'Meta Platforms Inc.', leaks: ['Meta Pixel SDK Endpoint', 'Third-Party Web Tag', 'Meta Cookie Sync'] }
     ]
   },
   'flipkart.com': {
     brand: 'Flipkart / Walmart',
     nodes: [
-      { domain: 'flipkart.com', type: 'Commercial Marketplace Origin', threat: 'green', company: 'Flipkart Internet Pvt Ltd', leaks: ['Session ID (SNID)', 'Cart State Hash', 'TLS 1.3 Handshake'] },
-      { domain: 'static-assets-web.flixcart.com', type: 'Static Assets & UI Shards', threat: 'green', company: 'Akamai Global Edge', leaks: ['React UI Chunk Hash', 'Image Aspect Ratio Header', 'Cache ETag'] },
-      { domain: 'google-analytics.com', type: 'User Interaction Telemetry', threat: 'yellow', company: 'Google LLC', leaks: ['Category Browse Affinity', 'Search Query String', 'Client UUID Hash'] },
-      { domain: 'doubleclick.net', type: 'Real-Time Product Retargeting Auction', threat: 'red', company: 'Google / DoubleClick', leaks: ['Cart Product SKU Exfiltration', 'Price Tier Segmentation', 'Unmasked Hardware Canvas'] },
-      { domain: 'connect.facebook.net', type: 'Conversion Pixel & Social Graph', threat: 'red', company: 'Meta Platforms Inc.', leaks: ['Product View Attribution', 'Meta Identity Token (fbc)', 'Device Screen Resolution'] },
-      { domain: 'criteo.com', type: 'Dynamic E-Commerce Retargeter', threat: 'red', company: 'Criteo SA', leaks: ['Product Catalog Affinity', 'User Purchase Intent Vector', 'Cross-Domain Pixel Sync'] },
-      { domain: 'newrelic.com', type: 'Client Real User Monitoring (RUM)', threat: 'orange', company: 'New Relic Inc.', leaks: ['Page Load Timing Breakdown', 'DOM Interaction Latency', 'JS Execution Errors'] },
-      { domain: 'scorecardresearch.com', type: 'Mass Audience Reach Sensor', threat: 'orange', company: 'Comscore Inc.', leaks: ['ISP Subnet Identification', 'Visitor Frequency Vector', 'Reverse-DNS Beacon'] },
-      { domain: 'pubmatic.com', type: 'Programmatic Ad SSP Gateway', threat: 'red', company: 'PubMatic Inc.', leaks: ['Header Bidding Auction Token', 'Bid Floor Currency Matrix', 'Client IP Hash'] }
+      { domain: 'flipkart.com', type: 'Commercial Marketplace Origin', threat: 'green', company: 'Flipkart Internet Pvt Ltd', leaks: ['Commercial Marketplace Origin', 'HTTPS / TLS Encrypted Connection', 'Session Routing'] },
+      { domain: 'static-assets-web.flixcart.com', type: 'Static Assets & UI Shards', threat: 'green', company: 'Akamai Global Edge', leaks: ['Static Asset CDN', 'Frontend Script Shards', 'Edge Content Cache'] },
+      { domain: 'google-analytics.com', type: 'User Interaction Telemetry', threat: 'yellow', company: 'Google LLC', leaks: ['Web Analytics Measurement', 'Pageview Event Beacon', 'Client Interaction Metrics'] },
+      { domain: 'doubleclick.net', type: 'Real-Time Product Retargeting Auction', threat: 'red', company: 'Google / DoubleClick', leaks: ['Third-Party Ad Serving Network', 'Ad Placement Impression', 'Publisher Ad Identifier'] },
+      { domain: 'connect.facebook.net', type: 'Conversion Pixel & Social Graph', threat: 'red', company: 'Meta Platforms Inc.', leaks: ['Meta Conversion Pixel', 'Social Integration SDK', 'Campaign Attribution Tag'] },
+      { domain: 'criteo.com', type: 'Dynamic E-Commerce Retargeter', threat: 'red', company: 'Criteo SA', leaks: ['Third-Party Ad Network', 'Dynamic Retargeting Beacon', 'Cross-Domain Cookie Sync'] },
+      { domain: 'newrelic.com', type: 'Client Real User Monitoring (RUM)', threat: 'orange', company: 'New Relic Inc.', leaks: ['Real User Monitoring (RUM)', 'Frontend Performance Telemetry', 'Error Diagnostics Beacon'] },
+      { domain: 'scorecardresearch.com', type: 'Mass Audience Reach Sensor', threat: 'orange', company: 'Comscore Inc.', leaks: ['Audience Measurement Beacon', 'Web Traffic Census', 'Pageview Counter Endpoint'] },
+      { domain: 'pubmatic.com', type: 'Programmatic Ad SSP Gateway', threat: 'red', company: 'PubMatic Inc.', leaks: ['Programmatic Ad SSP Gateway', 'Header Bidding Auction', 'Ad Impression Request'] }
     ]
   },
   'instagram.com': {
     brand: 'Instagram / Meta Platforms',
     nodes: [
-      { domain: 'instagram.com', type: 'Social Media Origin', threat: 'green', company: 'Meta Platforms Inc.', leaks: ['Session ID (sessionid)', 'CSRF Token (csrftoken)', 'TLS 1.3 Handshake'] },
-      { domain: 'static.cdninstagram.com', type: 'UI Application Bundles & CDN', threat: 'green', company: 'Meta Global Edge', leaks: ['React Native Web Bundle', 'Typography Subset', 'Content ETag'] },
-      { domain: 'graph.instagram.com', type: 'Social Graph API Gateway', threat: 'yellow', company: 'Meta Platform Services', leaks: ['User Profile Metadata', 'Media Feed Pagination Token', 'Client Context JSON'] },
-      { domain: 'connect.facebook.net', type: 'Cross-App Identity & Pixel Sync', threat: 'red', company: 'Meta Platforms Inc.', leaks: ['Unified Meta User ID', 'Browser Hardware Concurrency', 'Canvas Fingerprint Hash'] },
-      { domain: 'graph.facebook.com', type: 'Advertising Graph & Cohort Targeting', threat: 'red', company: 'Meta Platforms Inc.', leaks: ['User Interest Affinity Vector', 'Commercial Targeting Cohort', 'Ad Engagement State'] },
-      { domain: 'logging.instagram.com', type: 'Interaction & Telemetry Stream', threat: 'orange', company: 'Meta Infrastructure Data', leaks: ['Feed Dwell Time per Post', 'Video Completion Percentage', 'Scroll Velocity Vector'] }
+      { domain: 'instagram.com', type: 'Social Media Origin', threat: 'green', company: 'Meta Platforms Inc.', leaks: ['Primary Web Origin', 'HTTPS / TLS Encrypted Connection', 'User Session Routing'] },
+      { domain: 'static.cdninstagram.com', type: 'UI Application Bundles & CDN', threat: 'green', company: 'Meta Global Edge', leaks: ['UI Application Framework CDN', 'Static Script Distribution', 'Media Cache Validator'] },
+      { domain: 'graph.instagram.com', type: 'Social Graph API Gateway', threat: 'yellow', company: 'Meta Platform Services', leaks: ['Instagram Graph API', 'Profile & Media Metadata Service', 'Client API Coordination'] },
+      { domain: 'connect.facebook.net', type: 'Cross-App Identity & Pixel Sync', threat: 'red', company: 'Meta Platforms Inc.', leaks: ['Meta Identity & Pixel SDK', 'Cross-Service Web Tag', 'Third-Party Cookie Sync'] },
+      { domain: 'graph.facebook.com', type: 'Advertising Graph & Cohort Targeting', threat: 'red', company: 'Meta Platforms Inc.', leaks: ['Meta Graph API Endpoint', 'Advertising Service Ingestion', 'Campaign Graph Routing'] },
+      { domain: 'logging.instagram.com', type: 'Interaction & Telemetry Stream', threat: 'orange', company: 'Meta Infrastructure Data', leaks: ['Interaction Telemetry Ingestion', 'Application Diagnostics', 'Product Usage Metrics'] }
     ]
   },
   'chatgpt.com': {
     brand: 'ChatGPT / OpenAI',
     nodes: [
-      { domain: 'chatgpt.com', type: 'AI Assistant Origin', threat: 'green', company: 'OpenAI OpCo LLC (Cloudflare)', leaks: ['Session Nonce (cf_clearance)', 'User Profile ID', 'HTTP/3 TLS 1.3 Handshake'] },
-      { domain: 'cdn.oaistatic.com', type: 'Application Bundle & Client UI CDN', threat: 'green', company: 'Cloudflare Global Edge', leaks: ['Next.js React Bundle Hash', 'Font Subset Asset', 'Cache-Control Header'] },
-      { domain: 'api.statsig.com', type: 'Feature Flagging & Experimentation Telemetry', threat: 'orange', company: 'Statsig Inc.', leaks: ['Experiment Exposure Token', 'User Cohort Hash', 'Feature Gate Evaluation Vector'] },
-      { domain: 'browser-intake-datadoghq.com', type: 'Real User Monitoring & APM Telemetry', threat: 'orange', company: 'Datadog Inc.', leaks: ['DOM Performance Timing', 'Session Replay Chunk', 'Client Network Latency'] },
-      { domain: 'sentry.io', type: 'Client Error & Crash Reporting Sentinel', threat: 'yellow', company: 'Functional Software Inc.', leaks: ['Error Stack Breadcrumbs', 'OS Kernel Architecture', 'Device Memory Profile'] },
-      { domain: 'intercom.io', type: 'Customer Messaging & Support Telemetry', threat: 'yellow', company: 'Intercom Inc.', leaks: ['Visitor Identity Hash', 'Active Tab Focus State', 'Client Ping Timer'] },
-      { domain: 'cloudflareinsights.com', type: 'Real User Telemetry & Web Vitals', threat: 'yellow', company: 'Cloudflare Inc.', leaks: ['LCP / CLS Core Web Vitals', 'Anycast RTT Metric', 'Edge PoP Route ID'] }
+      { domain: 'chatgpt.com', type: 'AI Assistant Origin', threat: 'green', company: 'OpenAI OpCo LLC (Cloudflare)', leaks: ['Primary Web Origin', 'HTTPS / TLS Encrypted Connection', 'Session Routing'] },
+      { domain: 'cdn.oaistatic.com', type: 'Application Bundle & Client UI CDN', threat: 'green', company: 'Cloudflare Global Edge', leaks: ['Client UI Bundle CDN', 'Static Asset Distribution', 'Cloudflare Edge Caching'] },
+      { domain: 'api.statsig.com', type: 'Feature Flagging & Experimentation Telemetry', threat: 'orange', company: 'Statsig Inc.', leaks: ['Feature Flagging Service', 'Configuration Diagnostics', 'Feature Gate Evaluation Endpoint'] },
+      { domain: 'browser-intake-datadoghq.com', type: 'Real User Monitoring & APM Telemetry', threat: 'orange', company: 'Datadog Inc.', leaks: ['Real User Monitoring (RUM)', 'Application Performance Telemetry', 'Frontend Error Ingestion'] },
+      { domain: 'sentry.io', type: 'Client Error & Crash Reporting Sentinel', threat: 'yellow', company: 'Functional Software Inc.', leaks: ['Application Error Reporting', 'Diagnostic Stack Traces', 'Crash Sentinel Beacon'] },
+      { domain: 'intercom.io', type: 'Customer Messaging & Support Telemetry', threat: 'yellow', company: 'Intercom Inc.', leaks: ['Customer Support Messenger', 'Client Interaction Channel', 'Support Session Sync'] },
+      { domain: 'cloudflareinsights.com', type: 'Real User Telemetry & Web Vitals', threat: 'yellow', company: 'Cloudflare Inc.', leaks: ['Cloudflare Web Analytics', 'Core Web Vitals Telemetry', 'Edge Performance Metrics'] }
     ]
   }
 };
@@ -382,11 +382,11 @@ const TRACKER_SIGNATURES = {
   'googleadservices.com': { company: 'Google LLC', type: 'Conversion Tracking Beacon', threat: 'yellow', desc: 'Google Ad Conversion' },
   'fonts.googleapis.com': { company: 'Google Fonts', type: 'Web Font Delivery & Telemetry', threat: 'green', desc: 'Google Fonts API' },
   'fonts.gstatic.com': { company: 'Google LLC', type: 'Static Typography Edge CDN', threat: 'green', desc: 'Google Fonts CDN' },
-  'facebook.net': { company: 'Meta Platforms', type: 'Social Graph Fingerprinter', threat: 'red', desc: 'Meta Social Graph' },
+  'facebook.net': { company: 'Meta Platforms', type: 'Social Graph & Analytics SDK', threat: 'red', desc: 'Meta Social SDK' },
   'connect.facebook.net': { company: 'Meta Platforms', type: 'Identity Beacon & Pixel Sync', threat: 'red', desc: 'Meta Pixel SDK' },
   'facebook.com': { company: 'Meta Platforms', type: 'Social Identity & Graph Sync', threat: 'red', desc: 'Meta Platform' },
   'clarity.ms': { company: 'Microsoft Corp', type: 'Session Replay & Heatmap Recorder', threat: 'orange', desc: 'Microsoft Clarity' },
-  'hotjar.com': { company: 'Hotjar Ltd.', type: 'Session Spyware & Keystroke Tracker', threat: 'orange', desc: 'Hotjar Behavioral Sensor' },
+  'hotjar.com': { company: 'Hotjar Ltd.', type: 'Session Recording & Heatmap Analytics', threat: 'orange', desc: 'Hotjar Behavioral Analytics' },
   'criteo.com': { company: 'Criteo SA', type: 'Cross-Domain Behavioral Retargeter', threat: 'red', desc: 'Criteo Dynamic Retargeter' },
   'scorecardresearch.com': { company: 'Comscore Inc.', type: 'Mass Audience Reach Sensor', threat: 'orange', desc: 'Comscore Beacon' },
   'pubmatic.com': { company: 'PubMatic Inc.', type: 'Bidstream Real-Time Data Broker', threat: 'red', desc: 'PubMatic SSP' },
@@ -412,41 +412,6 @@ const TRACKER_SIGNATURES = {
   'intercom.io': { company: 'Intercom Inc.', type: 'Live Visitor Chat & User Profiler', threat: 'orange', desc: 'Intercom Messenger' }
 };
 
-/**
- * Scrapes live page HTML via public CORS proxies to discover genuine third-party scripts and links
- */
-async function scrapeLivePageResources(url) {
-  const externalDomains = new Set();
-  const proxies = [
-    `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
-    `https://corsproxy.io/?url=${encodeURIComponent(url)}`
-  ];
-
-  for (const proxyUrl of proxies) {
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 2800);
-      const res = await fetch(proxyUrl, { signal: controller.signal });
-      clearTimeout(timeoutId);
-      if (res.ok) {
-        const html = await res.text();
-        const urlRegex = /(?:src|href)=["'](https?:\/\/[^"'\s>]+)["']/gi;
-        let match;
-        while ((match = urlRegex.exec(html)) !== null) {
-          try {
-            const parsed = new URL(match[1]);
-            const host = parsed.hostname.toLowerCase().replace(/^www\./, '');
-            if (host && host.includes('.')) {
-              externalDomains.add(host);
-            }
-          } catch (e) {}
-        }
-        if (externalDomains.size > 0) break;
-      }
-    } catch (e) {}
-  }
-  return Array.from(externalDomains);
-}
 
 /**
  * Query arbitrary DNS record types from Google DoH
@@ -501,14 +466,13 @@ export async function resolveRealDomainEcosystem(inputUrl, userLocation = { lat:
     ? domainParts[domainParts.length - 2].charAt(0).toUpperCase() + domainParts[domainParts.length - 2].slice(1)
     : 'Target Origin';
 
-  // Step 1: Parallel live intelligence extraction
-  const [liveA, liveCname, liveNs, liveMx, txtContent, scrapedResources] = await Promise.all([
+  // Step 1: Parallel live intelligence extraction via Google DoH
+  const [liveA, liveCname, liveNs, liveMx, txtContent] = await Promise.all([
     queryDnsRecord(cleanDomain, 'A'),
     queryDnsRecord(cleanDomain, 'CNAME'),
     queryDnsRecord(cleanDomain, 'NS'),
     queryDnsRecord(cleanDomain, 'MX'),
-    queryDnsTxtRecords(cleanDomain),
-    scrapeLivePageResources(formattedUrl)
+    queryDnsTxtRecords(cleanDomain)
   ]);
 
   const primaryLiveIp = liveA && liveA[0] ? liveA[0] : null;
@@ -522,9 +486,7 @@ export async function resolveRealDomainEcosystem(inputUrl, userLocation = { lat:
     ecosystem.nodes.forEach((node, idx) => {
       const loc = GLOBAL_POP_LOCATIONS[(idx * 3 + Math.floor(rand(idx) * 4)) % GLOBAL_POP_LOCATIONS.length];
       const ip = (idx === 0 && primaryLiveIp) ? primaryLiveIp : (
-        liveA && liveA[idx % liveA.length] ? liveA[idx % liveA.length] : (
-          `${104 + Math.floor(rand(idx) * 90)}.${16 + Math.floor(rand(idx + 1) * 200)}.${5 + Math.floor(rand(idx + 2) * 240)}.${10 + Math.floor(rand(idx + 3) * 240)}`
-        )
+        liveA && liveA[idx % liveA.length] ? liveA[idx % liveA.length] : 'DNS Anycast / Multi-Cloud'
       );
 
       resolvedNodes.push({
@@ -559,13 +521,12 @@ export async function resolveRealDomainEcosystem(inputUrl, userLocation = { lat:
       city: originLoc.city,
       geo: { lat: originLoc.lat, lng: originLoc.lng },
       threatLevel: 'green',
-      ip: primaryLiveIp || `${104 + Math.floor(rand(2) * 80)}.${20 + Math.floor(rand(3) * 180)}.${10 + Math.floor(rand(4) * 200)}.${15 + Math.floor(rand(5) * 200)}`,
+      ip: primaryLiveIp || 'DNS Anycast Cluster',
       trackerType: 'Primary Web Origin & Application Host',
       leakedData: [
-        `HTTP/3 Handshake: TLS 1.3 negotiated with ${cleanDomain}`,
-        `Origin IP Verified: ${primaryLiveIp || 'Anycast Cluster'}`,
-        `Application Session: sess_${rand(10).toString(16).substring(2, 10)}`,
-        `TCP Latency RTT: ${(12 + rand(11) * 28).toFixed(0)}ms`
+        `Target Host: ${cleanDomain}`,
+        `Origin IP: ${primaryLiveIp || 'Anycast Cluster'}`,
+        'Transport: Encrypted TLS Connection'
       ],
       startLat: userLocation.lat,
       startLng: userLocation.lng,
@@ -588,9 +549,9 @@ export async function resolveRealDomainEcosystem(inputUrl, userLocation = { lat:
           city: loc.city,
           geo: { lat: loc.lat, lng: loc.lng },
           threatLevel: 'green',
-          ip: `${172 + Math.floor(rand(7) * 40)}.${64 + Math.floor(rand(8) * 100)}.${10 + Math.floor(rand(9) * 200)}.${1 + Math.floor(rand(10) * 250)}`,
+          ip: 'CDN / Edge Point of Presence',
           trackerType: 'Authoritative CNAME Edge Distributor',
-          leakedData: [`CNAME Canonical Target: ${cnameHost}`, `Anycast Routing Protocol: BGP Anycast`, `Edge Cache Status: HIT`],
+          leakedData: [`CNAME Canonical Target: ${cnameHost}`, `CDN Edge Infrastructure`],
           startLat: userLocation.lat,
           startLng: userLocation.lng,
           endLat: loc.lat,
@@ -671,38 +632,6 @@ export async function resolveRealDomainEcosystem(inputUrl, userLocation = { lat:
         isPoisoned: false
       });
     });
-
-    // Also include any real third-party resources discovered from live page scraping
-    if (scrapedResources && scrapedResources.length > 0) {
-      scrapedResources.slice(0, 15).forEach((scrapedHost, idx) => {
-        if (!resolvedNodes.some((n) => n.domain === scrapedHost)) {
-          const sig = TRACKER_SIGNATURES[scrapedHost] || {};
-          const loc = GLOBAL_POP_LOCATIONS[(resolvedNodes.length + idx * 3) % GLOBAL_POP_LOCATIONS.length];
-          const threat = sig.threat || (scrapedHost.includes('ad') ? 'red' : scrapedHost.includes('track') || scrapedHost.includes('analytics') ? 'orange' : 'yellow');
-          resolvedNodes.push({
-            domain: scrapedHost,
-            company: sig.company || deriveCompanyFromDomain(scrapedHost),
-            city: loc.city,
-            geo: { lat: loc.lat, lng: loc.lng },
-            threatLevel: threat,
-            ip: `${104 + Math.floor(rand(idx + 15) * 80)}.${20 + Math.floor(rand(idx + 16) * 180)}.${10 + Math.floor(rand(idx + 17) * 200)}.${15 + Math.floor(rand(idx + 18) * 200)}`,
-            trackerType: sig.type || 'Third-Party Web Subresource',
-            leakedData: [
-              `Scraped Target Dependency: ${scrapedHost}`,
-              `In-Flight DOM Script / Beacon Probe`,
-              `Third-Party Connection Exfiltration`
-            ],
-            startLat: userLocation.lat,
-            startLng: userLocation.lng,
-            endLat: loc.lat,
-            endLng: loc.lng,
-            color: getThreatColor(threat),
-            isSevered: false,
-            isPoisoned: false
-          });
-        }
-      });
-    }
   }
 
   return resolvedNodes;
